@@ -9,7 +9,7 @@ class book(BaseModel):
     quantity: int 
     pages: int
     agesid: int
-    auther: str
+    author: str
     categoryid:int
 
 class bookUpdate(BaseModel):
@@ -20,4 +20,4 @@ class bookUpdate(BaseModel):
     quantity:int | None = None
     pages:int | None = None
     agesid:int | None = None
-    auther:str | None = None
+    author:str | None = None
