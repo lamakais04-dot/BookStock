@@ -11,4 +11,4 @@ class books(SQLModel, table =True):
     quantity: int 
     pages: int
     agesid: int
-    auther: str
+    author: str
