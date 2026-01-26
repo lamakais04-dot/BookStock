@@ -1,6 +1,7 @@
 import React from 'react'
 import AllBooks from '../../pages/books'
 import { Routes, Route, Outlet } from 'react-router-dom'
+import Navbar from '../header/navbar'
 import '../../csspages/layout.css'
 
 
@@ -8,8 +9,9 @@ export default function Layout() {
     return (
         <>
             <div className='layout'>
+                <Navbar></Navbar>
                 <Routes>
-                    <Route path='/' Component={AllBooks} />
+                    <Route path='/book' Component={AllBooks} />
                 </Routes>
                 <Outlet />
             </div>
