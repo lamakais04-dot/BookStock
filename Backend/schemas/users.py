@@ -3,9 +3,9 @@ from datetime import date
 from enum import Enum
 
 class UserGender(str,Enum):
-    male = "male"
-    female = "female"
-    other = "other"
+    male = "זכר"
+    female = "נקבה"
+    other = "אחר"
 
 class NewUser(BaseModel):
     firstname: str
@@ -14,10 +14,9 @@ class NewUser(BaseModel):
     address: str
     gender: UserGender
     email:str
-    hashedpassword:str
+    password:str
     phonenumber:str
     imageurl:str | None = None
-    libraryid:int | None = None
 
 
 class UserUpdate(BaseModel):
@@ -29,5 +28,8 @@ class UserUpdate(BaseModel):
     email:str| None = None
     phonenumber:str| None = None
     imageurl:str | None = None
-    libraryid:int | None = None
 
+
+class LoginData(BaseModel):
+    email:str
+    password:str
