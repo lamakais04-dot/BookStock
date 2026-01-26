@@ -5,6 +5,7 @@ export default function BookItem({ book }) {
   return (
     <div className="book-card">
       <div className="book-image">
+        <img className="book-image" src={book.image}/>
       </div>
 
       <h3 className="book-title">{book.title}</h3>
