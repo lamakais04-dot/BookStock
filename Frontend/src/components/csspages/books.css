@@ -1,5 +1,144 @@
 .books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 28px;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  direction: rtl;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Container wrapper אם יש */
+.books-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
+  padding: 20px 0;
+}
+
+/* כותרת אם תרצה להוסיף */
+.books-header {
+  text-align: center;
+  padding: 40px 20px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.books-header h1 {
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #8b4513 0%, #d4773e 50%, #c9704a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.books-header p {
+  font-size: 18px;
+  color: #8b6f47;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* מצב טעינה */
+.books-loading {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 18px;
+  color: #a0826d;
+}
+
+.books-loading::after {
+  content: '...';
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* מצב ריק */
+.books-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #a0826d;
+}
+
+.books-empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.books-empty h2 {
+  font-size: 24px;
+  color: #5d4e37;
+  margin: 0 0 12px 0;
+}
+
+.books-empty p {
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+    padding: 30px;
+  }
+  
+  .books-header h1 {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 768px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .books-header {
+    padding: 30px 20px 15px;
+  }
+  
+  .books-header h1 {
+    font-size: 32px;
+  }
+  
+  .books-header p {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .books-header h1 {
+    font-size: 28px;
+  }
 }
