@@ -2,10 +2,10 @@ from sqlmodel import SQLModel,Field
 from datetime import date
 from enum import Enum
 
-class UserGender(Enum):
-    male = "male"
-    female = "female"
-    other = "other"
+class UserGender(str, Enum):
+    male = "זכר"
+    female = "נקבה"
+    other = "אחר"
 
 class Users(SQLModel,table = True):
     __tablename__ = 'users'
@@ -16,10 +16,9 @@ class Users(SQLModel,table = True):
     address: str
     gender: UserGender
     email:str = Field(unique=True)
-    hashedpassword:str
+    hashedpass:str
     phonenumber:str = Field(unique=True)
     role:str = "user"
-    imageurl:str | None = None
-    libraryid:int
+    image:str | None = None
 
  

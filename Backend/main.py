@@ -1,5 +1,6 @@
 from fastapi import FastAPI,Request
-from routes.books import router as bookaRouter
+from routes.books import router as booksRouter
+from routes.auth import router as authRoter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,4 +26,5 @@ async def middleware_apikey(request: Request, call_next):
     return response
 
 
-app.include_router(bookaRouter, prefix="/api/book", tags=["book"])
+app.include_router(booksRouter, prefix="/api/book", tags=["book"])
+app.include_router(authRoter, prefix="/api/auth", tags=["auth"])
