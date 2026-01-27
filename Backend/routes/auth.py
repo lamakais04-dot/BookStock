@@ -36,3 +36,4 @@ def me(user=Depends(get_user)):
 @router.post("/uploadImage")
 def upload_image(image_file: UploadFile = File()):
     return upload_user_image(image_file)
+
