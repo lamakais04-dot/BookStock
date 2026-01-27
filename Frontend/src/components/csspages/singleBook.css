@@ -1,0 +1,13 @@
+.single-book {
+  display: flex;
+  gap: 30px;
+}
+
+.book-image img {
+  width: 250px;
+  border-radius: 8px;
+}
+
+.book-details {
+  max-width: 600px;
+}

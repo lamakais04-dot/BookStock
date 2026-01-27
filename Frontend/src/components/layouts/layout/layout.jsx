@@ -6,6 +6,7 @@ import '../../csspages/layout.css'
 import Login from '../../pages/login'
 import HomePage from '../../pages/homePage'
 import Signup from '../../pages/signup'
+import SingleBook from '../../pages/singlebook'
 
 
 export default function Layout() {
@@ -14,12 +15,13 @@ export default function Layout() {
             <div className='layout'>
                 <Navbar></Navbar>
                 <div id="component">
-                <Routes>
-                    <Route path='/book' Component={AllBooks} />
-                    <Route path='/login' Component={Login}/>
-                    <Route path='/' Component={HomePage}/>
-                    <Route path='/signup' Component={Signup}/>
-                </Routes>
+                    <Routes>
+                        <Route path='/book' Component={AllBooks} />
+                        <Route path='/login' Component={Login} />
+                        <Route path='/' Component={HomePage} />
+                        <Route path='/signup' Component={Signup} />
+                        <Route path="/book/:id" Component={SingleBook}/>
+                    </Routes>
                 </div>
                 <Outlet />
             </div>
