@@ -16,6 +16,7 @@ export default function Layout() {
                     <Route path='/book' Component={AllBooks} />
                     <Route path='/login' Component={Login}/>
                     <Route path='/signup' Component={Signup}/>
+                    <Route path='/' Component={homePage}/>
                 </Routes>
                 <Outlet />
             </div>
