@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends
 from fastapi.responses import Response
 from schemas.users import NewUser, LoginData
 from services.authService import (
