@@ -1,0 +1,63 @@
+.home-page {
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  direction: rtl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Heebo", sans-serif;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 60px;
+  border-radius: 12px;
+  color: #fff;
+  max-width: 700px;
+  text-align: center;
+}
+
+.overlay h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.overlay p {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  margin-bottom: 40px;
+}
+
+.actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.actions button {
+  padding: 14px 28px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #c8a97e;
+  color: #1a1a1a;
+  transition: 0.3s;
+}
+
+.actions button:hover {
+  background-color: #e0c097;
+}
+
+.actions .secondary {
+  background-color: transparent;
+  border: 2px solid #c8a97e;
+  color: #fff;
+}
+
+.actions .secondary:hover {
+  background-color: #c8a97e;
+  color: #1a1a1a;
+}
+
