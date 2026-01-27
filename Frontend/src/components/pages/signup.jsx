@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SignupClass from "../services/signup";
+import '../csspages/signup.css';
 
 export default function Signup() {
     const initialState = {
@@ -27,87 +28,150 @@ export default function Signup() {
         e.preventDefault();
         console.log(formData);
         SignupClass.handleSubmit(formData)
-
-        setFormData(initialState )
+        setFormData(initialState)
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className="signup-container">
+            <div className="signup-card">
+                <div className="signup-header">
+                    <div className="signup-icon">📚</div>
+                    <h1 className="signup-title">הצטרף אלינו</h1>
+                    <p className="signup-subtitle">צור חשבון חדש בספרייה</p>
+                </div>
 
-                <input
-                    name="firstname"
-                    placeholder="First Name"
-                    value={formData.firstname}
-                    onChange={handleChange}
-                />
+                <form className="signup-form" onSubmit={handleSubmit}>
+                    <div className="form-row">
+                        <div className="input-group">
+                            <label className="input-label">שם פרטי</label>
+                            <input
+                                className="signup-input"
+                                name="firstname"
+                                placeholder="שם פרטי"
+                                value={formData.firstname}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
 
-                <input
-                    name="lastname"
-                    placeholder="Last Name"
-                    value={formData.lastname}
-                    onChange={handleChange}
-                />
+                        <div className="input-group">
+                            <label className="input-label">שם משפחה</label>
+                            <input
+                                className="signup-input"
+                                name="lastname"
+                                placeholder="שם משפחה"
+                                value={formData.lastname}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    </div>
 
-                <input
-                    type="date"
-                    name="birthdate"
-                    value={formData.birthdate}
-                    onChange={handleChange}
-                />
+                    <div className="form-row">
+                        <div className="input-group">
+                            <label className="input-label">תאריך לידה</label>
+                            <input
+                                className="signup-input"
+                                type="date"
+                                name="birthdate"
+                                value={formData.birthdate}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
 
-                <input
-                    name="address"
-                    placeholder="Address"
-                    value={formData.address}
-                    onChange={handleChange}
-                />
+                        <div className="input-group">
+                            <label className="input-label">מגדר</label>
+                            <select
+                                className="signup-select"
+                                name="gender"
+                                value={formData.gender}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">בחר מגדר</option>
+                                <option value="זכר">זכר</option>
+                                <option value="נקבה">נקבה</option>
+                                <option value="אחר">אחר</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                >
-                    <option value="">Select Gender</option>
-                    <option value="זכר">זכר</option>
-                    <option value="נקבה">נקבה</option>
-                    <option value="אחר">אחר</option>
-                </select>
+                    <div className="input-group full-width">
+                        <label className="input-label">כתובת</label>
+                        <input
+                            className="signup-input"
+                            name="address"
+                            placeholder="רחוב, עיר, מיקוד"
+                            value={formData.address}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
 
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                />
+                    <div className="form-row">
+                        <div className="input-group">
+                            <label className="input-label">אימייל</label>
+                            <input
+                                className="signup-input"
+                                type="email"
+                                name="email"
+                                placeholder="example@mail.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleChange}
-                />
+                        <div className="input-group">
+                            <label className="input-label">מספר טלפון</label>
+                            <input
+                                className="signup-input"
+                                name="phonenumber"
+                                placeholder="05X-XXXXXXX"
+                                value={formData.phonenumber}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    </div>
 
-                <input
-                    name="phonenumber"
-                    placeholder="Phone Number"
-                    value={formData.phonenumber}
-                    onChange={handleChange}
-                />
+                    <div className="input-group full-width">
+                        <label className="input-label">סיסמה</label>
+                        <input
+                            className="signup-input"
+                            type="password"
+                            name="password"
+                            placeholder="בחר סיסמה חזקה"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                            minLength="6"
+                        />
+                    </div>
 
-                <input
-                    name="imageurl"
-                    placeholder="Image URL (optional)"
-                    value={formData.imageurl}
-                    onChange={handleChange}
-                    type="file"
-                />
+                    <div className="input-group full-width">
+                        <label className="input-label">תמונת פרופיל (אופציונלי)</label>
+                        <input
+                            className="signup-file-input"
+                            name="imageurl"
+                            placeholder="בחר תמונה"
+                            value={formData.imageurl}
+                            onChange={handleChange}
+                            type="file"
+                            accept="image/*"
+                        />
+                    </div>
 
-                <button type="submit">התחבר</button>
+                    <button className="signup-button" type="submit">
+                        הירשם עכשיו
+                    </button>
+                </form>
 
-            </form>
+                <div className="signup-footer">
+                    כבר יש לך חשבון? <a href="/login" className="signup-link">התחבר</a>
+                </div>
+            </div>
         </div>
     );
 }
