@@ -22,7 +22,7 @@ const HomePage = () => {
 
   return (
     <div className="home-container">
-      
+      {/* HERO */}
       <section
         className="hero"
         style={{ backgroundImage: `url(${libraryBg})` }}
@@ -41,6 +41,7 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* BOOKS */}
       <section className="section">
         <h2>ספרים שאולי תאהב/י</h2>
 
@@ -50,7 +51,6 @@ const HomePage = () => {
           ))}
         </div>
       </section>
-
     </div>
   );
 };
