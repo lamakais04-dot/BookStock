@@ -1,20 +1,28 @@
 .book-card {
-  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  flex-shrink: 0;
+
   background: linear-gradient(135deg, #fffbf5 0%, #fef8f0 100%);
   border-radius: 20px;
   padding: 18px;
+
   box-shadow: 0 8px 24px rgba(139, 69, 19, 0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+
   direction: rtl;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin: 20px;
+
   border: 1px solid rgba(210, 180, 140, 0.3);
   position: relative;
   overflow: hidden;
+
+  animation: fadeInUp 0.5s ease-out;
 }
+
 
 .book-card::before {
   content: '';
@@ -172,7 +180,6 @@
   transform: scale(0.9);
 }
 
-/* אנימציה לטעינה */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -188,19 +195,18 @@
   animation: fadeInUp 0.5s ease-out;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .book-card {
-    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
     padding: 14px;
-    margin: 12px;
   }
-  
+
   .book-image {
     height: 140px;
     width: 100%;
   }
-  
+
   .book-title {
     font-size: 14px;
   }
