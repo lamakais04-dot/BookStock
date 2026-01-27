@@ -5,6 +5,7 @@ import Navbar from '../header/navbar'
 import '../../csspages/layout.css'
 import Login from '../../pages/login'
 import HomePage from '../../pages/homePage'
+import signup from '../../pages/signup'
 
 export default function Layout() {
     return (
