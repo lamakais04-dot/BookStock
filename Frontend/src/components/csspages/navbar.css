@@ -1,3 +1,6 @@
+/* ===============================
+   NAVBAR BASE
+================================ */
 .navbar {
   background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
   padding: 1rem 2.5rem;
@@ -7,154 +10,153 @@
   right: 0;
   left: 0;
   z-index: 1000;
-  backdrop-filter: blur(10px);
   border-bottom: 2px solid rgba(210, 180, 140, 0.3);
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
   direction: rtl;
 }
 
+/* ===============================
+   RIGHT / LEFT SECTIONS
+================================ */
+.navbar-right,
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1.2rem;
 }
 
+/* ===============================
+   LOGO
+================================ */
 .navbar-logo {
   height: 50px;
-  width: auto;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.1);
   padding: 6px 10px;
+  border-radius: 40px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: 0.3s;
 }
 
 .navbar-logo:hover {
-  transform: scale(1.08) translateY(-2px);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  transform: scale(1.08);
 }
 
-.navbar a:has(.navbar-logo) {
-  padding: 0;
-  background: none !important;
-}
-
-.navbar a:has(.navbar-logo):hover {
-  background: none !important;
-  transform: none;
-}
-
-.navbar a:has(.navbar-logo)::before {
-  display: none;
-}
-
+/* ===============================
+   LINKS
+================================ */
 .navbar a {
   color: #fef8f0;
   text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  transition: all 0.3s ease;
   padding: 0.5rem 1.2rem;
   border-radius: 20px;
-  position: relative;
-  display: inline-block;
-}
-
-.navbar a::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #f5deb3, #ebe9e4);
-  transition: width 0.3s ease;
+  transition: 0.3s;
 }
 
 .navbar a:hover {
+  background: rgba(245, 222, 179, 0.15);
   color: #f5deb3;
-  background: rgba(245, 222, 179, 0.1);
-  transform: translateY(-2px);
-}
-
-.navbar a:hover::before {
-  width: 80%;
 }
 
 .navbar a.active {
   background: linear-gradient(135deg, #d4a574 0%, #c9945f 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(212, 165, 116, 0.4);
-  font-weight: 700;
+  color: #fff;
 }
 
-.navbar a.active::before {
-  width: 0;
-}
-
-/* אם יש כמה לינקים - wrapper */
-.navbar-links {
+/* ===============================
+   ICON BASE (HEART + PROFILE)
+================================ */
+.nav-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fffdf9;
   display: flex;
   align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* כפתור מיוחד (אם יש login/signup) */
-.navbar-btn {
-  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
-  color: #fffbf5 !important;
-  padding: 0.5rem 1.2rem !important;
-  border-radius: 20px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-}
-
-.navbar-btn:hover {
-  background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.4);
-  border-color: rgba(245, 222, 179, 0.5);
-}
-
-.navbar-btn::before {
-  display: none;
-}
-
-/* Mobile Menu Toggle */
-.navbar-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
+  justify-content: center;
   cursor: pointer;
-  padding: 8px;
-  background: rgba(245, 222, 179, 0.1);
+  user-select: none;
+  transition: 0.25s ease;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.18);
+}
+
+.nav-icon:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.28);
+}
+
+/* ===============================
+   HEART ICON
+================================ */
+.heart-svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #8b4513;
+  stroke-width: 2.2;
+  transition: 0.25s ease;
+}
+
+.nav-icon.heart.filled .heart-svg {
+  fill: #8b4513;
+  stroke: #8b4513;
+}
+
+.nav-icon.heart:hover .heart-svg {
+  transform: scale(1.15);
+}
+
+/* ===============================
+   PROFILE ICON
+================================ */
+.profile-icon-img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+/* ===============================
+   PROFILE DROPDOWN
+================================ */
+.profile-icon-wrapper {
+  position: relative;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  background: #fffaf3;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  min-width: 150px;
+  padding: 6px;
+  z-index: 2000;
+}
+
+.dropdown-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: 0.25s;
 }
 
-.navbar-toggle:hover {
-  background: rgba(245, 222, 179, 0.2);
+.dropdown-item:hover {
+  background: #f3e5d0;
 }
 
-.navbar-toggle span {
-  width: 25px;
-  height: 3px;
-  background: #fef8f0;
-  border-radius: 3px;
-  transition: all 0.3s ease;
+.dropdown-item.logout {
+  color: #b45309;
+  font-weight: 600;
 }
 
-/* Responsive */
+/* ===============================
+   RESPONSIVE
+================================ */
 @media (max-width: 768px) {
   .navbar {
     padding: 1rem 1.5rem;
@@ -164,49 +166,12 @@
     height: 40px;
   }
 
-  .navbar-toggle {
-    display: flex;
-  }
-
-  .navbar-links {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    left: 0;
-    background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
-    flex-direction: column;
-    padding: 1.5rem;
-    gap: 1rem;
-    box-shadow: 0 8px 16px rgba(139, 69, 19, 0.3);
-    transform: translateY(-100%);
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s ease;
-  }
-
-  .navbar-links.active {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .navbar a {
-    width: 100%;
-    text-align: center;
-    padding: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar {
-    padding: 1rem;
-  }
-
-  .navbar-logo {
-    height: 35px;
-  }
-
   .navbar a {
     font-size: 1rem;
+  }
+
+  .nav-icon {
+    width: 40px;
+    height: 40px;
   }
 }
