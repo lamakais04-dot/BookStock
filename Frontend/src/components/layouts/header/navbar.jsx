@@ -9,15 +9,21 @@ export default function Navbar() {
       <div>
         <nav className="navbar">
           <NavLink
-            to="/" 
+            to="/"
           >
-            <img className="navbar-logo" src={logo}/>
+            <img className="navbar-logo" src={logo} />
           </NavLink>
           <NavLink
             to="/book"
             className={({ isActive }) => isActive ? 'active' : ''}
           >
             כל הספרים
+          </NavLink>
+          <NavLink
+            to="/login"
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            התחברות
           </NavLink>
         </nav>
       </div>
