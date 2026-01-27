@@ -25,6 +25,12 @@ export default function Navbar() {
           >
             התחברות
           </NavLink>
+                    <NavLink
+            to="/signup"
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            הרשמה
+          </NavLink>
         </nav>
       </div>
     </>
