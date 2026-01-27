@@ -1,18 +1,22 @@
-.home-page {
-  height: 100vh;
+.home-container {
+  direction: rtl;
+  font-family: "Heebo", sans-serif;
+}
+
+/* HERO */
+.hero {
+  height: 75vh; /* לא כל המסך */
   background-size: cover;
   background-position: center;
-  direction: rtl;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Heebo", sans-serif;
 }
 
 .overlay {
   background: rgba(0, 0, 0, 0.6);
-  padding: 60px;
-  border-radius: 12px;
+  padding: 50px;
+  border-radius: 14px;
   color: #fff;
   max-width: 700px;
   text-align: center;
@@ -29,6 +33,7 @@
   margin-bottom: 40px;
 }
 
+/* BUTTONS */
 .actions {
   display: flex;
   gap: 20px;
@@ -61,3 +66,40 @@
   color: #1a1a1a;
 }
 
+/* CONTENT SECTIONS */
+.section {
+  padding: 80px 10%;
+  background-color: #f7f5f2;
+}
+
+.section h2 {
+  font-size: 2.2rem;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+}
+
+
+
+.books-scroll {
+  display: flex;
+  flex-wrap: nowrap;          
+  gap: 24px;
+  overflow-x: auto;           
+  padding: 20px 0;
+}
+
+
+.books-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.books-scroll::-webkit-scrollbar-thumb {
+  background: #c8a97e;
+  border-radius: 10px;
+}
