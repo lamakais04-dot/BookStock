@@ -201,3 +201,11 @@
     font-size: 1rem;
   }
 }
+.navbar {
+  /* כל מה שכבר יש אצלך נשאר */
+
+  position: fixed;   /* 👈 מוסיפים */
+  top: 0;             /* 👈 מוסיפים */
+  right: 0;
+  left: 0;
+}

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 class LoginClass {
     static async handleSubmit(email,password) {
-        console.log("im in handlw submit")
+        console.log("im in handle submit")
         const payload ={
             email:email,
             password: password
