@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../csspages/homePage.css";
 import libraryBg from "../../../imageLibrary.png";
-import BookItem from "./bookitem";
+import BookItem from "./BookItem";
 import Books from "../services/books";
 
 const HomePage = () => {
@@ -22,7 +22,6 @@ const HomePage = () => {
 
   return (
     <div className="home-container">
-      {/* HERO */}
       <section
         className="hero"
         style={{ backgroundImage: `url(${libraryBg})` }}
@@ -41,7 +40,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* BOOKS */}
       <section className="section">
         <h2>ספרים שאולי תאהב/י</h2>
 
