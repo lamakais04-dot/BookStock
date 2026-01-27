@@ -1,52 +1,46 @@
 .navbar {
   background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
-  padding: 1.2rem 2.5rem;
+  padding: 1rem 2.5rem;
   box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
   position: sticky;
   top: 0;
   z-index: 1000;
   backdrop-filter: blur(10px);
   border-bottom: 2px solid rgba(210, 180, 140, 0.3);
-}
-
-.navbar-container {
-  max-width: 1400px;
-  margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 2rem;
   direction: rtl;
 }
 
 .navbar-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #fef8f0;
-  font-size: 1.5rem;
-  font-weight: 800;
-  text-decoration: none;
-  transition: all 0.3s ease;
   height: 50px;
-  width: 100px;
+  width: auto;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 10px;
 }
 
 .navbar-logo:hover {
-  transform: scale(1.05);
-  color: #f5deb3;
+  transform: scale(1.08) translateY(-2px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
-.navbar-logo-icon {
-  font-size: 2rem;
-}
-
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
+.navbar a:has(.navbar-logo) {
   padding: 0;
+  background: none !important;
+}
+
+.navbar a:has(.navbar-logo):hover {
+  background: none !important;
+  transform: none;
+}
+
+.navbar a:has(.navbar-logo)::before {
+  display: none;
 }
 
 .navbar a {
@@ -92,6 +86,16 @@
 
 .navbar a.active::before {
   width: 0;
+}
+
+/* אם יש כמה לינקים - wrapper */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 /* כפתור מיוחד (אם יש login/signup) */
@@ -147,6 +151,10 @@
     padding: 1rem 1.5rem;
   }
 
+  .navbar-logo {
+    height: 40px;
+  }
+
   .navbar-toggle {
     display: flex;
   }
@@ -185,11 +193,11 @@
     padding: 1rem;
   }
 
-  .navbar a {
-    font-size: 1rem;
+  .navbar-logo {
+    height: 35px;
   }
 
-  .navbar-logo {
-    font-size: 1.3rem;
+  .navbar a {
+    font-size: 1rem;
   }
 }
