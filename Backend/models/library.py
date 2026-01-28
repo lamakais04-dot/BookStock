@@ -2,8 +2,7 @@
 from sqlmodel import SQLModel,Field
 
 
-
-class library(SQLModel, table =True):
+class Library(SQLModel, table =True):
     __tablename__='library'
     id:int|None = Field(primary_key=True, default=None)
     userid : int

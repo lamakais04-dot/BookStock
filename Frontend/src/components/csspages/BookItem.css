@@ -39,7 +39,6 @@
   0% {
     background-position: 200% 0;
   }
-
   100% {
     background-position: -200% 0;
   }
@@ -99,6 +98,7 @@
   display: flex;
   gap: 8px;
   margin-top: 6px;
+  align-items: center;
 }
 
 /* Borrow */
@@ -118,6 +118,14 @@
 .book-card .borrow-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(139, 69, 19, 0.35);
+}
+
+/* ✅ added: disabled state */
+.book-card .borrow-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Heart */
@@ -140,13 +148,42 @@
   transform: scale(1.15);
 }
 
+/* ✅ keep your global heart rules (added previously) */
+.heart {
+  cursor: pointer;
+  font-size: 22px;
+  transition: transform 0.2s;
+}
+
+.heart:hover {
+  transform: scale(1.2);
+}
+
+.heart.active {
+  color: red;
+}
+
+/* ✅ added: borrow messages (no alert) */
+.borrow-success {
+  color: #2e7d32;
+  font-size: 13px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.borrow-error {
+  color: #c62828;
+  font-size: 13px;
+  margin-top: 6px;
+  text-align: center;
+}
+
 /* =============================== ANIMATION ================================ */
 @keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
