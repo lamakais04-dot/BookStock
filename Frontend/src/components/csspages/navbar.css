@@ -122,8 +122,30 @@
    PROFILE DROPDOWN
 ================================ */
 .profile-icon-wrapper {
-  position: relative;
+  width: 42px;
+  height: 42px;
 }
+
+.nav-icon.profile {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;          /* הכי חשוב */
+  cursor: pointer;
+  border: 2px solid #d6c3a3; /* אופציונלי – ביג׳/חום */
+  background-color: #f3efe9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* ממלא את כל העיגול */
+  border-radius: 50%;
+}
+
 
 .profile-dropdown {
   position: absolute;
