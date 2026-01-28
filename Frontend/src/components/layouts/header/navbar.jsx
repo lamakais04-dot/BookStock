@@ -12,26 +12,11 @@ export default function Navbar() {
 
   if (loading) return null;
 
-  const handleLogout = async () => {
-    try {
-      await axios.post(
-        "http://localhost:8000/api/auth/logout",
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            apiKey: "123456789apikeysecure",
-          },
-        }
-      );
-    } catch (err) {
-      console.error("Logout failed", err);
-    } finally {
-      setUser(null);
-      navigate("/login", { replace: true });
-    }
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.clear();
+    navigate("/login");
   };
-
 
   return (
     <nav className="navbar">
