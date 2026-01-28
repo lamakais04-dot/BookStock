@@ -3,8 +3,10 @@ from db import engine
 from models.books import books
 from models.ages import Ages
 from sqlalchemy.sql import func
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from sqlalchemy import or_
+from utils.auth_helper import get_user
+from schemas.books import book
 
 
 
