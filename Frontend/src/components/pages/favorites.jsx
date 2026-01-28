@@ -11,7 +11,6 @@ export default function FavoritesPage() {
   useEffect(() => {
     async function loadFavorites() {
       try {
-        // 1️⃣ מביאים את המועדפים (IDs)
         const favs = await Favorites.getFavorites();
         const bookIds = favs.map(f => f.bookid);
 
@@ -20,7 +19,6 @@ export default function FavoritesPage() {
           return;
         }
 
-        // 2️⃣ מביאים כל ספר לפי ID
         const bookRequests = bookIds.map(id =>
           Books.getBookById(id)
         );
