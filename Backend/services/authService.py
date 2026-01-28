@@ -42,7 +42,11 @@ def login_user(login_req: LoginData, response):
             httponly=True,
             samesite="lax",
             secure=False,
+<<<<<<< HEAD
+            path="/"
+=======
             path = "/"
+>>>>>>> 5fbf6b8297e60f71d2ec73f246f517244ab16543
         )
         return user.id
 
