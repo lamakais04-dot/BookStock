@@ -23,7 +23,7 @@ def login(login_req: LoginData, response: Response):
 
 
 @router.post("/logout")
-def logout(response: Response, user=Depends(get_user)):
+def logout(response: Response):
     response.delete_cookie(key="access_token", path="/")
     return {"message": "Logged out successfully"}
 

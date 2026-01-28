@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
                 }
             })
             setUser(res.data)
-            setIsAdmin(res.data?.isadmin === true)
+            setIsAdmin(res.data?.role === "admin")
         } catch {
             setUser(null)
             setIsAdmin(false)
