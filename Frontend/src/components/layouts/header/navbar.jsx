@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../../csspages/navbar.css";
@@ -55,11 +55,23 @@ export default function Navbar() {
                 className="nav-icon profile"
                 onClick={() => setOpenProfileMenu(!openProfileMenu)}
               >
-                <img
-                  src="/profilelogo.svg"
-                  alt="profile"
-                  className="profile-icon-img"
-                />
+                {user?.image === null ?
+
+                  <img
+                    src="/profilelogo.svg"
+                    alt="profile"
+                    className="nav-icon profile"
+                  />
+
+                  :
+
+                  <img
+                    src={user.image}
+                    alt="profile"
+                    className="profile-icon-img"
+                  />
+                }
+
               </div>
 
               {openProfileMenu && (
