@@ -4,21 +4,17 @@ from models.books import books
 from models.ages import Ages
 from sqlalchemy.sql import func
 from fastapi import HTTPException
+from sqlalchemy import or_
 
 
-def parse_age_group(age_group: str):
-    if age_group == "0-3":
-        return 0, 3
-    if age_group == "4-10":
-        return 4, 10
-    if age_group == "10-18":
-        return 10, 18
-    if age_group == "18+":
-        return 18, 120
-    return None, None
 
-
-def get_books(page=1, limit=8, category_id=None, age_group_id=None):
+def get_books(
+    page=1,
+    limit=8,
+    category_id=None,
+    age_group_id=None,
+    search: str | None = None,
+):
     offset = (page - 1) * limit
 
     with Session(engine) as session:
@@ -30,6 +26,10 @@ def get_books(page=1, limit=8, category_id=None, age_group_id=None):
         if age_group_id:
             query = query.where(books.agesid == age_group_id)
 
+        if search:
+            query = query.where(books.title.ilike(f"%{search}%"))
+
+        # 🔢 סופרים אחרי כל הפילטרים
         total = session.exec(
             select(func.count()).select_from(query.subquery())
         ).one()
@@ -41,9 +41,8 @@ def get_books(page=1, limit=8, category_id=None, age_group_id=None):
         return {
             "books": books_list,
             "totalPages": (total + limit - 1) // limit,
-            "currentPage": page
+            "currentPage": page,
         }
-
 
 
 def get_random_books(limit: int = 10):

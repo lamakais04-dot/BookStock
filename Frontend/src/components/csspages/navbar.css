@@ -207,3 +207,25 @@
   border-radius: 20px;
   transition: 0.3s;
 }
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-search input {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  width: 180px;
+  direction: rtl;
+}
+
+.navbar-search button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
