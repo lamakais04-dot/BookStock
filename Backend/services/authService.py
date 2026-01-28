@@ -41,7 +41,8 @@ def login_user(login_req: LoginData, response):
             value=token,
             httponly=True,
             samesite="lax",
-            secure=False
+            secure=False,
+            path="/"
         )
         return user.id
 
