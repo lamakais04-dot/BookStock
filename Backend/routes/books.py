@@ -1,20 +1,25 @@
-from fastapi import APIRouter
-from services.bookService import get_random_books, get_book_by_id, get_books
+from fastapi import APIRouter, Query
+from services.bookService import (
+    get_random_books,
+    get_book_by_id,
+    get_books
+)
 
-
-router = APIRouter() 
+router = APIRouter()
 
 @router.get("/")
-def get_books_route():
-    return get_books()
+def get_books_route(
+    page: int = Query(1, ge=1),
+    limit: int = Query(8, ge=1, le=50)
+):
+    return get_books(page, limit)
+
+
+@router.get("/random/limit")
+def get_random_books_route(limit: int = 10):
+    return get_random_books(limit)
 
 
 @router.get("/{book_id}")
 def get_book_by_id_route(book_id: int):
     return get_book_by_id(book_id)
-
-
-@router.get("/random/limit")
-def get_random_books_route():
-    return get_random_books()
-

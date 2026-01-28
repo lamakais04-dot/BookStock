@@ -1,18 +1,24 @@
 import React, { useState } from 'react'
 import LoginClass from '../services/login.js'
 import '../csspages/login.css'
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext.jsx';
+
 
 export default function Login() {
+
+    const navigate = useNavigate();
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const { fetchUser } = useAuth();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        console.log(e)
-        LoginClass.handleSubmit(email, password)
-
+        await LoginClass.handleSubmit(email, password)
+        await fetchUser();
         setEmail("")
         setPassword("")
+        navigate("/")
     }
 
     return (
@@ -27,24 +33,24 @@ export default function Login() {
                 <form className="login-form" onSubmit={handleSubmit}>
                     <div className="input-group">
                         <label className="input-label">אימייל</label>
-                        <input 
+                        <input
                             className="login-input"
                             type="email"
-                            placeholder="אימייל..." 
-                            value={email} 
-                            onChange={(e) => {setEmail(e.target.value)}}
+                            placeholder="אימייל..."
+                            value={email}
+                            onChange={(e) => { setEmail(e.target.value) }}
                             required
                         />
                     </div>
 
                     <div className="input-group">
                         <label className="input-label">סיסמה</label>
-                        <input 
+                        <input
                             className="login-input"
                             type="password"
-                            placeholder='סיסמה...' 
-                            value={password} 
-                            onChange={(e) => {setPassword(e.target.value)}}
+                            placeholder='סיסמה...'
+                            value={password}
+                            onChange={(e) => { setPassword(e.target.value) }}
                             required
                         />
                     </div>
