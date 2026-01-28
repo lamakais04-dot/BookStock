@@ -41,7 +41,8 @@ def login_user(login_req: LoginData, response):
             value=token,
             httponly=True,
             samesite="lax",
-            secure=False
+            secure=False,
+            path = "/"
         )
         return user.id
 
@@ -73,6 +74,6 @@ def upload_user_image(image_file: UploadFile):
 def create_token(user: Users):
     secret_key = os.getenv("JWT_SECRET")
     expire = datetime.now(timezone.utc) + timedelta(days=1)
-
-    payload = {"userId": user.id, "exp": expire}
-    return jwt.encode(payload, secret_key, algorithm="HS256")
+    payload = {"userId": user.id, "exp": expire, "role":user.role}
+    jwtToken = jwt.encode(payload, secret_key, "HS256")
+    return jwtToken
