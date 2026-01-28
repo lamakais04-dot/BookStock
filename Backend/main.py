@@ -2,6 +2,7 @@ from fastapi import FastAPI,Request
 from routes.books import router as booksRouter
 from routes.auth import router as authRoter
 from routes.categories import router as categoriesRouter
+from routes.favoriteBooks import router as favoritesRouter
 from routes.ages import router as agesRouter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,4 +39,6 @@ app.include_router(booksRouter, prefix="/api/book", tags=["book"])
 app.include_router(authRoter, prefix="/api/auth", tags=["auth"])
 app.include_router(agesRouter, prefix="/api/age", tags=["age"])
 app.include_router(categoriesRouter, prefix="/api/category", tags=["category"])
+app.include_router(favoritesRouter, prefix="/api/favorites", tags=["favorites"])
+
 
