@@ -10,9 +10,12 @@ router = APIRouter()
 @router.get("/")
 def get_books_route(
     page: int = Query(1, ge=1),
-    limit: int = Query(8, ge=1, le=50)
+    limit: int = Query(8, ge=1, le=50),
+    category_id: int | None = Query(None),
+    age_group_id: int | None = Query(None)
 ):
-    return get_books(page, limit)
+    return get_books(page, limit, category_id, age_group_id)
+
 
 
 @router.get("/random/limit")
