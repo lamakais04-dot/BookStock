@@ -45,6 +45,10 @@ class Books {
     );
     return res.data;
   }
+
+  static async addToFavorite(){
+    const res = await axios.post()
+  }
 }
 
 export default Books;
