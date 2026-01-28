@@ -83,6 +83,8 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+            <label className="welcome"> שלום, {user.firstname}</label>
+
           </>
         ) : (
           <>

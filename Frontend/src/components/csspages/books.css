@@ -14,6 +14,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -69,9 +70,20 @@
 }
 
 @keyframes dots {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
+
+  0%,
+  20% {
+    content: '.';
+  }
+
+  40% {
+    content: '..';
+  }
+
+  60%,
+  100% {
+    content: '...';
+  }
 }
 
 /* מצב ריק */
@@ -105,7 +117,7 @@
     gap: 24px;
     padding: 30px;
   }
-  
+
   .books-header h1 {
     font-size: 36px;
   }
@@ -117,15 +129,15 @@
     gap: 20px;
     padding: 20px;
   }
-  
+
   .books-header {
     padding: 30px 20px 15px;
   }
-  
+
   .books-header h1 {
     font-size: 32px;
   }
-  
+
   .books-header p {
     font-size: 16px;
   }
@@ -137,7 +149,7 @@
     gap: 16px;
     padding: 16px;
   }
-  
+
   .books-header h1 {
     font-size: 28px;
   }
