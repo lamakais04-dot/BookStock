@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../../csspages/navbar.css";
 import logo from "../../../../BookStockLogo.png";
+import LoginClass from "../../services/login";
 
 export default function Navbar() {
   const { user, loading, setUser } = useAuth();
@@ -14,8 +15,9 @@ export default function Navbar() {
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.clear();
+    LoginClass.handleLogout()
     navigate("/login");
+    window.location.reload()
   };
 
   return (
@@ -81,6 +83,8 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+            <label className="welcome"> שלום, {user.firstname}</label>
+
           </>
         ) : (
           <>

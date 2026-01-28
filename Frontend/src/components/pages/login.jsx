@@ -2,8 +2,12 @@ import React, { useState } from 'react'
 import LoginClass from '../services/login.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import '../csspages/login.css'
+import { NavLink, useNavigate } from "react-router-dom";
+
 
 export default function Login() {
+
+    const navigate = useNavigate();
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errors, setErrors] = useState({})
