@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import BookItem from "./BookItem";
@@ -20,33 +21,42 @@ export default function AllBooks() {
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const booksPerPage = 8;
+    const booksPerPage = 10;
 
+    // 🔹 חיפוש מה־URL
+    const location = useLocation();
+    const search =
+        new URLSearchParams(location.search).get("search") || "";
+
+    // 🔹 טעינת ספרים (עם debounce)
     useEffect(() => {
-        async function getAllBooks() {
+        const delay = setTimeout(async () => {
             try {
                 const data = await Books.getBooks(
                     currentPage,
                     booksPerPage,
                     categoryId,
-                    ageGroupId
+                    ageGroupId,
+                    search
                 );
-                console.log(data.books)
-                setBooks(data.books);
-                setTotalPages(data.totalPages);
+
+                setBooks(data?.books || []);
+                setTotalPages(data?.totalPages || 1);
             } catch (err) {
                 console.error(err);
+                setBooks([]);
             }
-        }
+        }, 400);
 
-        getAllBooks();
-    }, [currentPage, categoryId, ageGroupId]);
+        return () => clearTimeout(delay);
+    }, [currentPage, categoryId, ageGroupId, search]);
 
+    // 🔹 איפוס עמוד כשמסננים / מחפשים
     useEffect(() => {
         setCurrentPage(1);
-    }, [categoryId, ageGroupId]);
+    }, [categoryId, ageGroupId, search]);
 
-
+    // 🔹 טעינת פילטרים
     useEffect(() => {
         async function loadFilters() {
             try {
@@ -64,6 +74,7 @@ export default function AllBooks() {
 
     return (
         <>
+            {/* גילאים */}
             <div className="age-filter">
                 {ageGroups?.map(age => (
                     <button
@@ -79,12 +90,18 @@ export default function AllBooks() {
                 ))}
             </div>
 
+            {/* ספרים */}
             <div className="books-grid">
-                {books?.map(book => (
-                    <BookItem key={book.id} book={book} />
-                ))}
+                {books.length === 0 ? (
+                    <p>לא נמצאו ספרים</p>
+                ) : (
+                    books.map(book => (
+                        <BookItem key={book.id} book={book} />
+                    ))
+                )}
             </div>
 
+            {/* Pagination */}
             {totalPages > 1 && (
                 <div className="pagination">
                     <button
@@ -113,6 +130,7 @@ export default function AllBooks() {
                 </div>
             )}
 
+            {/* קטגוריות */}
             <div className="category-menu">
                 <button
                     className="menu-btn"

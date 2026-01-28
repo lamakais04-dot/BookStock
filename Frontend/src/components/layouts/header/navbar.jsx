@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../../csspages/navbar.css";
@@ -9,15 +9,16 @@ export default function Navbar() {
   const { user, loading, setUser } = useAuth();
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [favorite, setFavorite] = useState(false);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   if (loading) return null;
 
   const handleLogout = () => {
     setUser(null);
-    LoginClass.handleLogout()
+    LoginClass.handleLogout();
     navigate("/login");
-    window.location.reload()
+    window.location.reload();
   };
 
   return (
@@ -29,6 +30,20 @@ export default function Navbar() {
         </NavLink>
 
         <NavLink to="/book">כל הספרים</NavLink>
+      </div>
+
+      {/* SEARCH – LIVE */}
+      <div className="navbar-search">
+        <input
+          type="text"
+          placeholder="חיפוש ספר..."
+          value={search}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearch(value);
+            navigate(`/book?search=${encodeURIComponent(value)}`);
+          }}
+        />
       </div>
 
       {/* LEFT */}
@@ -55,23 +70,19 @@ export default function Navbar() {
                 className="nav-icon profile"
                 onClick={() => setOpenProfileMenu(!openProfileMenu)}
               >
-                {user?.image === null ?
-
-                  <img
-                    src="/profilelogo.svg"
-                    alt="profile"
-                    className="nav-icon profile"
-                  />
-
-                  :
-
+                {user?.image ? (
                   <img
                     src={user.image}
                     alt="profile"
                     className="profile-icon-img"
                   />
-                }
-
+                ) : (
+                  <img
+                    src="/profilelogo.svg"
+                    alt="profile"
+                    className="nav-icon profile"
+                  />
+                )}
               </div>
 
               {openProfileMenu && (
@@ -95,8 +106,8 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <label className="welcome"> שלום, {user.firstname}</label>
 
+            <label className="welcome">שלום, {user.firstname}</label>
           </>
         ) : (
           <>
