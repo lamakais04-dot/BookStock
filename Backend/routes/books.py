@@ -1,12 +1,9 @@
-from fastapi import APIRouter, Query,Depends
+from fastapi import APIRouter, Query, Depends
 from utils.auth_helper import get_user
-from services.bookService import (
-    get_random_books,
-    get_book_by_id,
-    get_books
-)
+from services.bookService import get_random_books, get_book_by_id, get_books
 
 router = APIRouter()
+
 
 @router.get("/")
 def get_books_route(
@@ -14,10 +11,10 @@ def get_books_route(
     limit: int = Query(8, ge=1, le=50),
     category_id: int | None = Query(None),
     age_group_id: int | None = Query(None),
-    user=Depends(get_user)
+    search: str | None = Query(None),
+    user=Depends(get_user),
 ):
-    return get_books(page, limit, category_id, age_group_id)
-
+    return get_books(page, limit, category_id, age_group_id,search)
 
 
 @router.get("/random/limit")
