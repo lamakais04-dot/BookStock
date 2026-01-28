@@ -7,6 +7,7 @@ import Login from '../../pages/login'
 import Signup from '../../pages/signup'
 import HomePage from '../../pages/homePage'
 import AllBooks from '../../pages/books'
+import FavoritesPage from '../../pages/favorites'
 import SingleBook from '../../pages/singlebook'
 
 import ProtectedRoute from '../../pages/ProtectedRoute'
@@ -46,6 +47,15 @@ export default function Layout() {
             element={
               <ProtectedRoute>
                 <SingleBook />
+              </ProtectedRoute>
+            }
+          />
+
+                    <Route
+            path='/favorites'
+            element={
+              <ProtectedRoute>
+                <FavoritesPage/>
               </ProtectedRoute>
             }
           />
