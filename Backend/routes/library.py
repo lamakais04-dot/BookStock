@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from utils.auth_helper import get_user
-from services.libraryService import borrow_book,can_borrow
+from services.libraryService import borrow_book,can_borrow,return_book
 
 router = APIRouter()
 
@@ -12,3 +12,7 @@ def borrow(book_id: int, user=Depends(get_user)):
 def can_borrow_route(user=Depends(get_user)):
     allowed = can_borrow(user["id"])
     return {"allowed": allowed}
+
+@router.post("/return/{book_id}")
+def returnb(book_id: int, user=Depends(get_user)):
+    return return_book(user["id"], book_id)
