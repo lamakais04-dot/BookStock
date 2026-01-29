@@ -16,27 +16,77 @@ export default function Signup() {
     };
 
     const [formData, setFormData] = useState(initialState);
-    const [showAlert, setShowAlert] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    const MAX_BIRTHDATE = "2015-12-31";
+
+    // ===== Validators =====
+    const validators = {
+        firstname: (v) => v.length > 1 || "שם פרטי קצר מדי",
+        lastname: (v) => v.length > 1 || "שם משפחה קצר מדי",
+
+        birthdate: (v) =>
+            v && v <= MAX_BIRTHDATE || "שנת לידה חייבת להיות עד 2015",
+
+        gender: (v) => v !== "" || "חובה לבחור מגדר",
+
+        email: (v) =>
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
+
+        password: (v) =>
+            v.length >= 6 || "הסיסמה חייבת להכיל לפחות 6 תווים",
+
+        phonenumber: (v) =>
+            /^\d{10}$/.test(v) || "מספר טלפון חייב להכיל 10 ספרות",
+
+        address: (v) => v.length > 3 || "כתובת קצרה מדי"
+    };
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+
+        let newValue = value;
+
+        // ===== טלפון – רק מספרים ועד 10 =====
+        if (name === "phonenumber") {
+            newValue = value.replace(/\D/g, "").slice(0, 10);
+        }
+
+        setFormData({ ...formData, [name]: newValue });
+
+        if (validators[name]) {
+            const valid = validators[name](newValue);
+            setErrors({
+                ...errors,
+                [name]: valid === true ? "" : valid
+            });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const newErrors = {};
+
+        Object.keys(validators).forEach((field) => {
+            const valid = validators[field](formData[field]);
+            if (valid !== true) newErrors[field] = valid;
+        });
+
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
+
         try {
             await SignupClass.handleSubmit(formData);
-            setShowAlert(true);
+            setShowSuccess(true);
             setFormData(initialState);
+            setErrors({});
 
-            // סגירה אוטומטית אחרי 4 שניות
-            setTimeout(() => setShowAlert(false), 4000);
-        } catch (err) {
-            console.error(err);
+            setTimeout(() => setShowSuccess(false), 4000);
+        } catch {
+            setErrors({ general: "הרשמה נכשלה, נסה שוב" });
+            setShowSuccess(false);
         }
     };
 
@@ -49,64 +99,87 @@ export default function Signup() {
                     <p className="signup-subtitle">צור חשבון חדש בספרייה</p>
                 </div>
 
-                {showAlert && (
-                    <div className="signup-alert">
-                        <strong>🎉 נרשמת בהצלחה!</strong>
-                        <div>אפשר להתחבר לחשבון</div>
+                {errors.general && (
+                    <div className="signup-alert error">❌ {errors.general}</div>
+                )}
+
+                {showSuccess && (
+                    <div className="signup-alert success">
+                        ✔ נרשמת בהצלחה! אפשר להתחבר לחשבון
                     </div>
                 )}
 
                 <form className="signup-form" onSubmit={handleSubmit}>
-                    {/* כל הטופס שלך – לא שיניתי כלום */}
                     <div className="form-row">
                         <div className="input-group">
                             <label className="input-label">שם פרטי</label>
-                            <input className="signup-input" name="firstname" value={formData.firstname} onChange={handleChange} required />
+                            <input className="signup-input" name="firstname" value={formData.firstname} onChange={handleChange} />
+                            {errors.firstname && <span className="error-text">{errors.firstname}</span>}
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">שם משפחה</label>
-                            <input className="signup-input" name="lastname" value={formData.lastname} onChange={handleChange} required />
+                            <input className="signup-input" name="lastname" value={formData.lastname} onChange={handleChange} />
+                            {errors.lastname && <span className="error-text">{errors.lastname}</span>}
                         </div>
                     </div>
 
                     <div className="form-row">
                         <div className="input-group">
                             <label className="input-label">תאריך לידה</label>
-                            <input className="signup-input" type="date" name="birthdate" value={formData.birthdate} onChange={handleChange} required />
+                            <input
+                                className="signup-input"
+                                type="date"
+                                name="birthdate"
+                                max={MAX_BIRTHDATE}
+                                value={formData.birthdate}
+                                onChange={handleChange}
+                            />
+                            {errors.birthdate && <span className="error-text">{errors.birthdate}</span>}
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">מגדר</label>
-                            <select className="signup-select" name="gender" value={formData.gender} onChange={handleChange} required>
+                            <select className="signup-select" name="gender" value={formData.gender} onChange={handleChange}>
                                 <option value="">בחר מגדר</option>
                                 <option value="זכר">זכר</option>
                                 <option value="נקבה">נקבה</option>
                                 <option value="אחר">אחר</option>
                             </select>
+                            {errors.gender && <span className="error-text">{errors.gender}</span>}
                         </div>
                     </div>
 
                     <div className="input-group full-width">
                         <label className="input-label">כתובת</label>
-                        <input className="signup-input" name="address" value={formData.address} onChange={handleChange} required />
+                        <input className="signup-input" name="address" value={formData.address} onChange={handleChange} />
+                        {errors.address && <span className="error-text">{errors.address}</span>}
                     </div>
 
                     <div className="form-row">
                         <div className="input-group">
                             <label className="input-label">אימייל</label>
-                            <input className="signup-input" type="email" name="email" value={formData.email} onChange={handleChange} required />
+                            <input className="signup-input" type="email" name="email" value={formData.email} onChange={handleChange} />
+                            {errors.email && <span className="error-text">{errors.email}</span>}
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">מספר טלפון</label>
-                            <input className="signup-input" name="phonenumber" value={formData.phonenumber} onChange={handleChange} required />
+                            <input
+                                className="signup-input"
+                                name="phonenumber"
+                                value={formData.phonenumber}
+                                onChange={handleChange}
+                                inputMode="numeric"
+                            />
+                            {errors.phonenumber && <span className="error-text">{errors.phonenumber}</span>}
                         </div>
                     </div>
 
                     <div className="input-group full-width">
                         <label className="input-label">סיסמה</label>
-                        <input className="signup-input" type="password" name="password" value={formData.password} onChange={handleChange} required minLength="6" />
+                        <input className="signup-input" type="password" name="password" value={formData.password} onChange={handleChange} />
+                        {errors.password && <span className="error-text">{errors.password}</span>}
                     </div>
 
                     <button className="signup-button" type="submit">
