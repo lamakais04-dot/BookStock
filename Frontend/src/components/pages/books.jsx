@@ -9,174 +9,175 @@ import "../csspages/filters.css";
 import "../csspages/pagination.css";
 
 export default function AllBooks() {
-    const [books, setBooks] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+  const [books, setBooks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-    const [categories, setCategories] = useState([]);
-    const [ageGroups, setAgeGroups] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [ageGroups, setAgeGroups] = useState([]);
 
-    const [categoryId, setCategoryId] = useState(null);
-    const [ageGroupId, setAgeGroupId] = useState(null);
+  const [categoryId, setCategoryId] = useState(null);
+  const [ageGroupId, setAgeGroupId] = useState(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const booksPerPage = 10;
 
-    const booksPerPage = 10;
+  const location = useLocation();
+  const search =
+    new URLSearchParams(location.search).get("search") || "";
 
-    // 🔹 חיפוש מה־URL
-    const location = useLocation();
-    const search =
-        new URLSearchParams(location.search).get("search") || "";
+  // ===== Fetch books (רק כשצריך) =====
+  useEffect(() => {
+    const delay = setTimeout(async () => {
+      try {
+        const data = await Books.getBooks(
+          currentPage,
+          booksPerPage,
+          categoryId,
+          ageGroupId,
+          search
+        );
 
-    // 🔹 טעינת ספרים (עם debounce)
-    useEffect(() => {
-        const delay = setTimeout(async () => {
-            try {
-                const data = await Books.getBooks(
-                    currentPage,
-                    booksPerPage,
-                    categoryId,
-                    ageGroupId,
-                    search
-                );
+        setBooks(data?.books || []);
+        setTotalPages(data?.totalPages || 1);
+      } catch (err) {
+        console.error(err);
+        setBooks([]);
+      }
+    }, 400);
 
-                setBooks(data?.books || []);
-                setTotalPages(data?.totalPages || 1);
-            } catch (err) {
-                console.error(err);
-                setBooks([]);
+    return () => clearTimeout(delay);
+  }, [currentPage, categoryId, ageGroupId, search]);
+
+  // איפוס עמוד בסינון
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryId, ageGroupId, search]);
+
+  // ===== Load filters =====
+  useEffect(() => {
+    async function loadFilters() {
+      try {
+        const cats = await Filters.getCategories();
+        const ages = await Filters.getAgeGroups();
+        setCategories(cats);
+        setAgeGroups(ages);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadFilters();
+  }, []);
+
+  return (
+    <>
+      {/* Age filter */}
+      <div className="age-filter">
+        {ageGroups.map(age => (
+          <button
+            key={age.id}
+            className={`age-btn ${ageGroupId === age.id ? "active" : ""}`}
+            onClick={() =>
+              setAgeGroupId(ageGroupId === age.id ? null : age.id)
             }
-        }, 400);
+          >
+            <span className="star">★</span>
+            {age.description}
+          </button>
+        ))}
+      </div>
 
-        return () => clearTimeout(delay);
-    }, [currentPage, categoryId, ageGroupId, search]);
+      {/* Books grid */}
+      <div className="books-grid">
+        {books.length === 0 ? (
+          <div className="books-empty">
+            <div className="books-empty-icon">📚</div>
+            <h2>לא נמצאו ספרים</h2>
+            <p>נסה לשנות את הסינון או את מילות החיפוש</p>
+          </div>
+        ) : (
+          books.map(book => (
+            <BookItem
+              key={book.id}
+              book={book}
+              setBooks={setBooks}   // 🔥 זה הסוד
+            />
+          ))
+        )}
+      </div>
 
-    // 🔹 איפוס עמוד כשמסננים / מחפשים
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [categoryId, ageGroupId, search]);
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+          >
+            הקודם
+          </button>
 
-    // 🔹 טעינת פילטרים
-    useEffect(() => {
-        async function loadFilters() {
-            try {
-                const cats = await Filters.getCategories();
-                const ages = await Filters.getAgeGroups();
-                setCategories(cats);
-                setAgeGroups(ages);
-            } catch (err) {
-                console.error(err);
-            }
-        }
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
 
-        loadFilters();
-    }, []);
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+          >
+            הבא
+          </button>
+        </div>
+      )}
 
-    return (
-        <>
-            {/* גילאים */}
-            <div className="age-filter">
-                {ageGroups?.map(age => (
-                    <button
-                        key={age.id}
-                        className={`age-btn ${ageGroupId === age.id ? "active" : ""}`}
-                        onClick={() =>
-                            setAgeGroupId(ageGroupId === age.id ? null : age.id)
-                        }
-                    >
-                        <span className="star">★</span>
-                        {age.description}
-                    </button>
-                ))}
-            </div>
+      {/* Categories */}
+      <div className="category-menu">
+        <button
+          className="menu-btn"
+          onMouseEnter={() => setIsFilterOpen(true)}
+          onMouseLeave={() => setIsFilterOpen(false)}
+        >
+          ☰
+        </button>
 
-            {/* ספרים */}
-            <div className="books-grid">
-                {books.length === 0 ? (
-                    <div className="books-empty">
-                        <div className="books-empty-icon">📚</div>
-                        <h2>לא נמצאו ספרים</h2>
-                        <p>נסה לשנות את הסינון או את מילות החיפוש</p>
-                    </div>
-                ) : (
-                    books.map(book => (
-                        <BookItem key={book.id} book={book} />
-                    ))
-                )}
-            </div>
+        {isFilterOpen && (
+          <div
+            className="category-list"
+            onMouseEnter={() => setIsFilterOpen(true)}
+            onMouseLeave={() => setIsFilterOpen(false)}
+          >
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                className={categoryId === cat.id ? "active" : ""}
+                onClick={() => {
+                  setCategoryId(cat.id);
+                  setIsFilterOpen(false);
+                }}
+              >
+                <span className="star">★</span>
+                {cat.name}
+              </button>
+            ))}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="pagination">
-                    <button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(p => p - 1)}
-                    >
-                        הקודם
-                    </button>
-
-                    {[...Array(totalPages)].map((_, i) => (
-                        <button
-                            key={i}
-                            className={currentPage === i + 1 ? "active" : ""}
-                            onClick={() => setCurrentPage(i + 1)}
-                        >
-                            {i + 1}
-                        </button>
-                    ))}
-
-                    <button
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage(p => p + 1)}
-                    >
-                        הבא
-                    </button>
-                </div>
-            )}
-
-            {/* קטגוריות */}
-            <div className="category-menu">
-                <button
-                    className="menu-btn"
-                    onMouseEnter={() => setIsFilterOpen(true)}
-                    onMouseLeave={() => setIsFilterOpen(false)}
-                >
-                    ☰
-                </button>
-
-                {isFilterOpen && (
-                    <div 
-                        className="category-list"
-                        onMouseEnter={() => setIsFilterOpen(true)}
-                        onMouseLeave={() => setIsFilterOpen(false)}
-                    >
-                        {categories?.map(cat => (
-                            <button
-                                key={cat.id}
-                                className={categoryId === cat.id ? "active" : ""}
-                                onClick={() => {
-                                    setCategoryId(cat.id);
-                                    setIsFilterOpen(false);
-                                }}
-                            >
-                                <span className="star">★</span>
-                                {cat.name}
-                            </button>
-                        ))}
-
-                        <button
-                            className="clear-filters"
-                            onClick={() => {
-                                setCategoryId(null);
-                                setAgeGroupId(null);
-                                setIsFilterOpen(false);
-                            }}
-                        >
-                            נקה סינון
-                        </button>
-                    </div>
-                )}
-            </div>
-        </>
-    );
+            <button
+              className="clear-filters"
+              onClick={() => {
+                setCategoryId(null);
+                setAgeGroupId(null);
+                setIsFilterOpen(false);
+              }}
+            >
+              נקה סינון
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }
