@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends,HTTPException
 from fastapi.responses import Response
 from schemas.users import NewUser, LoginData
 from services.authService import (
@@ -7,6 +7,7 @@ from services.authService import (
     upload_user_image,
     get_user_profile
 )
+from services.bookService import get_book_by_id
 from utils.auth_helper import get_user
 
 router = APIRouter()
