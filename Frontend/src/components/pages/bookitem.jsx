@@ -5,19 +5,15 @@ import Favorites from "../services/favorites";
 import Library from "../services/library";
 import { useAuth } from "../context/AuthContext";
 
-export default function BookItem({ book }) {
+export default function BookItem({ book, setBooks }) {
   const navigate = useNavigate();
-  const { user, setUser, fetchUser } = useAuth();
+  const { user, setUser } = useAuth();
 
-  // ===== Favorites State =====
   const [isFavorite, setIsFavorite] = useState(false);
-
-  // ===== Borrow UI State =====
   const [borrowMsg, setBorrowMsg] = useState("");
   const [borrowError, setBorrowError] = useState("");
   const [borrowLoading, setBorrowLoading] = useState(false);
 
-  // האם הספר הזה מושאל על ידי המשתמש
   const isBorrowedByMe = Boolean(
     user?.borrowedBooks?.includes(book.id)
   );
@@ -26,27 +22,21 @@ export default function BookItem({ book }) {
     navigate(`/book/${book.id}`);
   };
 
-  // ===== Load favorites =====
+  // ===== Favorites =====
   useEffect(() => {
-    async function checkFavorite() {
+    async function loadFavs() {
       if (!user) return;
       try {
         const favs = await Favorites.getFavorites();
         const ids = favs.map(f => f.bookid);
         setIsFavorite(ids.includes(book.id));
-      } catch (err) {
-        console.error("Error fetching favorites:", err);
-      }
+      } catch {}
     }
-    checkFavorite();
+    loadFavs();
   }, [book.id, user]);
 
-  // ===== Toggle favorite =====
   const handleLike = async () => {
-    if (!user) {
-      alert("יש להתחבר כדי להוסיף למועדפים");
-      return;
-    }
+    if (!user) return alert("יש להתחבר כדי להוסיף למועדפים");
     try {
       if (isFavorite) {
         await Favorites.remove(book.id);
@@ -55,34 +45,36 @@ export default function BookItem({ book }) {
         await Favorites.add(book.id);
         setIsFavorite(true);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   // ===== Borrow =====
   const handleBorrow = async () => {
+    setBorrowLoading(true);
     setBorrowMsg("");
     setBorrowError("");
-    setBorrowLoading(true);
 
     try {
       const res = await Library.borrowBook(book.id);
 
-      setBorrowMsg(res.message || "📚 הספר הושאל בהצלחה");
-
-      console.log(res.borrowedBooks)
       setUser(prev => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow
       }));
 
-      
-    } catch (err) {
-      setBorrowError(
-        err?.response?.data?.detail || "לא ניתן להשאיל את הספר כרגע"
+      // 🔥 עדכון מקומי – הסדר נשמר
+      setBooks(prev =>
+        prev.map(b =>
+          b.id === book.id
+            ? { ...b, quantity: b.quantity - 1 }
+            : b
+        )
       );
+
+      setBorrowMsg(res.message);
+    } catch {
+      setBorrowError("לא ניתן להשאיל את הספר");
     } finally {
       setBorrowLoading(false);
     }
@@ -90,9 +82,9 @@ export default function BookItem({ book }) {
 
   // ===== Return =====
   const handleReturn = async () => {
+    setBorrowLoading(true);
     setBorrowMsg("");
     setBorrowError("");
-    setBorrowLoading(true);
 
     try {
       const res = await Library.returnBook(book.id);
@@ -102,19 +94,29 @@ export default function BookItem({ book }) {
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow
       }));
-    } catch (err) {
+
+      // 🔥 עדכון מקומי
+      setBooks(prev =>
+        prev.map(b =>
+          b.id === book.id
+            ? { ...b, quantity: b.quantity + 1 }
+            : b
+        )
+      );
+
+      setBorrowMsg(res.message);
+    } catch {
       setBorrowError("שגיאה בהחזרת הספר");
     } finally {
       setBorrowLoading(false);
     }
   };
 
-  // ===== Disable logic =====
-  // חשוב: לא חוסמים ספר שמושאל על ידך
   const borrowDisabled =
     !user ||
     borrowLoading ||
-    (!user.canBorrow && !isBorrowedByMe);
+    (!user.canBorrow && !isBorrowedByMe) ||
+    book.quantity === 0;
 
   return (
     <div className="book-card">
@@ -146,6 +148,8 @@ export default function BookItem({ book }) {
           >
             {!user
               ? "התחברי כדי להשאיל"
+              : book.quantity === 0
+              ? "לא זמין"
               : !user.canBorrow
               ? "הגעת למקסימום השאלות"
               : borrowLoading
@@ -157,7 +161,6 @@ export default function BookItem({ book }) {
         <span
           onClick={handleLike}
           className={`heart ${isFavorite ? "active" : ""}`}
-          style={{ cursor: "pointer" }}
         >
           {isFavorite ? "❤️" : "♡"}
         </span>
