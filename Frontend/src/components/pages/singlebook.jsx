@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Books from "../services/books";
 import "../csspages/singleBook.css";
+import { useFavorites } from "../context/FavoritesContext";
 
 export default function SingleBook() {
   const { id } = useParams();
