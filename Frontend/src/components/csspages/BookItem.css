@@ -209,3 +209,81 @@
     height: 140px;
   }
 }
+
+/* =========================
+   Borrow / Return Buttons
+   ========================= */
+
+.borrow-btn,
+.return-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease, filter 0.12s ease;
+}
+
+/* Borrow (default) */
+.borrow-btn {
+  background: #2f6f56; /* ירוק עדין */
+  color: #fff;
+}
+
+/* Return (red) */
+.return-btn {
+  background: #c0392b;
+  color: #fff;
+}
+
+/* Hover / active */
+.borrow-btn:hover,
+.return-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+.borrow-btn:active,
+.return-btn:active {
+  transform: translateY(0px);
+}
+
+/* Disabled state */
+.borrow-btn:disabled,
+.return-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  filter: none;
+}
+
+/* Special disabled look for "max borrow" */
+.borrow-btn:disabled {
+  background: #b9b3aa; /* אפור-בז' */
+  color: #ffffff;
+}
+
+/* Messages */
+.borrow-success,
+.borrow-error {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.borrow-success {
+  background: #e8f6ef;
+  color: #1e5c45;
+  border: 1px solid #cfeee0;
+}
+
+.borrow-error {
+  background: #fdecea;
+  color: #8a1f14;
+  border: 1px solid #f7c9c4;
+}

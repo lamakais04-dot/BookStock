@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../../csspages/navbar.css";
 import logo from "../../../../BookStockLogo.png";
@@ -8,12 +8,9 @@ import LoginClass from "../../services/login";
 export default function Navbar() {
   const { user, loading, setUser } = useAuth();
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
+  const [favorite, setFavorite] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // 🔹 בדיקה אם אנחנו בדף המועדפים
-  const isFavoritesPage = location.pathname === "/favorites";
 
   if (loading) return null;
 
@@ -70,9 +67,12 @@ export default function Navbar() {
           <>
             {/* FAVORITES */}
             <div
-              className={`nav-icon heart ${isFavoritesPage ? "filled" : ""}`}
+              className={`nav-icon heart ${favorite ? "filled" : ""}`}
               title="מועדפים"
-              onClick={() => navigate("/favorites")}
+              onClick={() => {
+                setFavorite(!favorite);
+                navigate("/favorites");
+              }}
             >
               <svg viewBox="0 0 24 24" className="heart-svg">
                 <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />
