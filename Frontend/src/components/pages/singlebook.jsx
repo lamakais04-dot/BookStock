@@ -100,16 +100,12 @@ export default function SingleBook() {
 
             <div className="info-item">
               <span className="info-label">קטגוריה</span>
-              <span className="info-value">
-                {book.categoryName || "—"}
-              </span>
+              <span className="info-value">{categoryName}</span>
             </div>
 
             <div className="info-item">
               <span className="info-label">טווח גילאים</span>
-              <span className="info-value">
-                {book.ageRangeName || "—"}
-              </span>
+              <span className="info-value">{ageRangeName}</span>
             </div>
           </div>
 

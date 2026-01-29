@@ -37,3 +37,9 @@ def me(user=Depends(get_user)):
 def upload_image(image_file: UploadFile = File()):
     return upload_user_image(image_file)
 
+@router.get("/{book_id}")
+def get_book_by_id_route(book_id: int, user=Depends(get_user)):
+    book = get_book_by_id(book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book

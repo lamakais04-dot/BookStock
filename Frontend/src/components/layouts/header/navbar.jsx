@@ -21,6 +21,16 @@ export default function Navbar() {
     window.location.reload();
   };
 
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    navigate(`/book?search=${encodeURIComponent(value)}`);
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    navigate("/book");
+  };
+
   return (
     <nav className="navbar">
       {/* RIGHT */}
@@ -38,12 +48,17 @@ export default function Navbar() {
           type="text"
           placeholder="חיפוש ספר..."
           value={search}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSearch(value);
-            navigate(`/book?search=${encodeURIComponent(value)}`);
-          }}
+          onChange={(e) => handleSearchChange(e.target.value)}
         />
+        {search && (
+          <button 
+            className="clear-search" 
+            onClick={clearSearch}
+            title="נקה חיפוש"
+          >
+            ×
+          </button>
+        )}
       </div>
 
       {/* LEFT */}
@@ -80,7 +95,7 @@ export default function Navbar() {
                   <img
                     src="/profilelogo.svg"
                     alt="profile"
-                    className="nav-icon profile"
+                    className="profile-icon-img"
                   />
                 )}
               </div>
@@ -107,7 +122,7 @@ export default function Navbar() {
               )}
             </div>
 
-            <label className="welcome">שלום, {user.firstname}</label>
+            <label className="welcome">שלום, {user.firstname}!</label>
           </>
         ) : (
           <>
