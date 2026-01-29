@@ -67,6 +67,88 @@
 }
 
 /* ===============================
+   SEARCH BAR - משופר!
+================================ */
+.navbar-search {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  max-width: 450px;
+  margin: 0 2rem;
+}
+
+.navbar-search input {
+  width: 100%;
+  padding: 10px 45px 10px 20px;
+  border-radius: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  outline: none;
+  direction: rtl;
+  
+  background: rgba(255, 255, 255, 0.95);
+  color: #5d4e37;
+  font-size: 15px;
+  font-weight: 500;
+  
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-search input::placeholder {
+  color: #a0826d;
+  font-weight: 400;
+}
+
+.navbar-search input:focus {
+  background: #ffffff;
+  border-color: #d4a574;
+  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.3);
+  transform: translateY(-1px);
+}
+
+/* אייקון חיפוש */
+.navbar-search::before {
+  content: "🔍";
+  position: absolute;
+  left: 16px;
+  font-size: 18px;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.navbar-search input:focus + ::before,
+.navbar-search:has(input:focus)::before {
+  opacity: 0.9;
+  transform: scale(1.1);
+}
+
+/* כפתור ניקוי (X) - מופיע רק כשיש טקסט */
+.navbar-search .clear-search {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #8b6f47;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.navbar-search .clear-search:hover {
+  opacity: 1;
+  background: rgba(139, 111, 71, 0.1);
+  transform: scale(1.1);
+}
+
+/* ===============================
    ICON BASE (HEART + PROFILE)
 ================================ */
 .nav-icon {
@@ -103,6 +185,16 @@
 .nav-icon.heart.filled .heart-svg {
   fill: #8b4513;
   stroke: #8b4513;
+  animation: heartPulse 0.3s ease;
+}
+
+@keyframes heartPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
 }
 
 .nav-icon.heart:hover .heart-svg {
@@ -122,6 +214,7 @@
    PROFILE DROPDOWN
 ================================ */
 .profile-icon-wrapper {
+  position: relative;
   width: 42px;
   height: 42px;
 }
@@ -130,9 +223,9 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  overflow: hidden;          /* הכי חשוב */
+  overflow: hidden;
   cursor: pointer;
-  border: 2px solid #d6c3a3; /* אופציונלי – ביג׳/חום */
+  border: 2px solid #d6c3a3;
   background-color: #f3efe9;
   display: flex;
   align-items: center;
@@ -142,10 +235,9 @@
 .profile-icon-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;         /* ממלא את כל העיגול */
+  object-fit: cover;
   border-radius: 50%;
 }
-
 
 .profile-dropdown {
   position: absolute;
@@ -157,6 +249,18 @@
   min-width: 150px;
   padding: 6px;
   z-index: 2000;
+  animation: dropdownSlide 0.2s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-item {
@@ -165,6 +269,7 @@
   cursor: pointer;
   border-radius: 8px;
   transition: 0.25s;
+  color: #5d4e37;
 }
 
 .dropdown-item:hover {
@@ -177,11 +282,46 @@
 }
 
 /* ===============================
+   WELCOME TEXT - מוקטן ומעוצב!
+================================ */
+.welcome {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.welcome:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
    RESPONSIVE
 ================================ */
+@media (max-width: 1024px) {
+  .navbar-search {
+    max-width: 300px;
+    margin: 0 1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .navbar {
     padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
   .navbar-logo {
@@ -189,43 +329,59 @@
   }
 
   .navbar a {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    padding: 0.4rem 1rem;
   }
 
   .nav-icon {
     width: 40px;
     height: 40px;
   }
+
+  .navbar-search {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .navbar-search input {
+    padding: 9px 40px 9px 18px;
+    font-size: 14px;
+  }
+
+  .welcome {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.9rem;
+  }
 }
 
-.welcome {
-  color: #fef8f0;
-  text-decoration: none;
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  border-radius: 20px;
-  transition: 0.3s;
-}
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
 
-.navbar-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+  .navbar-right,
+  .navbar-left {
+    gap: 0.8rem;
+  }
 
-.navbar-search input {
-  padding: 8px 12px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  outline: none;
-  width: 180px;
-  direction: rtl;
-}
+  .navbar a {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.8rem;
+  }
 
-.navbar-search button {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 18px;
+  .navbar-search input {
+    padding: 8px 38px 8px 16px;
+    font-size: 13px;
+  }
+
+  .navbar-search::before {
+    font-size: 16px;
+    left: 14px;
+  }
+
+  .welcome {
+    display: none;
+  }
 }

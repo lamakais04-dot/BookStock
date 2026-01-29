@@ -237,3 +237,15 @@
     font-size: 1rem;
   }
 }
+.signup-alert {
+  background: #e6f7ee;
+  border: 2px solid #2ecc71;
+  color: #1e7e34;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 18px;
+  font-weight: 600;
+  animation: fadeIn 0.4s ease;
+}
+

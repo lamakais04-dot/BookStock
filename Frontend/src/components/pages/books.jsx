@@ -93,7 +93,11 @@ export default function AllBooks() {
             {/* ספרים */}
             <div className="books-grid">
                 {books.length === 0 ? (
-                    <p>לא נמצאו ספרים</p>
+                    <div className="books-empty">
+                        <div className="books-empty-icon">📚</div>
+                        <h2>לא נמצאו ספרים</h2>
+                        <p>נסה לשנות את הסינון או את מילות החיפוש</p>
+                    </div>
                 ) : (
                     books.map(book => (
                         <BookItem key={book.id} book={book} />
@@ -134,13 +138,18 @@ export default function AllBooks() {
             <div className="category-menu">
                 <button
                     className="menu-btn"
-                    onClick={() => setIsFilterOpen(prev => !prev)}
+                    onMouseEnter={() => setIsFilterOpen(true)}
+                    onMouseLeave={() => setIsFilterOpen(false)}
                 >
                     ☰
                 </button>
 
                 {isFilterOpen && (
-                    <div className="category-list">
+                    <div 
+                        className="category-list"
+                        onMouseEnter={() => setIsFilterOpen(true)}
+                        onMouseLeave={() => setIsFilterOpen(false)}
+                    >
                         {categories?.map(cat => (
                             <button
                                 key={cat.id}
@@ -150,6 +159,7 @@ export default function AllBooks() {
                                     setIsFilterOpen(false);
                                 }}
                             >
+                                <span className="star">★</span>
                                 {cat.name}
                             </button>
                         ))}

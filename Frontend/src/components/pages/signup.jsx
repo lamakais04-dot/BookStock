@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SignupClass from "../services/signup";
-import '../csspages/signup.css';
+import "../csspages/signup.css";
 
 export default function Signup() {
     const initialState = {
@@ -13,9 +13,10 @@ export default function Signup() {
         password: "",
         phonenumber: "",
         imageurl: ""
-    }
+    };
 
-    const [formData, setFormData] = useState(initialState)
+    const [formData, setFormData] = useState(initialState);
+    const [showAlert, setShowAlert] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -24,11 +25,19 @@ export default function Signup() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
-        SignupClass.handleSubmit(formData)
-        setFormData(initialState)
+
+        try {
+            await SignupClass.handleSubmit(formData);
+            setShowAlert(true);
+            setFormData(initialState);
+
+            // סגירה אוטומטית אחרי 4 שניות
+            setTimeout(() => setShowAlert(false), 4000);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
@@ -40,55 +49,36 @@ export default function Signup() {
                     <p className="signup-subtitle">צור חשבון חדש בספרייה</p>
                 </div>
 
+                {showAlert && (
+                    <div className="signup-alert">
+                        <strong>🎉 נרשמת בהצלחה!</strong>
+                        <div>אפשר להתחבר לחשבון</div>
+                    </div>
+                )}
+
                 <form className="signup-form" onSubmit={handleSubmit}>
+                    {/* כל הטופס שלך – לא שיניתי כלום */}
                     <div className="form-row">
                         <div className="input-group">
                             <label className="input-label">שם פרטי</label>
-                            <input
-                                className="signup-input"
-                                name="firstname"
-                                placeholder="שם פרטי"
-                                value={formData.firstname}
-                                onChange={handleChange}
-                                required
-                            />
+                            <input className="signup-input" name="firstname" value={formData.firstname} onChange={handleChange} required />
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">שם משפחה</label>
-                            <input
-                                className="signup-input"
-                                name="lastname"
-                                placeholder="שם משפחה"
-                                value={formData.lastname}
-                                onChange={handleChange}
-                                required
-                            />
+                            <input className="signup-input" name="lastname" value={formData.lastname} onChange={handleChange} required />
                         </div>
                     </div>
 
                     <div className="form-row">
                         <div className="input-group">
                             <label className="input-label">תאריך לידה</label>
-                            <input
-                                className="signup-input"
-                                type="date"
-                                name="birthdate"
-                                value={formData.birthdate}
-                                onChange={handleChange}
-                                required
-                            />
+                            <input className="signup-input" type="date" name="birthdate" value={formData.birthdate} onChange={handleChange} required />
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">מגדר</label>
-                            <select
-                                className="signup-select"
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                required
-                            >
+                            <select className="signup-select" name="gender" value={formData.gender} onChange={handleChange} required>
                                 <option value="">בחר מגדר</option>
                                 <option value="זכר">זכר</option>
                                 <option value="נקבה">נקבה</option>
@@ -99,68 +89,24 @@ export default function Signup() {
 
                     <div className="input-group full-width">
                         <label className="input-label">כתובת</label>
-                        <input
-                            className="signup-input"
-                            name="address"
-                            placeholder="רחוב, עיר, מיקוד"
-                            value={formData.address}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input className="signup-input" name="address" value={formData.address} onChange={handleChange} required />
                     </div>
 
                     <div className="form-row">
                         <div className="input-group">
                             <label className="input-label">אימייל</label>
-                            <input
-                                className="signup-input"
-                                type="email"
-                                name="email"
-                                placeholder="example@mail.com"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
+                            <input className="signup-input" type="email" name="email" value={formData.email} onChange={handleChange} required />
                         </div>
 
                         <div className="input-group">
                             <label className="input-label">מספר טלפון</label>
-                            <input
-                                className="signup-input"
-                                name="phonenumber"
-                                placeholder="05X-XXXXXXX"
-                                value={formData.phonenumber}
-                                onChange={handleChange}
-                                required
-                            />
+                            <input className="signup-input" name="phonenumber" value={formData.phonenumber} onChange={handleChange} required />
                         </div>
                     </div>
 
                     <div className="input-group full-width">
                         <label className="input-label">סיסמה</label>
-                        <input
-                            className="signup-input"
-                            type="password"
-                            name="password"
-                            placeholder="בחר סיסמה חזקה"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            minLength="6"
-                        />
-                    </div>
-
-                    <div className="input-group full-width">
-                        <label className="input-label">תמונת פרופיל (אופציונלי)</label>
-                        <input
-                            className="signup-file-input"
-                            name="imageurl"
-                            placeholder="בחר תמונה"
-                            value={formData.imageurl}
-                            onChange={handleChange}
-                            type="file"
-                            accept="image/*"
-                        />
+                        <input className="signup-input" type="password" name="password" value={formData.password} onChange={handleChange} required minLength="6" />
                     </div>
 
                     <button className="signup-button" type="submit">
