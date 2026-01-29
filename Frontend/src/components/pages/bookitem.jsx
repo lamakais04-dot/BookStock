@@ -3,40 +3,50 @@ import { useNavigate } from "react-router-dom";
 import "../csspages/BookItem.css";
 import Favorites from "../services/favorites";
 import Library from "../services/library";
+import { useAuth } from "../context/AuthContext";
 
 export default function BookItem({ book }) {
   const navigate = useNavigate();
+  const { user, setUser, fetchUser } = useAuth();
 
-  // ===== Favorites =====
+  // ===== Favorites State =====
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // ===== Borrow UI (no alert) =====
+  // ===== Borrow UI State =====
   const [borrowMsg, setBorrowMsg] = useState("");
   const [borrowError, setBorrowError] = useState("");
-  const [borrowDisabled, setBorrowDisabled] = useState(false);
   const [borrowLoading, setBorrowLoading] = useState(false);
+
+  // האם הספר הזה מושאל על ידי המשתמש
+  const isBorrowedByMe = Boolean(
+    user?.borrowedBooks?.includes(book.id)
+  );
 
   const handleClick = () => {
     navigate(`/book/${book.id}`);
   };
 
-  // 🔹 בדיקה אם הספר כבר במועדפים
+  // ===== Load favorites =====
   useEffect(() => {
     async function checkFavorite() {
+      if (!user) return;
       try {
         const favs = await Favorites.getFavorites();
-        const ids = favs.map((f) => f.bookid);
+        const ids = favs.map(f => f.bookid);
         setIsFavorite(ids.includes(book.id));
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching favorites:", err);
       }
     }
-
     checkFavorite();
-  }, [book.id]);
+  }, [book.id, user]);
 
-  // ❤️ TOGGLE Favorites
+  // ===== Toggle favorite =====
   const handleLike = async () => {
+    if (!user) {
+      alert("יש להתחבר כדי להוסיף למועדפים");
+      return;
+    }
     try {
       if (isFavorite) {
         await Favorites.remove(book.id);
@@ -50,7 +60,7 @@ export default function BookItem({ book }) {
     }
   };
 
-  // 📚 Borrow (adds to library book1id/book2id) - no alert
+  // ===== Borrow =====
   const handleBorrow = async () => {
     setBorrowMsg("");
     setBorrowError("");
@@ -59,25 +69,57 @@ export default function BookItem({ book }) {
     try {
       const res = await Library.borrowBook(book.id);
 
-      // הודעה יפה (אם בא מהשרת - נציג, אחרת ברירת מחדל)
-      setBorrowMsg(res?.message || "📚 הספר נוסף לספרייה שלך");
-      setBorrowDisabled(true);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.detail ||
-        "לא ניתן להשאיל ספר נוסף";
+      setBorrowMsg(res.message || "📚 הספר הושאל בהצלחה");
 
-      setBorrowError(msg);
-      setBorrowDisabled(true);
+      console.log(res.borrowedBooks)
+      setUser(prev => ({
+        ...prev,
+        borrowedBooks: res.borrowedBooks,
+        canBorrow: res.canBorrow
+      }));
+
+      
+    } catch (err) {
+      setBorrowError(
+        err?.response?.data?.detail || "לא ניתן להשאיל את הספר כרגע"
+      );
     } finally {
       setBorrowLoading(false);
     }
   };
 
+  // ===== Return =====
+  const handleReturn = async () => {
+    setBorrowMsg("");
+    setBorrowError("");
+    setBorrowLoading(true);
+
+    try {
+      const res = await Library.returnBook(book.id);
+
+      setUser(prev => ({
+        ...prev,
+        borrowedBooks: res.borrowedBooks,
+        canBorrow: res.canBorrow
+      }));
+    } catch (err) {
+      setBorrowError("שגיאה בהחזרת הספר");
+    } finally {
+      setBorrowLoading(false);
+    }
+  };
+
+  // ===== Disable logic =====
+  // חשוב: לא חוסמים ספר שמושאל על ידך
+  const borrowDisabled =
+    !user ||
+    borrowLoading ||
+    (!user.canBorrow && !isBorrowedByMe);
+
   return (
     <div className="book-card">
       <div className="book-image" onClick={handleClick}>
-        <img src={book.image} alt={book.title} className="book-image" />
+        <img src={book.image} alt={book.title} />
       </div>
 
       <h3 className="book-title" onClick={handleClick}>
@@ -88,23 +130,39 @@ export default function BookItem({ book }) {
       <p className="book-meta">{book.quantity} ספרים זמינים</p>
 
       <div className="book-actions">
-        <button
-          className="borrow-btn"
-          onClick={handleBorrow}
-          disabled={borrowDisabled || borrowLoading}
-        >
-          {borrowLoading ? "טוען..." : borrowDisabled ? "לא זמין" : "השאל ספר"}
-        </button>
+        {isBorrowedByMe ? (
+          <button
+            className="return-btn"
+            onClick={handleReturn}
+            disabled={borrowLoading}
+          >
+            החזרה
+          </button>
+        ) : (
+          <button
+            className="borrow-btn"
+            onClick={handleBorrow}
+            disabled={borrowDisabled}
+          >
+            {!user
+              ? "התחברי כדי להשאיל"
+              : !user.canBorrow
+              ? "הגעת למקסימום השאלות"
+              : borrowLoading
+              ? "טוען..."
+              : "השאל ספר"}
+          </button>
+        )}
 
         <span
           onClick={handleLike}
           className={`heart ${isFavorite ? "active" : ""}`}
+          style={{ cursor: "pointer" }}
         >
           {isFavorite ? "❤️" : "♡"}
         </span>
       </div>
 
-      {/* Messages (no alert) */}
       {borrowMsg && <p className="borrow-success">{borrowMsg}</p>}
       {borrowError && <p className="borrow-error">{borrowError}</p>}
     </div>
