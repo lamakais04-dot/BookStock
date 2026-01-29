@@ -7,6 +7,7 @@
   margin: 0 auto;
   direction: rtl;
   animation: fadeIn 0.6s ease-out;
+  min-height: 500px;
 }
 
 @keyframes fadeIn {
@@ -21,14 +22,14 @@
   }
 }
 
-/* Container wrapper אם יש */
+/* Container wrapper */
 .books-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
   padding: 20px 0;
 }
 
-/* כותרת אם תרצה להוסיף */
+/* כותרת */
 .books-header {
   text-align: center;
   padding: 40px 20px 20px;
@@ -70,9 +71,7 @@
 }
 
 @keyframes dots {
-
-  0%,
-  20% {
+  0%, 20% {
     content: '.';
   }
 
@@ -80,34 +79,57 @@
     content: '..';
   }
 
-  60%,
-  100% {
+  60%, 100% {
     content: '...';
   }
 }
 
-/* מצב ריק */
+/* מצב ריק - מעוצב ובאמצע */
 .books-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 80px 20px;
-  color: #a0826d;
+  padding: 100px 20px;
+  min-height: 400px;
+  animation: fadeIn 0.6s ease-out;
 }
 
 .books-empty-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
-  opacity: 0.5;
+  font-size: 80px;
+  margin-bottom: 24px;
+  opacity: 0.6;
+  display: inline-block;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(5deg);
+  }
 }
 
 .books-empty h2 {
-  font-size: 24px;
+  font-size: 28px;
   color: #5d4e37;
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
+  font-weight: 700;
 }
 
 .books-empty p {
-  font-size: 16px;
+  font-size: 17px;
   margin: 0;
+  color: #8b6f47;
+  opacity: 0.8;
+  max-width: 400px;
 }
 
 /* Responsive Design */
@@ -141,6 +163,23 @@
   .books-header p {
     font-size: 16px;
   }
+
+  .books-empty {
+    padding: 80px 20px;
+    min-height: 350px;
+  }
+
+  .books-empty-icon {
+    font-size: 70px;
+  }
+
+  .books-empty h2 {
+    font-size: 24px;
+  }
+
+  .books-empty p {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -152,5 +191,22 @@
 
   .books-header h1 {
     font-size: 28px;
+  }
+
+  .books-empty {
+    padding: 60px 16px;
+    min-height: 300px;
+  }
+
+  .books-empty-icon {
+    font-size: 64px;
+  }
+
+  .books-empty h2 {
+    font-size: 22px;
+  }
+
+  .books-empty p {
+    font-size: 15px;
   }
 }

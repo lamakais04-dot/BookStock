@@ -1,19 +1,17 @@
-import React, { useState } from 'react'
-import LoginClass from '../services/login.js'
-import { useAuth } from '../context/AuthContext.jsx'
-import '../csspages/login.css'
-import { NavLink, useNavigate } from "react-router-dom";
-
+import React, { useState } from "react";
+import LoginClass from "../services/login.js";
+import { useAuth } from "../context/AuthContext.jsx";
+import "../csspages/login.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-
     const navigate = useNavigate();
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [errors, setErrors] = useState({})
-    const [success, setSuccess] = useState(false)
+    const { fetchUser } = useAuth();
 
-    const { fetchUser } = useAuth()
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errors, setErrors] = useState({});
+    const [showSuccess, setShowSuccess] = useState(false);
 
     // ===== Validators =====
     const validators = {
@@ -22,36 +20,42 @@ export default function Login() {
 
         password: (v) =>
             v.length >= 6 || "הסיסמה חייבת להכיל לפחות 6 תווים"
-    }
+    };
 
     // ===== Handle Submit =====
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        const newErrors = {}
+        const newErrors = {};
 
-        const emailValid = validators.email(email)
-        if (emailValid !== true) newErrors.email = emailValid
+        const emailValid = validators.email(email);
+        if (emailValid !== true) newErrors.email = emailValid;
 
-        const passwordValid = validators.password(password)
-        if (passwordValid !== true) newErrors.password = passwordValid
+        const passwordValid = validators.password(password);
+        if (passwordValid !== true) newErrors.password = passwordValid;
 
-        setErrors(newErrors)
-        if (Object.keys(newErrors).length > 0) return
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
 
         try {
-            await LoginClass.handleSubmit(email, password)
-            await fetchUser()
+            await LoginClass.handleSubmit(email, password);
+            await fetchUser();
 
-            setSuccess(true)
-            setEmail("")
-            setPassword("")
-            setErrors({})
+            setShowSuccess(true);
+            setEmail("");
+            setPassword("");
+            setErrors({});
+
+            // אופציונלי: רידיירקט אחרי 2 שניות
+            setTimeout(() => {
+                navigate("/");
+            }, 2000);
+
         } catch {
-            setErrors({ general: "אימייל או סיסמה שגויים" })
-            setSuccess(false)
+            setErrors({ general: "אימייל או סיסמה שגויים" });
+            setShowSuccess(false);
         }
-    }
+    };
 
     return (
         <div className="login-container">
@@ -62,17 +66,20 @@ export default function Login() {
                     <p className="login-subtitle">התחבר לחשבון שלך</p>
                 </div>
 
+                {/* ===== ALERTS ===== */}
+                {errors.general && (
+                    <div className="login-alert error">
+                        ❌ {errors.general}
+                    </div>
+                )}
+
+                {showSuccess && (
+                    <div className="login-alert success">
+                        ✔ התחברת בהצלחה! מועבר לאתר...
+                    </div>
+                )}
+
                 <form className="login-form" onSubmit={handleSubmit}>
-                    {errors.general && (
-                        <div className="error-text">{errors.general}</div>
-                    )}
-
-                    {success && (
-                        <div className="success-text">
-                            התחברת בהצלחה ✔
-                        </div>
-                    )}
-
                     <div className="input-group">
                         <label className="input-label">אימייל</label>
                         <input
@@ -81,12 +88,12 @@ export default function Login() {
                             placeholder="example@gmail.com"
                             value={email}
                             onChange={(e) => {
-                                setEmail(e.target.value)
-                                const valid = validators.email(e.target.value)
+                                setEmail(e.target.value);
+                                const valid = validators.email(e.target.value);
                                 setErrors({
                                     ...errors,
                                     email: valid === true ? "" : valid
-                                })
+                                });
                             }}
                         />
                         {errors.email && (
@@ -102,12 +109,12 @@ export default function Login() {
                             placeholder="לפחות 6 תווים"
                             value={password}
                             onChange={(e) => {
-                                setPassword(e.target.value)
-                                const valid = validators.password(e.target.value)
+                                setPassword(e.target.value);
+                                const valid = validators.password(e.target.value);
                                 setErrors({
                                     ...errors,
                                     password: valid === true ? "" : valid
-                                })
+                                });
                             }}
                         />
                         {errors.password && (
@@ -128,5 +135,5 @@ export default function Login() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
