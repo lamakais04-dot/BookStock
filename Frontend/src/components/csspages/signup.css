@@ -249,3 +249,33 @@
   animation: fadeIn 0.4s ease;
 }
 
+/* ===== ALERTS ===== */
+.signup-alert {
+  padding: 14px 16px;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 18px;
+  animation: fadeInUp 0.4s ease;
+}
+
+.signup-alert.success {
+  background: #e6f7ee;
+  border: 2px solid #2ecc71;
+  color: #1e7e34;
+}
+
+.signup-alert.error {
+  background: #fdecea;
+  border: 2px solid #e74c3c;
+  color: #922b21;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+
