@@ -2,15 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Books from "../services/books";
 import "../csspages/singleBook.css";
+import Library from "../services/library";
+import { useAuth } from "../context/AuthContext";
 import { useFavorites } from "../context/FavoritesContext";
 
 export default function SingleBook() {
   const { id } = useParams();
+  const bookId = Number(id);
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user, setUser } = useAuth();
+  const isBorrowedByMe = user?.borrowedBooks?.includes(bookId);
+
 
   const { favorites, toggleFavorite } = useFavorites();
-  const bookId = Number(id);
   const isFavorite = favorites.includes(bookId);
 
   useEffect(() => {
@@ -37,6 +42,29 @@ export default function SingleBook() {
       </div>
     );
   }
+
+  const handleBorrow = async () => {
+    try {
+      const res = await Library.borrowBook(bookId);
+      setUser(prev => ({
+        ...prev,
+        borrowedBooks: res.borrowedBooks,
+        canBorrow: res.canBorrow
+      }));
+    } catch {
+      alert("לא ניתן להשאיל");
+    }
+  };
+
+  const handleReturn = async () => {
+    const res = await Library.returnBook(bookId);
+    setUser(prev => ({
+      ...prev,
+      borrowedBooks: res.borrowedBooks,
+      canBorrow: res.canBorrow
+    }));
+  };
+
 
   return (
     <div className="single-book-container">
@@ -87,9 +115,23 @@ export default function SingleBook() {
 
           {/* ACTIONS */}
           <div className="book-actions">
-            <button className="borrow-button">
-              השאלת ספר
-            </button>
+            {isBorrowedByMe ? (
+              <button className="borrow-button return" onClick={handleReturn}>
+                החזרה
+              </button>
+            ) : (
+              <button
+                className="borrow-button"
+                onClick={handleBorrow}
+                disabled={!user || !user.canBorrow}
+              >
+                {!user
+                  ? "התחברי כדי להשאיל"
+                  : !user.canBorrow
+                    ? "הגעת למקסימום השאלות"
+                    : "השאלת ספר"}
+              </button>
+            )}
 
             <button
               className={`favorite-button ${isFavorite ? "active" : ""}`}
