@@ -2,10 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Books from "../services/books";
 import "../csspages/singleBook.css";
+import { useFavorites } from "../context/FavoritesContext";
 
 export default function SingleBook() {
   const { id } = useParams();
   const [book, setBook] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const { favorites, toggleFavorite } = useFavorites();
+  const bookId = Number(id);
+  const isFavorite = favorites.includes(bookId);
 
   useEffect(() => {
     async function fetchBook() {
@@ -14,12 +20,14 @@ export default function SingleBook() {
         setBook(data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchBook();
   }, [id]);
 
-  if (!book) {
+  if (loading || !book) {
     return (
       <div className="loading-container">
         <div className="loading-spinner">
@@ -64,12 +72,16 @@ export default function SingleBook() {
 
             <div className="info-item">
               <span className="info-label">קטגוריה</span>
-              <span className="info-value">{book.categoryName || "—"}</span>
+              <span className="info-value">
+                {book.categoryName || "—"}
+              </span>
             </div>
 
             <div className="info-item">
               <span className="info-label">טווח גילאים</span>
-              <span className="info-value">{book.ageRangeName || "—"}</span>
+              <span className="info-value">
+                {book.ageRangeName || "—"}
+              </span>
             </div>
           </div>
 
@@ -79,9 +91,14 @@ export default function SingleBook() {
               השאלת ספר
             </button>
 
-            <button className="favorite-button">
-              <span className="favorite-icon">♡</span>
-              הוספה למועדפים
+            <button
+              className={`favorite-button ${isFavorite ? "active" : ""}`}
+              onClick={() => toggleFavorite(bookId)}
+            >
+              <span className="favorite-icon">
+                {isFavorite ? "❤️" : "♡"}
+              </span>
+              {isFavorite ? "במועדפים" : "הוספה למועדפים"}
             </button>
           </div>
         </div>

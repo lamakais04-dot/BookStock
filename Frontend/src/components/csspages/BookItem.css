@@ -120,15 +120,23 @@
   box-shadow: 0 6px 14px rgba(139, 69, 19, 0.35);
 }
 
-/* ✅ added: disabled state */
-.book-card .borrow-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+/* Heart Wrapper */
+.book-card .heart-wrapper {
+  cursor: pointer;
+  position: relative;
+  display: block;
 }
 
-/* Heart */
+/* הסתר את ה-checkbox */
+.book-card .heart-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Heart - רגיל */
 .book-card .heart {
   width: 38px;
   height: 38px;
@@ -139,8 +147,8 @@
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  cursor: pointer;
-  transition: 0.25s;
+  transition: all 0.3s ease;
+  color: #8b6f47;
 }
 
 .book-card .heart:hover {
@@ -148,34 +156,33 @@
   transform: scale(1.15);
 }
 
-/* ✅ keep your global heart rules (added previously) */
-.heart {
-  cursor: pointer;
-  font-size: 22px;
-  transition: transform 0.2s;
+/* Heart - מועדף (ממולא) - כאשר ה-checkbox מסומן */
+.book-card .heart-checkbox:checked + .heart {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  border-color: #ff6b6b;
+  color: #ffffff;
+  animation: heartBeat 0.3s ease;
 }
 
-.heart:hover {
-  transform: scale(1.2);
+.book-card .heart-checkbox:checked + .heart:hover {
+  background: linear-gradient(135deg, #ff5252, #e91e63);
+  transform: scale(1.15);
 }
 
-.heart.active {
-  color: red;
-}
-
-/* ✅ added: borrow messages (no alert) */
-.borrow-success {
-  color: #2e7d32;
-  font-size: 13px;
-  margin-top: 6px;
-  text-align: center;
-}
-
-.borrow-error {
-  color: #c62828;
-  font-size: 13px;
-  margin-top: 6px;
-  text-align: center;
+/* אנימציית פעימת לב */
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.3);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.25);
+  }
 }
 
 /* =============================== ANIMATION ================================ */
