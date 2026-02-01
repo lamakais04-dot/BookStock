@@ -1,0 +1,41 @@
+/* ===============================
+   BACK BUTTON – FORCE LEFT
+================================ */
+.favorites-back {
+  position: absolute;
+  top: 140px;      /* ⬇️ מתחת ל-header */
+  left: 40px;      /* ⬅️ שמאל אמיתי */
+  z-index: 20;
+}
+
+.favorites-back button {
+  background: transparent;
+  border: 2px solid #8b4513;
+  color: #8b4513;
+
+  padding: 10px 22px;
+  border-radius: 14px;
+
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.favorites-back button:hover {
+  background: rgba(139, 69, 19, 0.08);
+  transform: translateY(-2px);
+}
+
+.favorites-back button:active {
+  transform: scale(0.96);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .favorites-back {
+    left: 16px;
+    top: 120px;
+  }
+}

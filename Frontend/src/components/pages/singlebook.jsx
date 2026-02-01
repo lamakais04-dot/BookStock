@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import "../csspages/singleBook.css";
 import Library from "../services/library";
@@ -8,12 +8,14 @@ import { useFavorites } from "../context/FavoritesContext";
 
 export default function SingleBook() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const bookId = Number(id);
+
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const { user, setUser } = useAuth();
   const isBorrowedByMe = user?.borrowedBooks?.includes(bookId);
-
 
   const { favorites, toggleFavorite } = useFavorites();
   const isFavorite = favorites.includes(bookId);
@@ -65,9 +67,14 @@ export default function SingleBook() {
     }));
   };
 
-
   return (
     <div className="single-book-container">
+
+      {/* ===== BACK BUTTON ===== */}
+      <button className="back-button" onClick={() => navigate(-1)}>
+        ← חזרה
+      </button>
+
       <div className="single-book">
 
         {/* IMAGE */}
@@ -100,12 +107,12 @@ export default function SingleBook() {
 
             <div className="info-item">
               <span className="info-label">קטגוריה</span>
-              <span className="info-value">{categoryName}</span>
+              <span className="info-value">{book.categoryName}</span>
             </div>
 
             <div className="info-item">
               <span className="info-label">טווח גילאים</span>
-              <span className="info-value">{ageRangeName}</span>
+              <span className="info-value">{book.ageRangeName}</span>
             </div>
           </div>
 
@@ -140,7 +147,6 @@ export default function SingleBook() {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );
