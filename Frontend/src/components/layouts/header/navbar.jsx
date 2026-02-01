@@ -105,7 +105,7 @@ export default function Navbar() {
                   <div
                     className="dropdown-item"
                     onClick={() => {
-                      navigate(`/profile/${user.id}`);
+                      navigate(`/profile`);
                       setOpenProfileMenu(false);
                     }}
                   >
