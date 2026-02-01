@@ -26,7 +26,7 @@ export default function AllBooks() {
   const search =
     new URLSearchParams(location.search).get("search") || "";
 
-  // ===== Fetch books (רק כשצריך) =====
+  // ===== Fetch books =====
   useEffect(() => {
     const delay = setTimeout(async () => {
       try {
@@ -71,7 +71,7 @@ export default function AllBooks() {
 
   return (
     <>
-      {/* Age filter */}
+      {/* ===== Age Filter ===== */}
       <div className="age-filter">
         {ageGroups.map(age => (
           <button
@@ -87,7 +87,23 @@ export default function AllBooks() {
         ))}
       </div>
 
-      {/* Books grid */}
+      {/* ===== Clear Filters (OUTSIDE menu) ===== */}
+      {(categoryId || ageGroupId || search) && (
+        <div className="clear-filters-wrapper">
+          <button
+            className="clear-filters"
+            onClick={() => {
+              setCategoryId(null);
+              setAgeGroupId(null);
+              setCurrentPage(1);
+            }}
+          >
+            ✖ נקה סינון
+          </button>
+        </div>
+      )}
+
+      {/* ===== Books grid ===== */}
       <div className="books-grid">
         {books.length === 0 ? (
           <div className="books-empty">
@@ -100,13 +116,13 @@ export default function AllBooks() {
             <BookItem
               key={book.id}
               book={book}
-              setBooks={setBooks}   // 🔥 זה הסוד
+              setBooks={setBooks}
             />
           ))
         )}
       </div>
 
-      {/* Pagination */}
+      {/* ===== Pagination ===== */}
       {totalPages > 1 && (
         <div className="pagination">
           <button
@@ -135,7 +151,7 @@ export default function AllBooks() {
         </div>
       )}
 
-      {/* Categories */}
+      {/* ===== Categories Menu ===== */}
       <div className="category-menu">
         <button
           className="menu-btn"
@@ -164,17 +180,6 @@ export default function AllBooks() {
                 {cat.name}
               </button>
             ))}
-
-            <button
-              className="clear-filters"
-              onClick={() => {
-                setCategoryId(null);
-                setAgeGroupId(null);
-                setIsFilterOpen(false);
-              }}
-            >
-              נקה סינון
-            </button>
           </div>
         )}
       </div>
