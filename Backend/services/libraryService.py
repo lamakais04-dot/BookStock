@@ -95,6 +95,24 @@ def get_borrowed_books(user_id: int) -> list[int]:
         ]
 
 
+def get_user_borrowed_books(user_id: int):
+    with Session(engine) as session:
+        library = session.exec(select(Library).where(Library.userid == user_id)).first()
+
+        if not library:
+            return []
+
+        # 🔥 סינון None
+        book_ids = [
+            book_id
+            for book_id in [library.book1id, library.book2id]
+            if book_id is not None
+        ]
+
+        if not book_ids:
+            return []
+
+        return session.exec(select(books).where(books.id.in_(book_ids))).all()
 
 
 def return_book(user_id: int, book_id: int):
