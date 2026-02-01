@@ -1,3 +1,7 @@
+/* =========================
+   Books Grid
+   ========================= */
+
 .books-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -15,21 +19,26 @@
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Container wrapper */
+/* =========================
+   Container
+   ========================= */
+
 .books-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
   padding: 20px 0;
 }
 
-/* כותרת */
+/* =========================
+   Header
+   ========================= */
+
 .books-header {
   text-align: center;
   padding: 40px 20px 20px;
@@ -43,170 +52,157 @@
   background: linear-gradient(135deg, #8b4513 0%, #d4773e 50%, #c9704a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
   margin: 0 0 12px 0;
-  letter-spacing: -0.5px;
 }
 
 .books-header p {
   font-size: 18px;
   color: #8b6f47;
   margin: 0;
-  font-weight: 500;
 }
 
-/* מצב טעינה */
-.books-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  font-size: 18px;
-  color: #a0826d;
-}
+/* =========================
+   Empty State
+   ========================= */
 
-.books-loading::after {
-  content: '...';
-  animation: dots 1.5s infinite;
-}
-
-@keyframes dots {
-  0%, 20% {
-    content: '.';
-  }
-
-  40% {
-    content: '..';
-  }
-
-  60%, 100% {
-    content: '...';
-  }
-}
-
-/* מצב ריק - מעוצב ובאמצע */
 .books-empty {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
   padding: 100px 20px;
-  min-height: 400px;
-  animation: fadeIn 0.6s ease-out;
+  text-align: center;
 }
 
 .books-empty-icon {
   font-size: 80px;
   margin-bottom: 24px;
   opacity: 0.6;
-  display: inline-block;
-  animation: iconFloat 3s ease-in-out infinite;
-}
-
-@keyframes iconFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-10px) rotate(-5deg);
-  }
-  75% {
-    transform: translateY(-5px) rotate(5deg);
-  }
 }
 
 .books-empty h2 {
   font-size: 28px;
   color: #5d4e37;
-  margin: 0 0 16px 0;
-  font-weight: 700;
 }
 
 .books-empty p {
   font-size: 17px;
-  margin: 0;
   color: #8b6f47;
-  opacity: 0.8;
-  max-width: 400px;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 24px;
-    padding: 30px;
-  }
+/* =========================
+   AGE FILTER (צד שמאל)
+   ========================= */
 
-  .books-header h1 {
-    font-size: 36px;
-  }
+.age-filter {
+  position: fixed;
+  top: 140px;
+  left: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;               /* ⬅️ רווח גדול יותר */
+
+  z-index: 50;
+  direction: rtl;
 }
+
+.age-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 18px;      /* ⬅️ כפתור גדול יותר */
+  font-size: 1rem;
+  font-weight: 700;
+
+  background: #ffffff;
+  border: 2px solid #e8dcc8;
+  border-radius: 16px;
+
+  color: #5d4e37;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.age-btn:hover {
+  background: #fef3e2;
+  border-color: #8b4513;
+  transform: translateY(-2px);
+}
+
+.age-btn.active {
+  background: linear-gradient(135deg, #8b4513, #a0522d);
+  color: #ffffff;
+  border-color: #8b4513;
+}
+
+.age-btn .star {
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
+/* =========================
+   Clear Filters Button
+   ========================= */
+
+.clear-filters-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 4px;
+  transform: translateY(20px); /* ⬅️ ירידה אמיתית למטה */
+}
+
+.clear-filters {
+  background: transparent;
+  border: 2px solid #8b4513;
+  color: #8b4513;
+  padding: 8px 18px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.clear-filters:hover {
+  background: rgba(139, 69, 19, 0.08);
+  transform: translateY(-2px);
+}
+
+/* =========================
+   Responsive
+   ========================= */
 
 @media (max-width: 768px) {
+  .age-filter {
+    top: 100px;
+    gap: 10px;
+  }
+
+  .age-btn {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
   .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 20px;
     padding: 20px;
-  }
-
-  .books-header {
-    padding: 30px 20px 15px;
-  }
-
-  .books-header h1 {
-    font-size: 32px;
-  }
-
-  .books-header p {
-    font-size: 16px;
-  }
-
-  .books-empty {
-    padding: 80px 20px;
-    min-height: 350px;
-  }
-
-  .books-empty-icon {
-    font-size: 70px;
-  }
-
-  .books-empty h2 {
-    font-size: 24px;
-  }
-
-  .books-empty p {
-    font-size: 16px;
+    gap: 20px;
   }
 }
 
 @media (max-width: 480px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 16px;
-    padding: 16px;
+  .age-filter {
+    position: static;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
   }
 
-  .books-header h1 {
-    font-size: 28px;
-  }
-
-  .books-empty {
-    padding: 60px 16px;
-    min-height: 300px;
-  }
-
-  .books-empty-icon {
-    font-size: 64px;
-  }
-
-  .books-empty h2 {
-    font-size: 22px;
-  }
-
-  .books-empty p {
-    font-size: 15px;
+  .clear-filters-wrapper {
+    transform: none;
+    margin: 20px 0;
   }
 }
