@@ -1,0 +1,19 @@
+# schemas/admin_users.py
+from datetime import datetime
+from typing import Optional, List
+from pydantic import BaseModel
+
+class BorrowRow(BaseModel):
+    book_id: int
+    title: str
+    borrowed_at: datetime
+    returned_at: Optional[datetime]
+
+class AdminUserRow(BaseModel):
+    id: int
+    firstname: str
+    lastname: str
+    email: str
+    role: str
+    borrowed_now_count: int
+    total_borrows: int

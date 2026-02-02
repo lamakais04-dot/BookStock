@@ -7,7 +7,12 @@ from routes.library import router as libyayrRouter
 from routes.ages import router as agesRouter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from routes.admin_users import router as admin_users_router
+from routes.admin_activity import router as admin_activity_router
+from routes.admin_export import router as admin_export_router
+
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -50,3 +55,6 @@ app.include_router(agesRouter, prefix="/api/age", tags=["age"])
 app.include_router(categoriesRouter, prefix="/api/category", tags=["category"])
 app.include_router(favoritesRouter, prefix="/api/favorites", tags=["favorites"])
 app.include_router(libyayrRouter, prefix="/api/library", tags=["library"])
+app.include_router(admin_users_router)
+app.include_router(admin_activity_router)
+app.include_router(admin_export_router)

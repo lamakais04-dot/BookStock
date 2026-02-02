@@ -10,6 +10,7 @@ import AllBooks from '../../pages/books'
 import FavoritesPage from '../../pages/favorites'
 import SingleBook from '../../pages/singlebook'
 import Profile from '../../pages/profile'
+import AdminActivity from '../../pages/admin/AdminActivity'
 import ProtectedRoute from '../../pages/ProtectedRoute'
 export default function Layout() {
     return (
@@ -68,6 +69,9 @@ export default function Layout() {
                             </ProtectedRoute>
                         }
                     />
+
+                    <Route path="/admin/activity" element={<AdminActivity />} />
+
 
                 </Routes>
 

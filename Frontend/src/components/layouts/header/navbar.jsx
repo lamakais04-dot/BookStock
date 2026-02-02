@@ -12,14 +12,11 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // בדיקת אדמין
   const isAdmin = user?.role === "admin";
-
   const isFavoritePage = location.pathname === "/favorites";
 
-  // ניקוי חיפוש כשעוזבים את עמוד הספרים
   useEffect(() => {
-    if (location.pathname !== "/book") {
+    if (!location.pathname.startsWith("/book")) {
       setSearch("");
     }
   }, [location.pathname]);
@@ -43,10 +40,6 @@ export default function Navbar() {
     navigate("/book");
   };
 
-  const handleFavoriteClick = () => {
-    navigate("/favorites");
-  };
-
   return (
     <nav className="navbar">
       {/* ===== RIGHT ===== */}
@@ -57,10 +50,9 @@ export default function Navbar() {
 
         <NavLink to="/book">כל הספרים</NavLink>
 
-        {/* 🔧 ניהול מערכת – מוביל לפרופיל + גלילה */}
         {isAdmin && (
-          <NavLink to="/profile#admin" className="admin-nav-link">
-            ניהול מערכת
+          <NavLink to="/admin/activity" className="admin-nav-link">
+            🕘 פעילות אחרונה
           </NavLink>
         )}
       </div>
@@ -92,7 +84,7 @@ export default function Navbar() {
             <div
               className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
               title="מועדפים"
-              onClick={handleFavoriteClick}
+              onClick={() => navigate("/favorites")}
             >
               <svg viewBox="0 0 24 24" className="heart-svg">
                 <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />
@@ -103,7 +95,7 @@ export default function Navbar() {
             <div className="profile-icon-wrapper">
               <div
                 className={`nav-icon profile ${isAdmin ? "admin-border" : ""}`}
-                onClick={() => setOpenProfileMenu(!openProfileMenu)}
+                onClick={() => setOpenProfileMenu((p) => !p)}
               >
                 {isAdmin && <span className="admin-crown">👑</span>}
                 <img
@@ -125,16 +117,15 @@ export default function Navbar() {
                     הפרופיל שלי
                   </div>
 
-                  {/* 🔧 אדמין – גלילה לניהול מערכת */}
                   {isAdmin && (
                     <div
                       className="dropdown-item admin-only"
                       onClick={() => {
-                        navigate("/profile#admin");
+                        navigate("/admin/activity");
                         setOpenProfileMenu(false);
                       }}
                     >
-                      ניהול מערכת
+                      🕘 פעילות אחרונה
                     </div>
                   )}
 
