@@ -49,7 +49,6 @@ export default function FavoritesPage() {
 
   return (
     <div className="favorites-container">
-
       {/* 🔙 כפתור חזרה */}
       <div className="favorites-back">
         <button onClick={() => navigate(-1)}>
@@ -62,10 +61,14 @@ export default function FavoritesPage() {
           <div className="favorites-empty">
             <div className="empty-icon">📚</div>
             <h2>אין ספרים מועדפים</h2>
+            <p>עדיין לא הוספת ספרים למועדפים שלך.<br />התחילי לגלות ספרים מדהימים!</p>
+            <a href="/book" className="browse-btn">
+              גלה/י ספרים
+            </a>
           </div>
         ) : (
           books.map(book => (
-            <BookItem key={book.id} book={book} />
+            <BookItem key={book.id} book={book} setBooks={setBooks} />
           ))
         )}
       </div>

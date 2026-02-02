@@ -10,6 +10,8 @@ import "../csspages/pagination.css";
 
 export default function AllBooks() {
   const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -26,8 +28,10 @@ export default function AllBooks() {
   const search =
     new URLSearchParams(location.search).get("search") || "";
 
-  // ===== Fetch books =====
+  /* ===== Fetch books ===== */
   useEffect(() => {
+    setLoading(true);
+
     const delay = setTimeout(async () => {
       try {
         const data = await Books.getBooks(
@@ -43,18 +47,21 @@ export default function AllBooks() {
       } catch (err) {
         console.error(err);
         setBooks([]);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
       }
     }, 400);
 
     return () => clearTimeout(delay);
   }, [currentPage, categoryId, ageGroupId, search]);
 
-  // איפוס עמוד בסינון
+  /* איפוס עמוד בסינון */
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryId, ageGroupId, search]);
 
-  // ===== Load filters =====
+  /* ===== Load filters ===== */
   useEffect(() => {
     async function loadFilters() {
       try {
@@ -87,7 +94,7 @@ export default function AllBooks() {
         ))}
       </div>
 
-      {/* ===== Clear Filters (OUTSIDE menu) ===== */}
+      {/* ===== Clear Filters ===== */}
       {(categoryId || ageGroupId || search) && (
         <div className="clear-filters-wrapper">
           <button
@@ -103,9 +110,14 @@ export default function AllBooks() {
         </div>
       )}
 
-      {/* ===== Books grid ===== */}
+      {/* ===== Books Grid ===== */}
       <div className="books-grid">
-        {books.length === 0 ? (
+        {loading ? (
+          <div className="books-loading">
+            <div className="loading-spinner"></div>
+            <p>טוען ספרים...</p>
+          </div>
+        ) : books.length === 0 ? (
           <div className="books-empty">
             <div className="books-empty-icon">📚</div>
             <h2>לא נמצאו ספרים</h2>
@@ -123,7 +135,7 @@ export default function AllBooks() {
       </div>
 
       {/* ===== Pagination ===== */}
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <div className="pagination">
           <button
             disabled={currentPage === 1}

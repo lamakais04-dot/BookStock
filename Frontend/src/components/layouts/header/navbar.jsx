@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../../csspages/navbar.css";
 import logo from "../../../../BookStockLogo.png";
@@ -8,10 +8,21 @@ import LoginClass from "../../services/login";
 export default function Navbar() {
   const { user, loading, setUser } = useAuth();
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
-  const [favorite, setFavorite] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // בודק אם אנחנו בעמוד המועדפים
+  const isFavoritePage = location.pathname === "/favorites";
+
+  // ✅ חייב להיות לפני כל return
+  useEffect(() => {
+    if (location.pathname !== "/book") {
+      setSearch("");
+    }
+  }, [location.pathname]);
+
+  // ❌ קודם היה לפני ה־useEffect – וזה שבר את React
   if (loading) return null;
 
   const handleLogout = () => {
@@ -29,6 +40,10 @@ export default function Navbar() {
   const clearSearch = () => {
     setSearch("");
     navigate("/book");
+  };
+
+  const handleFavoriteClick = () => {
+    navigate("/favorites");
   };
 
   return (
@@ -51,8 +66,8 @@ export default function Navbar() {
           onChange={(e) => handleSearchChange(e.target.value)}
         />
         {search && (
-          <button 
-            className="clear-search" 
+          <button
+            className="clear-search"
             onClick={clearSearch}
             title="נקה חיפוש"
           >
@@ -67,12 +82,9 @@ export default function Navbar() {
           <>
             {/* FAVORITES */}
             <div
-              className={`nav-icon heart ${favorite ? "filled" : ""}`}
+              className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
               title="מועדפים"
-              onClick={() => {
-                setFavorite(!favorite);
-                navigate("/favorites");
-              }}
+              onClick={handleFavoriteClick}
             >
               <svg viewBox="0 0 24 24" className="heart-svg">
                 <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />

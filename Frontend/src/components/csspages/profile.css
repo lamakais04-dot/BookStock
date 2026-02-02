@@ -1,120 +1,212 @@
+/* ===============================
+   PROFILE PAGE WRAPPER
+================================ */
+.profile-page-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
+    position: relative;
+    overflow: visible;
+}
+
+/* ===============================
+   BACK BUTTON – FLOATING
+================================ */
+.profile-back-btn {
+    position: fixed;
+    top: 120px;
+    left: 30px;
+
+    padding: 12px 26px;
+    font-size: 15px;
+    font-weight: 700;
+
+    background: linear-gradient(135deg, #fffaf3, #fdf0df);
+    color: #8b4513;
+
+    border: 2px solid #8b4513;
+    border-radius: 28px;
+
+    cursor: pointer;
+    z-index: 999;
+
+    box-shadow: 0 10px 26px rgba(139,69,19,0.25);
+    transition: all 0.3s ease;
+}
+
+.profile-back-btn:hover {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(139,69,19,0.35);
+}
+
+.profile-back-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(139,69,19,0.3);
+}
+
+/* ===============================
+   FLOATING BOOKS – BACKGROUND
+================================ */
+.floating-books {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.floating-book {
+    position: absolute;
+    top: -80px;
+    font-size: 56px;
+    opacity: 0.28;
+    filter: drop-shadow(0 6px 10px rgba(139,69,19,0.25));
+    animation: floatBook linear infinite;
+}
+
+/* פיזור + מהירויות */
+.fb-1  { left: 2%;  animation-duration: 18s; }
+.fb-2  { left: 8%;  animation-duration: 22s; }
+.fb-3  { left: 14%; animation-duration: 20s; }
+.fb-4  { left: 22%; animation-duration: 26s; }
+.fb-5  { left: 30%; animation-duration: 21s; }
+.fb-6  { left: 38%; animation-duration: 24s; }
+.fb-7  { left: 46%; animation-duration: 19s; }
+.fb-8  { left: 54%; animation-duration: 25s; }
+.fb-9  { left: 62%; animation-duration: 22s; }
+.fb-10 { left: 70%; animation-duration: 27s; }
+.fb-11 { left: 78%; animation-duration: 20s; }
+.fb-12 { left: 86%; animation-duration: 24s; }
+.fb-13 { left: 94%; animation-duration: 18s; }
+
+@keyframes floatBook {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.25; }
+    50%  { opacity: 0.32; }
+    100% { transform: translateY(120vh) rotate(360deg); opacity: 0.25; }
+}
+
+/* ===============================
+   PAGE CONTENT
+================================ */
 .profile-page {
     max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+    margin: 0 auto;
+    padding: 110px 20px 40px;
     direction: rtl;
+    position: relative;
+    z-index: 2;
 }
 
-/* ===== User Card ===== */
+/* ===============================
+   PROFILE CARD
+================================ */
 .profile-card {
     display: flex;
-    align-items: center;
-    gap: 30px;
-
-    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    gap: 40px;
+    padding: 50px;
+    background: linear-gradient(135deg, #8b4513, #a05a2c, #d4a574);
+    border-radius: 32px;
     color: white;
-
-    border-radius: 22px;
-    padding: 30px;
-    margin-bottom: 50px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 60px rgba(139,69,19,0.45);
 }
 
-.profile-avatar {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: white;
-    color: #8b4513;
-    font-size: 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-details h1 {
-    margin: 0 0 12px;
-    font-size: 30px;
-}
-
-.profile-details p {
-    margin: 4px 0;
-    font-size: 16px;
-}
-
-/* ===== Section ===== */
-.profile-section-title {
-    font-size: 26px;
-    margin-bottom: 20px;
-    color: #5a2d0c;
-}
-
-/* ===== Books Grid ===== */
-.profile-books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 28px;
-}
-
-/* ===== Empty ===== */
-.profile-empty {
-    background: #f6efe9;
-    padding: 20px;
-    border-radius: 14px;
-    text-align: center;
-    color: #6b4a2f;
-}
-
+/* ===============================
+   AVATAR
+================================ */
 .profile-avatar {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    padding-top: 50px;
+    padding-right: 40px;
 }
 
 .profile-avatar-img {
-    width: 90px;
-    height: 90px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid white;
+    border: 5px solid #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
 }
 
 .upload-btn {
+    margin-top: 14px;
+    padding: 8px 18px;
     font-size: 13px;
+    border-radius: 22px;
+    border: 2px solid rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.15);
     color: #fff;
     cursor: pointer;
-    text-decoration: underline;
 }
 
+/* ===============================
+   DETAILS
+================================ */
+.profile-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-details h1 {
+    font-size: 32px;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+/* ===============================
+   PROFILE ROWS
+================================ */
 .profile-row {
+    width: 100%;
+    max-width: 620px;
+    margin-bottom: 14px;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.18);
 }
 
 .profile-row span {
-    width: 90px;
-    color: #eee;
-    font-size: 14px;
+    min-width: 90px;
+    text-align: right;
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+}
+
+.profile-row strong,
+.profile-row input {
+    margin-left: auto;
+    text-align: right;
+    font-size: 15px;
+    color: #fff;
 }
 
 .profile-row input {
-    padding: 6px 10px;
-    border-radius: 8px;
-    border: none;
+    width: 100%;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.25);
 }
 
+/* ===============================
+   BUTTONS
+================================ */
 .edit-btn,
 .save-btn {
-    margin-top: 15px;
-    padding: 10px 18px;
-    border-radius: 14px;
+    margin-top: 28px;
+    padding: 12px 36px;
+    border-radius: 28px;
     border: none;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    font-weight: bold;
 }
 
 .edit-btn {
@@ -124,5 +216,79 @@
 
 .save-btn {
     background: #2ecc71;
-    color: white;
+    color: #fff;
+}
+
+/* ===============================
+   SECTION TITLE
+================================ */
+.profile-section-title {
+    margin: 90px auto 40px;
+    padding: 22px 42px;
+    width: fit-content;
+    background: rgba(255,255,255,0.85);
+    border-radius: 26px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #5d3a1a;
+    text-align: center;
+    box-shadow: 0 18px 40px rgba(139,69,19,0.25);
+}
+
+/* ===============================
+   BOOKS GRID
+================================ */
+.profile-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 28px;
+}
+
+/* ===============================
+   EMPTY
+================================ */
+.profile-empty {
+    background: #fef3e2;
+    padding: 60px;
+    border-radius: 20px;
+    text-align: center;
+    color: #6b4a2f;
+}
+
+/* ===============================
+   LOADING
+================================ */
+.profile-loading {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #8b6f47;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    .profile-back-btn {
+        top: 90px;
+        left: 16px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .profile-card {
+        flex-direction: column;
+        padding: 30px 20px;
+    }
+
+    .profile-avatar {
+        padding: 20px 0 0;
+    }
+
+    .profile-section-title {
+        font-size: 22px;
+        padding: 18px 30px;
+    }
 }
