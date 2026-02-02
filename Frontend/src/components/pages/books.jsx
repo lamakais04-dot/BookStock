@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import BookItem from "./BookItem";
-import Modal from "./Modal";
-import BookForm from "./BookForm";
 import { useAuth } from "../context/AuthContext";
 
 import "../csspages/books.css";
@@ -14,32 +12,25 @@ import "../csspages/pagination.css";
 export default function AllBooks() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
-
   const [categoryId, setCategoryId] = useState(null);
   const [ageGroupId, setAgeGroupId] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editBook, setEditBook] = useState(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // From your original code
 
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const navigate = useNavigate();
 
   const booksPerPage = 10;
   const location = useLocation();
-  const search =
-    new URLSearchParams(location.search).get("search") || "";
+  const search = new URLSearchParams(location.search).get("search") || "";
 
   /* ===== Fetch books ===== */
   useEffect(() => {
     setLoading(true);
-
     const delay = setTimeout(async () => {
       try {
         const data = await Books.getBooks(
@@ -59,11 +50,10 @@ export default function AllBooks() {
         setLoading(false);
       }
     }, 400);
-
     return () => clearTimeout(delay);
   }, [currentPage, categoryId, ageGroupId, search]);
 
-  /* איפוס עמוד בסינון */
+  /* Reset page on filter change */
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryId, ageGroupId, search]);
@@ -72,8 +62,10 @@ export default function AllBooks() {
   useEffect(() => {
     async function loadFilters() {
       try {
-        setCategories(await Filters.getCategories());
-        setAgeGroups(await Filters.getAgeGroups());
+        const cats = await Filters.getCategories();
+        const ages = await Filters.getAgeGroups();
+        setCategories(cats);
+        setAgeGroups(ages);
       } catch (err) {
         console.error(err);
       }
@@ -83,24 +75,22 @@ export default function AllBooks() {
 
   return (
     <>
-      {/* ===== ADMIN ADD BUTTON ===== */}
+      {/* ===== Admin Add Button ===== */}
       {isAdmin && (
         <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <button onClick={() => setShowAddModal(true)}>
-            ➕ הוסף ספר
+          <button className="add-book-btn" onClick={() => navigate("/book/new")}>
+            ➕ הוסף ספר חדש למערכת
           </button>
         </div>
       )}
 
       {/* ===== Age Filter ===== */}
       <div className="age-filter">
-        {ageGroups.map(age => (
+        {ageGroups.map((age) => (
           <button
             key={age.id}
             className={`age-btn ${ageGroupId === age.id ? "active" : ""}`}
-            onClick={() =>
-              setAgeGroupId(ageGroupId === age.id ? null : age.id)
-            }
+            onClick={() => setAgeGroupId(ageGroupId === age.id ? null : age.id)}
           >
             <span className="star">★</span>
             {age.description}
@@ -138,66 +128,26 @@ export default function AllBooks() {
             <p>נסה לשנות את הסינון או את מילות החיפוש</p>
           </div>
         ) : (
-          books.map(book => (
+          books.map((book) => (
             <BookItem
               key={book.id}
               book={book}
               setBooks={setBooks}
+              isAdmin={isAdmin}
             />
           ))
         )}
-        {books.map(book => (
-          <BookItem
-            key={book.id}
-            book={book}
-            setBooks={setBooks}
-            isAdmin={isAdmin}
-            setEditBook={setEditBook}
-          />
-        ))}
       </div>
 
-      {/* ===== Add Modal ===== */}
-      {showAddModal && (
-        <Modal onClose={() => setShowAddModal(false)}>
-          <h2>הוספת ספר</h2>
-          <BookForm
-            categories={categories}
-            ageGroups={ageGroups}
-            onSubmit={async (data) => {
-              try {
-                const newBook = await Books.addBook({
-                  title: data.title,
-                  summary: data.summary,
-                  author: data.author,
-                  quantity: data.quantity,
-                  pages: data.pages,
-                  categoryid: data.categoryid,
-                  agesid: data.agesid,
-                  image: data.imageFile, // FILE
-                });
-
-                setBooks(prev => [newBook, ...prev]);
-                setShowAddModal(false);
-              } catch (err) {
-                console.error(err);
-                alert("Failed to add book");
-              }
-            }}
-          />
-
-
-        </Modal>
       {/* ===== Pagination ===== */}
       {!loading && totalPages > 1 && (
         <div className="pagination">
           <button
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage(p => p - 1)}
+            onClick={() => setCurrentPage((p) => p - 1)}
           >
             הקודם
           </button>
-
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
@@ -207,51 +157,47 @@ export default function AllBooks() {
               {i + 1}
             </button>
           ))}
-
           <button
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(p => p + 1)}
+            onClick={() => setCurrentPage((p) => p + 1)}
           >
             הבא
           </button>
         </div>
       )}
 
-      {/* ===== Edit Modal ===== */}
-      {editBook && (
-        <Modal onClose={() => setEditBook(null)}>
-          <h2>עריכת ספר</h2>
-          <BookForm
-            initialData={editBook}
-            categories={categories}
-            ageGroups={ageGroups}
-            onSubmit={async (data) => {
-              try {
-                const updated = await Books.updateBook(editBook.id, {
-                  title: data.title,
-                  summary: data.summary,
-                  author: data.author,
-                  quantity: data.quantity,
-                  pages: data.pages,
-                  categoryid: data.categoryid,
-                  agesid: data.agesid,
-                  image: data.imageFile || null, // אופציונלי
-                });
+      {/* ===== Categories Menu (Floating/Hover Logic) ===== */}
+      <div className="category-menu">
+        <button
+          className="menu-btn"
+          onMouseEnter={() => setIsFilterOpen(true)}
+          onMouseLeave={() => setIsFilterOpen(false)}
+        >
+          ☰
+        </button>
 
-                setBooks(prev =>
-                  prev.map(b => (b.id === updated.id ? updated : b))
-                );
-                setEditBook(null);
-              } catch (err) {
-                console.error(err);
-                alert("Failed to update book");
-              }
-            }}
-          />
-
-
-        </Modal>
-      )}
+        {isFilterOpen && (
+          <div
+            className="category-list"
+            onMouseEnter={() => setIsFilterOpen(true)}
+            onMouseLeave={() => setIsFilterOpen(false)}
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                className={categoryId === cat.id ? "active" : ""}
+                onClick={() => {
+                  setCategoryId(cat.id === categoryId ? null : cat.id);
+                  setIsFilterOpen(false);
+                }}
+              >
+                <span className="star">★</span>
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </>
   );
 }
