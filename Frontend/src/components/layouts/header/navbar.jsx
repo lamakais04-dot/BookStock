@@ -12,11 +12,13 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // בדיקת אדמין
   const isAdmin = user?.role === "admin";
   const isFavoritePage = location.pathname === "/favorites";
 
+  // ניקוי חיפוש כשעוזבים את עמוד הספרים
   useEffect(() => {
-    if (!location.pathname.startsWith("/book")) {
+    if (location.pathname !== "/book") {
       setSearch("");
     }
   }, [location.pathname]);
@@ -40,6 +42,10 @@ export default function Navbar() {
     navigate("/book");
   };
 
+  const handleFavoriteClick = () => {
+    navigate("/favorites");
+  };
+
   return (
     <nav className="navbar">
       {/* ===== RIGHT ===== */}
@@ -50,9 +56,20 @@ export default function Navbar() {
 
         <NavLink to="/book">כל הספרים</NavLink>
 
+        {/* ✅ Admin: פעילות אחרונה */}
         {isAdmin && (
-          <NavLink to="/admin/activity" className="admin-nav-link">
+          <div
+            className="dropdown-item admin-only"
+            onClick={() => navigate("/admin/activity")}
+          >
             🕘 פעילות אחרונה
+          </div>
+        )}
+
+        {/* ✅ Admin: ניהול מערכת → פרופיל + גלילה */}
+        {isAdmin && (
+          <NavLink to="/profile#admin" className="admin-nav-link">
+            🔧 ניהול מערכת
           </NavLink>
         )}
       </div>
@@ -84,7 +101,7 @@ export default function Navbar() {
             <div
               className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
               title="מועדפים"
-              onClick={() => navigate("/favorites")}
+              onClick={handleFavoriteClick}
             >
               <svg viewBox="0 0 24 24" className="heart-svg">
                 <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />
@@ -95,7 +112,7 @@ export default function Navbar() {
             <div className="profile-icon-wrapper">
               <div
                 className={`nav-icon profile ${isAdmin ? "admin-border" : ""}`}
-                onClick={() => setOpenProfileMenu((p) => !p)}
+                onClick={() => setOpenProfileMenu(!openProfileMenu)}
               >
                 {isAdmin && <span className="admin-crown">👑</span>}
                 <img
@@ -117,22 +134,33 @@ export default function Navbar() {
                     הפרופיל שלי
                   </div>
 
+                  {/* ✅ Admin: לוח בקרה אדמין */}
                   {isAdmin && (
                     <div
                       className="dropdown-item admin-only"
                       onClick={() => {
-                        navigate("/admin/activity");
+                        navigate("/admin-dashboard");
                         setOpenProfileMenu(false);
                       }}
                     >
-                      🕘 פעילות אחרונה
+                      לוח בקרה אדמין
                     </div>
                   )}
 
-                  <div
-                    className="dropdown-item logout"
-                    onClick={handleLogout}
-                  >
+                  {/* ✅ Admin: ניהול מערכת → פרופיל#admin */}
+                  {isAdmin && (
+                    <div
+                      className="dropdown-item admin-only"
+                      onClick={() => {
+                        navigate("/profile#admin");
+                        setOpenProfileMenu(false);
+                      }}
+                    >
+                      ניהול מערכת
+                    </div>
+                  )}
+
+                  <div className="dropdown-item logout" onClick={handleLogout}>
                     התנתקות
                   </div>
                 </div>
