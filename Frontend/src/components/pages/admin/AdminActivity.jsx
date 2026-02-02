@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminService from "../../services/admin";
 import { downloadBlob } from "../../../../utils/downloadHelper";
+import "../../csspages/adminActivity.css";
 
 export default function AdminActivity() {
   const [rows, setRows] = useState([]);
@@ -46,64 +47,90 @@ export default function AdminActivity() {
   };
 
   return (
-    <div style={{ padding: 24, direction: "rtl" }}>
-      <h1>🕘 פעילות אחרונה (השאלה / החזרה)</h1>
-
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <select value={action} onChange={(e) => setAction(e.target.value)}>
-          <option value="ALL">הכל</option>
-          <option value="BORROW">השאלות</option>
-          <option value="RETURN">החזרות</option>
-        </select>
-
-        <input
-          placeholder="סינון לפי User ID (אופציונלי)"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          style={{ width: 240 }}
-        />
-
-        <button onClick={handleExcel}>📤 Export Excel</button>
-        <button onClick={handlePdf}>📄 Export PDF</button>
-        <button onClick={handlePrint}>🖨️ Print</button>
-      </div>
-
-      <hr />
-
-      {loading ? (
-        <p>טוען...</p>
-      ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={{ borderBottom: "1px solid #ccc", padding: 10 }}>תאריך</th>
-                <th style={{ borderBottom: "1px solid #ccc", padding: 10 }}>פעולה</th>
-                <th style={{ borderBottom: "1px solid #ccc", padding: 10 }}>משתמש</th>
-                <th style={{ borderBottom: "1px solid #ccc", padding: 10 }}>ספר</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i}>
-                  <td style={{ borderBottom: "1px solid #eee", padding: 10 }}>
-                    {new Date(r.date).toLocaleString()}
-                  </td>
-                  <td style={{ borderBottom: "1px solid #eee", padding: 10 }}>
-                    {r.action === "BORROW" ? "📚 השאלה" : "✅ החזרה"}
-                  </td>
-                  <td style={{ borderBottom: "1px solid #eee", padding: 10 }}>
-                    {r.firstname} {r.lastname} (#{r.user_id})
-                  </td>
-                  <td style={{ borderBottom: "1px solid #eee", padding: 10 }}>
-                    {r.title} (#{r.book_id})
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="admin-activity-page">
+      <div className="admin-activity-container">
+        
+        {/* HEADER */}
+        <div className="admin-activity-header">
+          <h1>🕘 פעילות אחרונה (השאלה / החזרה)</h1>
         </div>
-      )}
+
+        {/* FILTERS */}
+        <div className="admin-activity-filters">
+          <div className="filters-row">
+            <select value={action} onChange={(e) => setAction(e.target.value)}>
+              <option value="ALL">הכל</option>
+              <option value="BORROW">השאלות</option>
+              <option value="RETURN">החזרות</option>
+            </select>
+
+            <input
+              placeholder="סינון לפי User ID (אופציונלי)"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+            />
+
+            <button onClick={handleExcel}>📤 Export Excel</button>
+            <button onClick={handlePdf}>📄 Export PDF</button>
+            <button onClick={handlePrint}>🖨️ Print</button>
+          </div>
+        </div>
+
+        <hr className="admin-activity-divider" />
+
+        {/* LOADING */}
+        {loading ? (
+          <div className="admin-activity-loading">טוען</div>
+        ) : rows.length === 0 ? (
+          /* EMPTY STATE */
+          <div className="admin-activity-empty">
+            <div className="admin-activity-empty-icon">📋</div>
+            <div className="admin-activity-empty-text">אין פעילות להצגה</div>
+          </div>
+        ) : (
+          /* TABLE */
+          <div className="admin-activity-table-wrapper">
+            <div className="admin-activity-table-scroll">
+              <table className="admin-activity-table">
+                <thead>
+                  <tr>
+                    <th>תאריך</th>
+                    <th>פעולה</th>
+                    <th>משתמש</th>
+                    <th>ספר</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r, i) => (
+                    <tr key={i}>
+                      <td>
+                        {new Date(r.date).toLocaleString("he-IL", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })}
+                      </td>
+                      <td>
+                        <span className={`activity-action ${r.action === "BORROW" ? "borrow" : "return"}`}>
+                          {r.action === "BORROW" ? "📚 השאלה" : "✅ החזרה"}
+                        </span>
+                      </td>
+                      <td>
+                        {r.firstname} {r.lastname} <span style={{ color: "#8b6f47", fontSize: "13px" }}>(#{r.user_id})</span>
+                      </td>
+                      <td>
+                        {r.title} <span style={{ color: "#8b6f47", fontSize: "13px" }}>(#{r.book_id})</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
