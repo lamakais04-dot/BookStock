@@ -54,13 +54,17 @@ export default function Navbar() {
         </NavLink>
 
         <NavLink to="/book">כל הספרים</NavLink>
-        
+
         {/* Admin specific link */}
         {isAdmin && (
-          <NavLink to="/admin-dashboard" className="admin-nav-link">
-            ניהול מערכת
-          </NavLink>
+          <div
+            className="dropdown-item admin-only"
+            onClick={() => navigate('/admin/activity')}
+          >
+            🕘 פעילות אחרונה
+          </div>
         )}
+
       </div>
 
       <div className="navbar-search">
@@ -114,9 +118,9 @@ export default function Navbar() {
                     הפרופיל שלי
                   </div>
                   {isAdmin && (
-                     <div className="dropdown-item admin-only" onClick={() => navigate('/admin-dashboard')}>
-                       לוח בקרה אדמין
-                     </div>
+                    <div className="dropdown-item admin-only" onClick={() => navigate('/admin-dashboard')}>
+                      לוח בקרה אדמין
+                    </div>
                   )}
                   <div className="dropdown-item logout" onClick={handleLogout}>
                     התנתקות
@@ -126,7 +130,7 @@ export default function Navbar() {
             </div>
 
             <label className="welcome">
-                שלום, {user.firstname}! {isAdmin && <small>(Admin)</small>}
+              שלום, {user.firstname}! {isAdmin && <small>(Admin)</small>}
             </label>
           </>
         ) : (
