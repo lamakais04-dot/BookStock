@@ -12,11 +12,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Helper to check admin status
+  // בדיקת אדמין
   const isAdmin = user?.role === "admin";
 
   const isFavoritePage = location.pathname === "/favorites";
 
+  // ניקוי חיפוש כשעוזבים את עמוד הספרים
   useEffect(() => {
     if (location.pathname !== "/book") {
       setSearch("");
@@ -48,21 +49,23 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
+      {/* ===== RIGHT ===== */}
       <div className="navbar-right">
         <NavLink to="/">
           <img className="navbar-logo" src={logo} alt="logo" />
         </NavLink>
 
         <NavLink to="/book">כל הספרים</NavLink>
-        
-        {/* Admin specific link */}
+
+        {/* 🔧 ניהול מערכת – מוביל לפרופיל + גלילה */}
         {isAdmin && (
-          <NavLink to="/admin-dashboard" className="admin-nav-link">
+          <NavLink to="/profile#admin" className="admin-nav-link">
             ניהול מערכת
           </NavLink>
         )}
       </div>
 
+      {/* ===== SEARCH ===== */}
       <div className="navbar-search">
         <input
           type="text"
@@ -71,13 +74,21 @@ export default function Navbar() {
           onChange={(e) => handleSearchChange(e.target.value)}
         />
         {search && (
-          <button className="clear-search" onClick={clearSearch} title="נקה חיפוש">×</button>
+          <button
+            className="clear-search"
+            onClick={clearSearch}
+            title="נקה חיפוש"
+          >
+            ×
+          </button>
         )}
       </div>
 
+      {/* ===== LEFT ===== */}
       <div className="navbar-left">
         {user ? (
           <>
+            {/* FAVORITES */}
             <div
               className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
               title="מועדפים"
@@ -88,12 +99,12 @@ export default function Navbar() {
               </svg>
             </div>
 
+            {/* PROFILE */}
             <div className="profile-icon-wrapper">
               <div
                 className={`nav-icon profile ${isAdmin ? "admin-border" : ""}`}
                 onClick={() => setOpenProfileMenu(!openProfileMenu)}
               >
-                {/* Admin Badge */}
                 {isAdmin && <span className="admin-crown">👑</span>}
                 <img
                   src={user?.image || "/profilelogo.svg"}
@@ -107,18 +118,30 @@ export default function Navbar() {
                   <div
                     className="dropdown-item"
                     onClick={() => {
-                      navigate(`/profile`);
+                      navigate("/profile");
                       setOpenProfileMenu(false);
                     }}
                   >
                     הפרופיל שלי
                   </div>
+
+                  {/* 🔧 אדמין – גלילה לניהול מערכת */}
                   {isAdmin && (
-                     <div className="dropdown-item admin-only" onClick={() => navigate('/admin-dashboard')}>
-                       לוח בקרה אדמין
-                     </div>
+                    <div
+                      className="dropdown-item admin-only"
+                      onClick={() => {
+                        navigate("/profile#admin");
+                        setOpenProfileMenu(false);
+                      }}
+                    >
+                      ניהול מערכת
+                    </div>
                   )}
-                  <div className="dropdown-item logout" onClick={handleLogout}>
+
+                  <div
+                    className="dropdown-item logout"
+                    onClick={handleLogout}
+                  >
                     התנתקות
                   </div>
                 </div>
@@ -126,7 +149,7 @@ export default function Navbar() {
             </div>
 
             <label className="welcome">
-                שלום, {user.firstname}! {isAdmin && <small>(Admin)</small>}
+              שלום, {user.firstname}! {isAdmin && <small>(Admin)</small>}
             </label>
           </>
         ) : (
