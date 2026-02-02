@@ -12,13 +12,11 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Helper to check admin status
   const isAdmin = user?.role === "admin";
-
   const isFavoritePage = location.pathname === "/favorites";
 
   useEffect(() => {
-    if (location.pathname !== "/book") {
+    if (!location.pathname.startsWith("/book")) {
       setSearch("");
     }
   }, [location.pathname]);
@@ -42,12 +40,9 @@ export default function Navbar() {
     navigate("/book");
   };
 
-  const handleFavoriteClick = () => {
-    navigate("/favorites");
-  };
-
   return (
     <nav className="navbar">
+      {/* ===== RIGHT ===== */}
       <div className="navbar-right">
         <NavLink to="/">
           <img className="navbar-logo" src={logo} alt="logo" />
@@ -55,18 +50,14 @@ export default function Navbar() {
 
         <NavLink to="/book">כל הספרים</NavLink>
 
-        {/* Admin specific link */}
         {isAdmin && (
-          <div
-            className="dropdown-item admin-only"
-            onClick={() => navigate('/admin/activity')}
-          >
+          <NavLink to="/admin/activity" className="admin-nav-link">
             🕘 פעילות אחרונה
-          </div>
+          </NavLink>
         )}
-
       </div>
 
+      {/* ===== SEARCH ===== */}
       <div className="navbar-search">
         <input
           type="text"
@@ -75,29 +66,37 @@ export default function Navbar() {
           onChange={(e) => handleSearchChange(e.target.value)}
         />
         {search && (
-          <button className="clear-search" onClick={clearSearch} title="נקה חיפוש">×</button>
+          <button
+            className="clear-search"
+            onClick={clearSearch}
+            title="נקה חיפוש"
+          >
+            ×
+          </button>
         )}
       </div>
 
+      {/* ===== LEFT ===== */}
       <div className="navbar-left">
         {user ? (
           <>
+            {/* FAVORITES */}
             <div
               className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
               title="מועדפים"
-              onClick={handleFavoriteClick}
+              onClick={() => navigate("/favorites")}
             >
               <svg viewBox="0 0 24 24" className="heart-svg">
                 <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />
               </svg>
             </div>
 
+            {/* PROFILE */}
             <div className="profile-icon-wrapper">
               <div
                 className={`nav-icon profile ${isAdmin ? "admin-border" : ""}`}
-                onClick={() => setOpenProfileMenu(!openProfileMenu)}
+                onClick={() => setOpenProfileMenu((p) => !p)}
               >
-                {/* Admin Badge */}
                 {isAdmin && <span className="admin-crown">👑</span>}
                 <img
                   src={user?.image || "/profilelogo.svg"}
@@ -111,18 +110,29 @@ export default function Navbar() {
                   <div
                     className="dropdown-item"
                     onClick={() => {
-                      navigate(`/profile`);
+                      navigate("/profile");
                       setOpenProfileMenu(false);
                     }}
                   >
                     הפרופיל שלי
                   </div>
+
                   {isAdmin && (
-                    <div className="dropdown-item admin-only" onClick={() => navigate('/admin-dashboard')}>
-                      לוח בקרה אדמין
+                    <div
+                      className="dropdown-item admin-only"
+                      onClick={() => {
+                        navigate("/admin/activity");
+                        setOpenProfileMenu(false);
+                      }}
+                    >
+                      🕘 פעילות אחרונה
                     </div>
                   )}
-                  <div className="dropdown-item logout" onClick={handleLogout}>
+
+                  <div
+                    className="dropdown-item logout"
+                    onClick={handleLogout}
+                  >
                     התנתקות
                   </div>
                 </div>
