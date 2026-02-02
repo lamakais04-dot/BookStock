@@ -1,0 +1,514 @@
+/* ===============================
+   ADMIN ACTIVITY PAGE
+================================ */
+.admin-activity-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
+    padding: 120px 40px 60px;
+    direction: rtl;
+    position: relative;
+}
+
+/* רקע עם ספרים מרחפים */
+.admin-activity-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.admin-activity-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.admin-activity-header {
+    background: linear-gradient(135deg, #8b4513, #a05a2c, #d4a574);
+    padding: 40px 50px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(139, 69, 19, 0.35);
+    margin-bottom: 40px;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-activity-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: rotate-glow 20s linear infinite;
+}
+
+@keyframes rotate-glow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.admin-activity-header h1 {
+    font-size: 36px;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ===============================
+   FILTERS SECTION
+================================ */
+.admin-activity-filters {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 32px 40px;
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
+    margin-bottom: 40px;
+    border: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.filters-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* SELECT */
+.admin-activity-filters select {
+    padding: 14px 20px;
+    padding-left: 40px; /* מקום לחץ */
+    font-size: 16px;
+    font-weight: 600;
+    color: #5d3a1a;
+    
+    background: linear-gradient(135deg, #fff, #fdf8f0);
+    border: 2px solid #d4a574;
+    border-radius: 16px;
+    
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+    
+    min-width: 160px;
+    
+    /* הסרת החץ הדיפולטיבי */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    /* חץ מותאם אישית */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b4513' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 16px center;
+}
+
+.admin-activity-filters select:focus {
+    outline: none;
+    border-color: #8b4513;
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.2);
+    transform: translateY(-2px);
+}
+
+.admin-activity-filters select:hover {
+    border-color: #a05a2c;
+}
+
+/* INPUT */
+.admin-activity-filters input {
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #5d3a1a;
+    
+    background: linear-gradient(135deg, #fff, #fdf8f0);
+    border: 2px solid #d4a574;
+    border-radius: 16px;
+    
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+    
+    width: 280px;
+}
+
+.admin-activity-filters input::placeholder {
+    color: #a0826d;
+}
+
+.admin-activity-filters input:focus {
+    outline: none;
+    border-color: #8b4513;
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.2);
+    transform: translateY(-2px);
+}
+
+/* BUTTONS */
+.admin-activity-filters button {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #5d3a1a;
+    
+    background: linear-gradient(135deg, #fff, #fdf8f0);
+    border: 2px solid #8b4513;
+    border-radius: 16px;
+    
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 6px 16px rgba(139, 69, 19, 0.15);
+    
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-activity-filters button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transition: left 0.5s;
+}
+
+.admin-activity-filters button:hover::before {
+    left: 100%;
+}
+
+.admin-activity-filters button:hover {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(139, 69, 19, 0.3);
+}
+
+.admin-activity-filters button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
+}
+
+/* ===============================
+   DIVIDER
+================================ */
+.admin-activity-divider {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4a574, transparent);
+    margin: 40px 0;
+}
+
+/* ===============================
+   LOADING
+================================ */
+.admin-activity-loading {
+    text-align: center;
+    padding: 80px 20px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #8b4513;
+}
+
+.admin-activity-loading::after {
+    content: '...';
+    display: inline-block;
+    animation: dots 1.5s steps(3, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* ===============================
+   TABLE WRAPPER
+================================ */
+.admin-activity-table-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
+    overflow: hidden;
+    border: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.admin-activity-table-scroll {
+    overflow-x: auto;
+    border-radius: 16px;
+}
+
+/* Custom scrollbar */
+.admin-activity-table-scroll::-webkit-scrollbar {
+    height: 10px;
+}
+
+.admin-activity-table-scroll::-webkit-scrollbar-track {
+    background: #fef3e2;
+    border-radius: 10px;
+}
+
+.admin-activity-table-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    border-radius: 10px;
+}
+
+.admin-activity-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #a05a2c, #d4a574);
+}
+
+/* ===============================
+   TABLE
+================================ */
+.admin-activity-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 15px;
+}
+
+/* THEAD */
+.admin-activity-table thead {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    color: white;
+}
+
+.admin-activity-table th {
+    padding: 18px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+    border-bottom: 3px solid #d4a574;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.admin-activity-table th:first-child {
+    border-top-right-radius: 12px;
+}
+
+.admin-activity-table th:last-child {
+    border-top-left-radius: 12px;
+}
+
+/* TBODY */
+.admin-activity-table tbody tr {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.admin-activity-table tbody tr:nth-child(even) {
+    background: #fef9f3;
+}
+
+.admin-activity-table tbody tr:hover {
+    background: linear-gradient(135deg, #fff9f0, #fef5e7);
+    transform: scale(1.01);
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.12);
+}
+
+.admin-activity-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0e5d8;
+    color: #5d3a1a;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+.admin-activity-table tbody tr:last-child td:first-child {
+    border-bottom-right-radius: 12px;
+}
+
+.admin-activity-table tbody tr:last-child td:last-child {
+    border-bottom-left-radius: 12px;
+}
+
+/* טקסט תאריך */
+.admin-activity-table td:first-child {
+    font-size: 14px;
+    color: #8b6f47;
+    font-weight: 600;
+}
+
+/* אייקוני פעולה */
+.activity-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.activity-action.borrow {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border: 2px solid #64b5f6;
+}
+
+.activity-action.return {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #2e7d32;
+    border: 2px solid #66bb6a;
+}
+
+/* ===============================
+   EMPTY STATE
+================================ */
+.admin-activity-empty {
+    text-align: center;
+    padding: 80px 40px;
+    color: #8b6f47;
+}
+
+.admin-activity-empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.admin-activity-empty-text {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ===============================
+   PRINT STYLES
+================================ */
+@media print {
+    .admin-activity-page {
+        background: white;
+        padding: 20px;
+    }
+    
+    .admin-activity-filters,
+    .admin-activity-header::before {
+        display: none;
+    }
+    
+    .admin-activity-header {
+        background: #8b4513;
+        box-shadow: none;
+        page-break-after: avoid;
+    }
+    
+    .admin-activity-table-wrapper {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    .admin-activity-table tbody tr:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 1024px) {
+    .admin-activity-page {
+        padding: 100px 30px 40px;
+    }
+    
+    .admin-activity-header {
+        padding: 30px 35px;
+    }
+    
+    .admin-activity-header h1 {
+        font-size: 30px;
+    }
+    
+    .admin-activity-filters {
+        padding: 24px 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-activity-page {
+        padding: 90px 20px 30px;
+    }
+    
+    .admin-activity-header {
+        padding: 24px 28px;
+        border-radius: 20px;
+    }
+    
+    .admin-activity-header h1 {
+        font-size: 26px;
+    }
+    
+    .admin-activity-filters {
+        padding: 20px 24px;
+    }
+    
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .admin-activity-filters select,
+    .admin-activity-filters input,
+    .admin-activity-filters button {
+        width: 100%;
+    }
+    
+    .admin-activity-table-wrapper {
+        padding: 20px;
+    }
+    
+    .admin-activity-table th,
+    .admin-activity-table td {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+    
+    .activity-action {
+        font-size: 13px;
+        padding: 5px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-activity-page {
+        padding: 80px 16px 24px;
+    }
+    
+    .admin-activity-header {
+        padding: 20px 24px;
+    }
+    
+    .admin-activity-header h1 {
+        font-size: 22px;
+    }
+    
+    .admin-activity-filters {
+        padding: 16px 20px;
+    }
+    
+    .admin-activity-table th,
+    .admin-activity-table td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .admin-activity-table th {
+        font-size: 14px;
+    }
+}

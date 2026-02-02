@@ -240,24 +240,36 @@
 ================================ */
 .admin-controls-section {
     margin-top: 60px;
-    padding: 50px 40px;
+    padding: 80px 40px;
     background: linear-gradient(135deg, #fff9f0, #fef5e7);
     border-radius: 28px;
     box-shadow: 0 18px 40px rgba(139,69,19,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.admin-controls-section .profile-section-title {
+    margin: 0 auto 50px;
 }
 
 /* ===============================
    ADMIN ACTIONS GRID
 ================================ */
 .admin-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     gap: 28px;
-    margin-top: 40px;
+    margin-top: 0;
+    flex-wrap: wrap;
 }
 
 /* ===============================
-   ADMIN ACTION BUTTONS - ENHANCED
+   ADMIN ACTION BUTTONS
 ================================ */
 .admin-action-btn {
     position: relative;
@@ -277,6 +289,9 @@
     box-shadow: 
         0 8px 20px rgba(139,69,19,0.15),
         inset 0 1px 0 rgba(255,255,255,0.8);
+    
+    width: 240px;
+    text-align: center;
 }
 
 /* אפקט גליטר */
