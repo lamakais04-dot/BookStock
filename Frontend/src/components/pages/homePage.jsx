@@ -4,12 +4,16 @@ import "../csspages/homePage.css";
 import libraryBg from "../../../imageLibrary.png";
 import BookItem from "./BookItem";
 import Books from "../services/books";
+import { useAuth } from "../context/AuthContext"; // 🔹 Import Auth
 
 const HomePage = () => {
   const [randomBooks, setRandomBooks] = useState([]);
   const navigate = useNavigate();
+  
+  // 🔹 Get user and check if admin
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
-  // 🔹 ref לקטע הספרים למטה
   const booksSectionRef = useRef(null);
 
   useEffect(() => {
@@ -25,12 +29,10 @@ const HomePage = () => {
     fetchRandomBooks();
   }, []);
 
-  // 🔹 חיפוש ספר → מעבר לדף החיפוש
   const handleSearchClick = () => {
     navigate("/book");
   };
 
-  // 🔹 השאל ספר → גלילה למטה בדף הבית
   const handleBorrowClick = () => {
     booksSectionRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -66,13 +68,17 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 🔻 הספרים למטה */}
       <section className="section" ref={booksSectionRef}>
         <h2>ספרים שאולי תאהב/י</h2>
 
         <div className="books-scroll">
           {randomBooks.map((book) => (
-            <BookItem key={book.id} book={book} />
+            <BookItem 
+              key={book.id} 
+              book={book} 
+              isAdmin={isAdmin} // 🔹 Pass the admin status here!
+              setBooks={setRandomBooks} // 🔹 Pass setBooks so delete works here too
+            />
           ))}
         </div>
       </section>
