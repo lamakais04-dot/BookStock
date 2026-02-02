@@ -12,6 +12,7 @@ import SingleBook from '../../pages/singlebook'
 import Profile from '../../pages/profile'
 import AdminActivity from '../../pages/admin/AdminActivity'
 import ProtectedRoute from '../../pages/ProtectedRoute'
+import AdminCategory from '../../pages/admin/AdminCategory'
 export default function Layout() {
     return (
         <div className='layout'>
@@ -71,6 +72,7 @@ export default function Layout() {
                     />
 
                     <Route path="/admin/activity" element={<AdminActivity />} />
+                    <Route path="/admin/categories" element={<AdminCategory />} />
 
 
                 </Routes>
