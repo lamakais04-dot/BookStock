@@ -2,16 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../csspages/BookItem.css";
 import Favorites from "../services/favorites";
+import Books from "../services/books";
 import Library from "../services/library";
 import { useAuth } from "../context/AuthContext";
 
-export default function BookItem({ book, setBooks, mode = "all" }) {
-    const navigate = useNavigate();
-    const { user, setUser } = useAuth();
-    const [isFavorite, setIsFavorite] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [msg, setMsg] = useState("");
-    const [error, setError] = useState("");
+export default function BookItem({
+  book,
+  setBooks,
+  isAdmin,
+  setEditBook,
+  mode = "all"
+}) {
+  const navigate = useNavigate();
+  const { user, setUser } = useAuth();
+
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(false);
 
     const isBorrowedByMe = Boolean(
         user?.borrowedBooks?.includes(book.id)
@@ -21,31 +27,21 @@ export default function BookItem({ book, setBooks, mode = "all" }) {
         navigate(`/book/${book.id}`);
     };
 
-    /* ================= Favorites ================= */
-    useEffect(() => {
-        if (!user || mode === "profile") return;
+  /* ===== ADMIN DELETE ===== */
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm(`Delete "${book.title}"?`)) return;
+    await Books.deleteBook(book.id);
+    setBooks(prev => prev.filter(b => b.id !== book.id));
+  };
 
-        async function loadFavorites() {
-            try {
-                const favs = await Favorites.getFavorites();
-                const ids = favs.map(f => f.bookid);
-                setIsFavorite(ids.includes(book.id));
-            } catch {}
-        }
-        loadFavorites();
-    }, [book.id, user, mode]);
-
-    /* ================= Auto-clear messages ================= */
-    useEffect(() => {
-        if (msg || error) {
-            const timer = setTimeout(() => {
-                setMsg("");
-                setError("");
-            }, 3000); // 3 שניות
-
-            return () => clearTimeout(timer);
-        }
-    }, [msg, error]);
+  /* ===== FAVORITES (USER ONLY) ===== */
+  useEffect(() => {
+    if (!user || isAdmin) return;
+    Favorites.getFavorites().then(favs => {
+      setIsFavorite(favs.map(f => f.bookid).includes(book.id));
+    });
+  }, [book.id, user, isAdmin]);
 
     const handleLike = async () => {
         if (!user) return alert("יש להתחבר כדי להוסיף למועדפים");
@@ -147,7 +143,30 @@ export default function BookItem({ book, setBooks, mode = "all" }) {
 
             <p className="book-meta">{book.pages} עמודים</p>
             <p className="book-meta">{book.quantity} ספרים זמינים</p>
+      <p className="book-meta">{book.pages} עמודים</p>
+      <p className="book-meta">{book.quantity} זמינים</p>
 
+      {/* ===== ADMIN ===== */}
+      {isAdmin && (
+        <div className="admin-actions">
+          <button onClick={() => setEditBook(book)}>✏️ ערוך</button>
+          <button onClick={handleDelete}>🗑 מחק</button>
+        </div>
+      )}
+
+      {/* ===== USER ===== */}
+      {!isAdmin && (
+        <div className="book-actions">
+          {isBorrowedByMe ? (
+            <button onClick={handleReturn}>החזרה</button>
+          ) : (
+            <button
+              onClick={handleBorrow}
+              disabled={book.quantity === 0}
+            >
+              השאלה
+            </button>
+          )}
             <div className="book-actions">
                 {/* ===== PROFILE MODE ===== */}
                 {mode === "profile" ? (
