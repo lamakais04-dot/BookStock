@@ -3,6 +3,9 @@ import { useLocation } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import BookItem from "./BookItem";
+import Modal from "./Modal";
+import BookForm from "./BookForm";
+import { useAuth } from "../context/AuthContext";
 
 import "../csspages/books.css";
 import "../csspages/filters.css";
@@ -20,8 +23,13 @@ export default function AllBooks() {
   const [ageGroupId, setAgeGroupId] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const booksPerPage = 10;
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editBook, setEditBook] = useState(null);
 
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+
+  const booksPerPage = 10;
   const location = useLocation();
   const search =
     new URLSearchParams(location.search).get("search") || "";
@@ -37,7 +45,6 @@ export default function AllBooks() {
           ageGroupId,
           search
         );
-
         setBooks(data?.books || []);
         setTotalPages(data?.totalPages || 1);
       } catch (err) {
@@ -49,7 +56,6 @@ export default function AllBooks() {
     return () => clearTimeout(delay);
   }, [currentPage, categoryId, ageGroupId, search]);
 
-  // איפוס עמוד בסינון
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryId, ageGroupId, search]);
@@ -58,10 +64,8 @@ export default function AllBooks() {
   useEffect(() => {
     async function loadFilters() {
       try {
-        const cats = await Filters.getCategories();
-        const ages = await Filters.getAgeGroups();
-        setCategories(cats);
-        setAgeGroups(ages);
+        setCategories(await Filters.getCategories());
+        setAgeGroups(await Filters.getAgeGroups());
       } catch (err) {
         console.error(err);
       }
@@ -71,6 +75,15 @@ export default function AllBooks() {
 
   return (
     <>
+      {/* ===== ADMIN ADD BUTTON ===== */}
+      {isAdmin && (
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <button onClick={() => setShowAddModal(true)}>
+            ➕ הוסף ספר
+          </button>
+        </div>
+      )}
+
       {/* ===== Age Filter ===== */}
       <div className="age-filter">
         {ageGroups.map(age => (
@@ -87,102 +100,87 @@ export default function AllBooks() {
         ))}
       </div>
 
-      {/* ===== Clear Filters (OUTSIDE menu) ===== */}
-      {(categoryId || ageGroupId || search) && (
-        <div className="clear-filters-wrapper">
-          <button
-            className="clear-filters"
-            onClick={() => {
-              setCategoryId(null);
-              setAgeGroupId(null);
-              setCurrentPage(1);
-            }}
-          >
-            ✖ נקה סינון
-          </button>
-        </div>
-      )}
-
       {/* ===== Books grid ===== */}
       <div className="books-grid">
-        {books.length === 0 ? (
-          <div className="books-empty">
-            <div className="books-empty-icon">📚</div>
-            <h2>לא נמצאו ספרים</h2>
-            <p>נסה לשנות את הסינון או את מילות החיפוש</p>
-          </div>
-        ) : (
-          books.map(book => (
-            <BookItem
-              key={book.id}
-              book={book}
-              setBooks={setBooks}
-            />
-          ))
-        )}
+        {books.map(book => (
+          <BookItem
+            key={book.id}
+            book={book}
+            setBooks={setBooks}
+            isAdmin={isAdmin}
+            setEditBook={setEditBook}
+          />
+        ))}
       </div>
 
-      {/* ===== Pagination ===== */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(p => p - 1)}
-          >
-            הקודם
-          </button>
+      {/* ===== Add Modal ===== */}
+      {showAddModal && (
+        <Modal onClose={() => setShowAddModal(false)}>
+          <h2>הוספת ספר</h2>
+          <BookForm
+            categories={categories}
+            ageGroups={ageGroups}
+            onSubmit={async (data) => {
+              try {
+                const newBook = await Books.addBook({
+                  title: data.title,
+                  summary: data.summary,
+                  author: data.author,
+                  quantity: data.quantity,
+                  pages: data.pages,
+                  categoryid: data.categoryid,
+                  agesid: data.agesid,
+                  image: data.imageFile, // FILE
+                });
 
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              className={currentPage === i + 1 ? "active" : ""}
-              onClick={() => setCurrentPage(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
+                setBooks(prev => [newBook, ...prev]);
+                setShowAddModal(false);
+              } catch (err) {
+                console.error(err);
+                alert("Failed to add book");
+              }
+            }}
+          />
 
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(p => p + 1)}
-          >
-            הבא
-          </button>
-        </div>
+
+        </Modal>
       )}
 
-      {/* ===== Categories Menu ===== */}
-      <div className="category-menu">
-        <button
-          className="menu-btn"
-          onMouseEnter={() => setIsFilterOpen(true)}
-          onMouseLeave={() => setIsFilterOpen(false)}
-        >
-          ☰
-        </button>
+      {/* ===== Edit Modal ===== */}
+      {editBook && (
+        <Modal onClose={() => setEditBook(null)}>
+          <h2>עריכת ספר</h2>
+          <BookForm
+            initialData={editBook}
+            categories={categories}
+            ageGroups={ageGroups}
+            onSubmit={async (data) => {
+              try {
+                const updated = await Books.updateBook(editBook.id, {
+                  title: data.title,
+                  summary: data.summary,
+                  author: data.author,
+                  quantity: data.quantity,
+                  pages: data.pages,
+                  categoryid: data.categoryid,
+                  agesid: data.agesid,
+                  image: data.imageFile || null, // אופציונלי
+                });
 
-        {isFilterOpen && (
-          <div
-            className="category-list"
-            onMouseEnter={() => setIsFilterOpen(true)}
-            onMouseLeave={() => setIsFilterOpen(false)}
-          >
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                className={categoryId === cat.id ? "active" : ""}
-                onClick={() => {
-                  setCategoryId(cat.id);
-                  setIsFilterOpen(false);
-                }}
-              >
-                <span className="star">★</span>
-                {cat.name}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+                setBooks(prev =>
+                  prev.map(b => (b.id === updated.id ? updated : b))
+                );
+                setEditBook(null);
+              } catch (err) {
+                console.error(err);
+                alert("Failed to update book");
+              }
+            }}
+          />
+
+
+        </Modal>
+      )}
     </>
   );
 }
