@@ -13,6 +13,8 @@ import "../csspages/pagination.css";
 
 export default function AllBooks() {
   const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -34,8 +36,10 @@ export default function AllBooks() {
   const search =
     new URLSearchParams(location.search).get("search") || "";
 
-  // ===== Fetch books =====
+  /* ===== Fetch books ===== */
   useEffect(() => {
+    setLoading(true);
+
     const delay = setTimeout(async () => {
       try {
         const data = await Books.getBooks(
@@ -50,17 +54,21 @@ export default function AllBooks() {
       } catch (err) {
         console.error(err);
         setBooks([]);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
       }
     }, 400);
 
     return () => clearTimeout(delay);
   }, [currentPage, categoryId, ageGroupId, search]);
 
+  /* איפוס עמוד בסינון */
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryId, ageGroupId, search]);
 
-  // ===== Load filters =====
+  /* ===== Load filters ===== */
   useEffect(() => {
     async function loadFilters() {
       try {
@@ -100,8 +108,44 @@ export default function AllBooks() {
         ))}
       </div>
 
-      {/* ===== Books grid ===== */}
+      {/* ===== Clear Filters ===== */}
+      {(categoryId || ageGroupId || search) && (
+        <div className="clear-filters-wrapper">
+          <button
+            className="clear-filters"
+            onClick={() => {
+              setCategoryId(null);
+              setAgeGroupId(null);
+              setCurrentPage(1);
+            }}
+          >
+            ✖ נקה סינון
+          </button>
+        </div>
+      )}
+
+      {/* ===== Books Grid ===== */}
       <div className="books-grid">
+        {loading ? (
+          <div className="books-loading">
+            <div className="loading-spinner"></div>
+            <p>טוען ספרים...</p>
+          </div>
+        ) : books.length === 0 ? (
+          <div className="books-empty">
+            <div className="books-empty-icon">📚</div>
+            <h2>לא נמצאו ספרים</h2>
+            <p>נסה לשנות את הסינון או את מילות החיפוש</p>
+          </div>
+        ) : (
+          books.map(book => (
+            <BookItem
+              key={book.id}
+              book={book}
+              setBooks={setBooks}
+            />
+          ))
+        )}
         {books.map(book => (
           <BookItem
             key={book.id}
@@ -144,6 +188,33 @@ export default function AllBooks() {
 
 
         </Modal>
+      {/* ===== Pagination ===== */}
+      {!loading && totalPages > 1 && (
+        <div className="pagination">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+          >
+            הקודם
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+          >
+            הבא
+          </button>
+        </div>
       )}
 
       {/* ===== Edit Modal ===== */}

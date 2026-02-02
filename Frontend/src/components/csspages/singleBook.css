@@ -7,49 +7,40 @@
 }
 
 /* =========================
-   BACK BUTTON – קטן יותר (אותו עיצוב)
+   BACK BUTTON
    ========================= */
 .back-button {
   position: absolute;
   top: 100px;
   left: 40px;
-
-  padding: 0.6rem 1.4rem;   /* הוקטן */
-  font-size: 0.95rem;       /* הוקטן */
-  font-weight: 600;         /* הוקטן */
-
+  padding: 0.6rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   background: linear-gradient(135deg, #fef3e2 0%, #fdefd5 100%);
   color: #8b4513;
-
   border: 2px solid #8b4513;
-  border-radius: 14px;      /* הוקטן מ־16 */
-
+  border-radius: 14px;
   cursor: pointer;
-
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.4rem;
-
   box-shadow: 0 3px 10px rgba(139, 69, 19, 0.14);
   transition: all 0.3s ease;
-
   z-index: 10;
 }
 
 .back-button:hover {
   background: linear-gradient(135deg, #fdefd5 0%, #f5deb3 100%);
   transform: translateY(-2px);
-  box-shadow: 0 5px 14px rgba(139, 69, 19, 0.22);
 }
 
 .back-button:active {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
 }
 
-/* ========================= */
-
+/* =========================
+   CARD
+   ========================= */
 .single-book {
   max-width: 1200px;
   margin: 0 auto;
@@ -74,6 +65,9 @@
   }
 }
 
+/* =========================
+   IMAGE (FIXED)
+   ========================= */
 .book-image-wrapper {
   flex-shrink: 0;
 }
@@ -82,20 +76,26 @@
   width: 320px;
   height: 450px;
   border-radius: 20px;
-  overflow: hidden;
+  background: linear-gradient(135deg, #f5e6cf 0%, #fdf6ec 100%);
   box-shadow: 0 8px 24px rgba(139, 69, 19, 0.2);
-  background: linear-gradient(135deg, #f5deb3 0%, #ecdcc0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  padding: 12px; /* ⭐ המרווח החשוב */
 }
 
 .book-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;   /* ❗ בלי חיתוך */
+  display: block;
+  border-radius: 14px;
 }
 
+/* =========================
+   DETAILS
+   ========================= */
 .book-details {
   flex: 1;
   display: flex;
@@ -127,6 +127,9 @@
   border-right: 4px solid #8b4513;
 }
 
+/* =========================
+   INFO GRID
+   ========================= */
 .book-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -152,6 +155,9 @@
   font-weight: 700;
 }
 
+/* =========================
+   ACTIONS
+   ========================= */
 .book-actions {
   display: flex;
   gap: 1rem;
@@ -176,10 +182,42 @@
 .borrow-button {
   background: linear-gradient(135deg, #2f6f56 0%, #27584a 100%);
   color: #ffffff;
+  border: none;
 }
 
 .favorite-button {
   background: linear-gradient(135deg, #fef3e2 0%, #fdefd5 100%);
   color: #8b4513;
   border: 2px solid #8b4513;
+}
+
+.borrow-button:hover,
+.favorite-button:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+@media (max-width: 900px) {
+  .single-book {
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .book-image {
+    width: 100%;
+    height: 380px;
+    padding: 10px;
+  }
+
+  .book-title {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .book-author {
+    text-align: center;
+  }
 }

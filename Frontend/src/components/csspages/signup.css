@@ -278,4 +278,46 @@
   margin-top: 2px;
 }
 
+/* ===============================
+   IMAGE UPLOAD – FINAL STEP
+================================ */
+
+.signup-image-upload {
+  width: 100%;
+  min-height: 120px;
+  border: 2px dashed rgba(139, 69, 19, 0.4);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fffbf5, #fef8f0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.signup-image-upload:hover {
+  border-color: #8b4513;
+  background: rgba(245, 222, 179, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(139, 69, 19, 0.2);
+}
+
+.upload-icon {
+  font-size: 2.3rem;
+}
+
+.upload-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #5d4e37;
+}
+
+.upload-text small {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #8b6f47;
+}
 
