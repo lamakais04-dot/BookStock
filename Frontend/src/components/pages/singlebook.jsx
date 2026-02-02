@@ -7,6 +7,43 @@ import { useAuth } from "../context/AuthContext";
 import { useFavorites } from "../context/FavoritesContext";
 import "../csspages/singleBook.css";
 
+// Modal Component
+function Modal({ show, onClose, title, message, type = "success", onConfirm }) {
+  if (!show) return null;
+
+  const icons = {
+    success: "✅",
+    error: "❌",
+    confirm: "❓"
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className={`modal-icon ${type}`}>{icons[type]}</div>
+        <h2 className="modal-title">{title}</h2>
+        <p className="modal-message">{message}</p>
+        <div className="modal-buttons">
+          {type === "confirm" ? (
+            <>
+              <button className="modal-btn modal-btn-danger" onClick={onConfirm}>
+                כן, מחק
+              </button>
+              <button className="modal-btn modal-btn-secondary" onClick={onClose}>
+                ביטול
+              </button>
+            </>
+          ) : (
+            <button className="modal-btn modal-btn-primary" onClick={onClose}>
+              סגור
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,6 +65,14 @@ export default function SingleBook() {
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+
+  // Modal states
+  const [modal, setModal] = useState({
+    show: false,
+    title: "",
+    message: "",
+    type: "success"
+  });
 
   // User relations
   const isBorrowedByMe = user?.borrowedBooks?.includes(bookId);
@@ -58,6 +103,14 @@ export default function SingleBook() {
     loadPageData();
   }, [id, isNew]);
 
+  const showModal = (title, message, type = "success") => {
+    setModal({ show: true, title, message, type });
+  };
+
+  const closeModal = () => {
+    setModal({ ...modal, show: false });
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setBook(prev => ({ ...prev, [name]: value }));
@@ -68,15 +121,17 @@ export default function SingleBook() {
       const dataToSend = { ...book, image: imageFile };
       if (isNew) {
         await Books.addBook(dataToSend);
-        alert("הספר נוסף בהצלחה!");
+        showModal("הצלחה! 🎉", "הספר נוסף בהצלחה למערכת", "success");
+        setTimeout(() => {
+          navigate("/book");
+        }, 2000);
       } else {
         await Books.updateBook(id, dataToSend);
-        alert("הספר עודכן בהצלחה!");
+        showModal("עודכן! ✨", "פרטי הספר עודכנו בהצלחה", "success");
+        setIsEditing(false);
       }
-      setIsEditing(false);
-      navigate("/book");
     } catch (err) {
-      alert("שגיאה בשמירת הנתונים");
+      showModal("שגיאה", "אירעה שגיאה בשמירת הנתונים. נסה שוב.", "error");
     }
   };
 
@@ -89,8 +144,9 @@ export default function SingleBook() {
         canBorrow: res.canBorrow
       }));
       setBook(prev => ({ ...prev, quantity: prev.quantity - 1 }));
+      showModal("הושאל! 📚", "הספר הושאל בהצלחה. תהנה מהקריאה!", "success");
     } catch {
-      alert("לא ניתן להשאיל");
+      showModal("שגיאה", "לא ניתן להשאיל את הספר כעת. נסה שוב מאוחר יותר.", "error");
     }
   };
 
@@ -103,8 +159,9 @@ export default function SingleBook() {
         canBorrow: res.canBorrow
       }));
       setBook(prev => ({ ...prev, quantity: prev.quantity + 1 }));
+      showModal("הוחזר! ✅", "תודה! הספר הוחזר בהצלחה", "success");
     } catch {
-      alert("שגיאה בהחזרת הספר");
+      showModal("שגיאה", "אירעה שגיאה בהחזרת הספר. נסה שוב.", "error");
     }
   };
 
@@ -112,6 +169,14 @@ export default function SingleBook() {
 
   return (
     <div className="single-book-container">
+      <Modal
+        show={modal.show}
+        onClose={closeModal}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
+
       <button className="back-button" onClick={() => navigate("/book")}>← חזרה לקטלוג</button>
 
       <div className={`single-book ${isEditing ? "editing-active" : ""}`}>
@@ -158,7 +223,7 @@ export default function SingleBook() {
               </div>
 
               <div className="edit-actions">
-                <button className="save-button" onClick={handleSave}>💾 שמור שינויים</button>
+                <button className="save-button" onClick={handleSave}>💾 שמור </button>
                 {!isNew && <button className="cancel-button" onClick={() => setIsEditing(false)}>ביטול</button>}
               </div>
             </div>

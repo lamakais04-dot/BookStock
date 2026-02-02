@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../../csspages/navbar.css";
-import logo from "../../../../BookStockLogo.png";
+import logo from "../../../../BookstockLogo.png";
 import LoginClass from "../../services/login";
 
 export default function Navbar() {

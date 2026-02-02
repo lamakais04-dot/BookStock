@@ -18,7 +18,7 @@ export default function AllBooks() {
   const [ageGroups, setAgeGroups] = useState([]);
   const [categoryId, setCategoryId] = useState(null);
   const [ageGroupId, setAgeGroupId] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // From your original code
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -75,11 +75,12 @@ export default function AllBooks() {
 
   return (
     <>
-      {/* ===== Admin Add Button ===== */}
+      {/* ===== Admin Add Button - צף בפינה ===== */}
       {isAdmin && (
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div className="add-book-wrapper">
           <button className="add-book-btn" onClick={() => navigate("/book/new")}>
-            ➕ הוסף ספר חדש למערכת
+            <span className="icon">➕</span>
+            הוסף ספר חדש
           </button>
         </div>
       )}
