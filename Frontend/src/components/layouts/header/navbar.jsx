@@ -12,17 +12,17 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // בודק אם אנחנו בעמוד המועדפים
+  // Helper to check admin status
+  const isAdmin = user?.role === "admin";
+
   const isFavoritePage = location.pathname === "/favorites";
 
-  // ✅ חייב להיות לפני כל return
   useEffect(() => {
     if (location.pathname !== "/book") {
       setSearch("");
     }
   }, [location.pathname]);
 
-  // ❌ קודם היה לפני ה־useEffect – וזה שבר את React
   if (loading) return null;
 
   const handleLogout = () => {
@@ -48,16 +48,21 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      {/* RIGHT */}
       <div className="navbar-right">
         <NavLink to="/">
           <img className="navbar-logo" src={logo} alt="logo" />
         </NavLink>
 
         <NavLink to="/book">כל הספרים</NavLink>
+        
+        {/* Admin specific link */}
+        {isAdmin && (
+          <NavLink to="/admin-dashboard" className="admin-nav-link">
+            ניהול מערכת
+          </NavLink>
+        )}
       </div>
 
-      {/* SEARCH – LIVE */}
       <div className="navbar-search">
         <input
           type="text"
@@ -66,21 +71,13 @@ export default function Navbar() {
           onChange={(e) => handleSearchChange(e.target.value)}
         />
         {search && (
-          <button
-            className="clear-search"
-            onClick={clearSearch}
-            title="נקה חיפוש"
-          >
-            ×
-          </button>
+          <button className="clear-search" onClick={clearSearch} title="נקה חיפוש">×</button>
         )}
       </div>
 
-      {/* LEFT */}
       <div className="navbar-left">
         {user ? (
           <>
-            {/* FAVORITES */}
             <div
               className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
               title="מועדפים"
@@ -91,25 +88,18 @@ export default function Navbar() {
               </svg>
             </div>
 
-            {/* PROFILE */}
             <div className="profile-icon-wrapper">
               <div
-                className="nav-icon profile"
+                className={`nav-icon profile ${isAdmin ? "admin-border" : ""}`}
                 onClick={() => setOpenProfileMenu(!openProfileMenu)}
               >
-                {user?.image ? (
-                  <img
-                    src={user.image}
-                    alt="profile"
-                    className="profile-icon-img"
-                  />
-                ) : (
-                  <img
-                    src="/profilelogo.svg"
-                    alt="profile"
-                    className="profile-icon-img"
-                  />
-                )}
+                {/* Admin Badge */}
+                {isAdmin && <span className="admin-crown">👑</span>}
+                <img
+                  src={user?.image || "/profilelogo.svg"}
+                  alt="profile"
+                  className="profile-icon-img"
+                />
               </div>
 
               {openProfileMenu && (
@@ -123,18 +113,21 @@ export default function Navbar() {
                   >
                     הפרופיל שלי
                   </div>
-
-                  <div
-                    className="dropdown-item logout"
-                    onClick={handleLogout}
-                  >
+                  {isAdmin && (
+                     <div className="dropdown-item admin-only" onClick={() => navigate('/admin-dashboard')}>
+                       לוח בקרה אדמין
+                     </div>
+                  )}
+                  <div className="dropdown-item logout" onClick={handleLogout}>
                     התנתקות
                   </div>
                 </div>
               )}
             </div>
 
-            <label className="welcome">שלום, {user.firstname}!</label>
+            <label className="welcome">
+                שלום, {user.firstname}! {isAdmin && <small>(Admin)</small>}
+            </label>
           </>
         ) : (
           <>
