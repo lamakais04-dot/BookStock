@@ -222,7 +222,7 @@ export default function Profile() {
 
                             <button
                                 className="admin-action-btn"
-                                onClick={() => navigate("/admin/activities")}
+                                onClick={() => navigate("/admin/activity")}
                             >
                                 📜 פעילויות אחרונות
                             </button>
