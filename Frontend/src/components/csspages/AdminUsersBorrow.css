@@ -1,0 +1,608 @@
+/* ===============================
+   ADMIN USER BORROWS PAGE
+================================ */
+.admin-borrows-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
+    padding: 120px 40px 60px;
+    direction: rtl;
+    position: relative;
+}
+
+/* רקע עם ספרים מרחפים */
+.admin-borrows-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.admin-borrows-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.admin-borrows-header {
+    background: linear-gradient(135deg, #8b4513, #a05a2c, #d4a574);
+    padding: 40px 50px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(139, 69, 19, 0.35);
+    margin-bottom: 40px;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-borrows-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: rotate-glow 20s linear infinite;
+}
+
+@keyframes rotate-glow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.admin-borrows-header h1 {
+    font-size: 36px;
+    margin: 0 0 12px 0;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.header-user-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+}
+
+/* כפתור חזרה */
+.back-btn {
+    position: absolute;
+    top: 40px;
+    left: 50px;
+    z-index: 2;
+    
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 14px;
+    
+    font-size: 15px;
+    font-weight: 700;
+    color: #5d3a1a;
+    
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn:hover {
+    background: #ffffff;
+    transform: translateY(-2px) translateX(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ===============================
+   STATS ROW
+================================ */
+.borrows-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.borrow-stat-card {
+    background: linear-gradient(135deg, #fff, #fef9f3);
+    border: 2px solid #e8dcc8;
+    border-radius: 24px;
+    padding: 32px 28px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(139, 69, 19, 0.12);
+    transition: all 0.3s ease;
+}
+
+.borrow-stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 36px rgba(139, 69, 19, 0.2);
+}
+
+.borrow-stat-card.open {
+    border-color: #64b5f6;
+    background: linear-gradient(135deg, #e3f2fd, #fff);
+}
+
+.borrow-stat-card.returned {
+    border-color: #66bb6a;
+    background: linear-gradient(135deg, #e8f5e9, #fff);
+}
+
+.borrow-stat-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.borrow-stat-value {
+    font-size: 42px;
+    font-weight: 800;
+    color: #8b4513;
+    margin-bottom: 8px;
+}
+
+.borrow-stat-card.open .borrow-stat-value {
+    color: #1565c0;
+}
+
+.borrow-stat-card.returned .borrow-stat-value {
+    color: #2e7d32;
+}
+
+.borrow-stat-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #8b6f47;
+}
+
+/* ===============================
+   FILTER BAR
+================================ */
+.borrows-filter-bar {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 24px 32px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 24px rgba(139, 69, 19, 0.12);
+    border: 2px solid rgba(139, 69, 19, 0.08);
+}
+
+.filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    user-select: none;
+    width: fit-content;
+}
+
+.toggle-track {
+    width: 56px;
+    height: 30px;
+    background: #e0e0e0;
+    border-radius: 30px;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filter-toggle.active .toggle-track {
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+}
+
+.toggle-thumb {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.filter-toggle.active .toggle-thumb {
+    right: 29px;
+}
+
+.filter-toggle-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #5d3a1a;
+}
+
+/* ===============================
+   TABLE WRAPPER
+================================ */
+.borrows-table-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
+    overflow: hidden;
+    border: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+/* ===============================
+   EMPTY STATE
+================================ */
+.borrows-empty {
+    text-align: center;
+    padding: 80px 40px;
+    color: #8b6f47;
+}
+
+.borrows-empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.borrows-empty-text {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ===============================
+   DESKTOP TABLE
+================================ */
+.borrows-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 15px;
+}
+
+.borrows-table thead {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    color: white;
+}
+
+.borrows-table th {
+    padding: 18px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 3px solid #d4a574;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.borrows-table th:first-child {
+    border-top-right-radius: 12px;
+}
+
+.borrows-table th:last-child {
+    border-top-left-radius: 12px;
+}
+
+.borrows-table tbody tr {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.borrows-table tbody tr:nth-child(even) {
+    background: #fef9f3;
+}
+
+.borrows-table tbody tr:hover {
+    background: linear-gradient(135deg, #fff9f0, #fef5e7);
+    transform: scale(1.01);
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.12);
+}
+
+.borrows-table tbody tr.open-row {
+    background: linear-gradient(135deg, #e3f2fd, #fff);
+}
+
+.borrows-table tbody tr.open-row:hover {
+    background: linear-gradient(135deg, #bbdefb, #e3f2fd);
+}
+
+.borrows-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0e5d8;
+    color: #5d3a1a;
+    font-weight: 500;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Book Cell */
+.book-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: right;
+}
+
+.book-icon {
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fef9f3, #fff);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+}
+
+.book-icon.open {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+}
+
+.book-icon.returned {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+}
+
+.book-title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Date Values */
+.date-value {
+    font-size: 14px;
+    color: #8b6f47;
+    font-weight: 600;
+}
+
+.date-pending {
+    font-size: 20px;
+    color: #ccc;
+    font-weight: 300;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.status-badge.open {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border: 2px solid #64b5f6;
+}
+
+.status-badge.returned {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #2e7d32;
+    border: 2px solid #66bb6a;
+}
+
+/* ===============================
+   MOBILE CARD LIST
+================================ */
+.borrows-card-list {
+    display: none;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 1024px) {
+    .admin-borrows-page {
+        padding: 100px 30px 40px;
+    }
+    
+    .admin-borrows-header {
+        padding: 30px 40px;
+    }
+    
+    .admin-borrows-header h1 {
+        font-size: 30px;
+    }
+    
+    .back-btn {
+        top: 30px;
+        left: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-borrows-page {
+        padding: 90px 20px 30px;
+    }
+    
+    .admin-borrows-header {
+        padding: 60px 28px 28px;
+        border-radius: 20px;
+    }
+    
+    .admin-borrows-header h1 {
+        font-size: 26px;
+    }
+    
+    .header-user-name {
+        font-size: 18px;
+    }
+    
+    .back-btn {
+        top: 20px;
+        left: 20px;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .borrows-stats-row {
+        gap: 16px;
+    }
+    
+    .borrow-stat-card {
+        padding: 24px 20px;
+    }
+    
+    .borrow-stat-icon {
+        font-size: 40px;
+    }
+    
+    .borrow-stat-value {
+        font-size: 36px;
+    }
+    
+    .borrows-filter-bar {
+        padding: 20px 24px;
+    }
+    
+    /* הסתרת טבלה והצגת כרטיסים */
+    .borrows-table {
+        display: none;
+    }
+    
+    .borrows-card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .borrow-card {
+        background: white;
+        border: 2px solid #e8dcc8;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 6px 20px rgba(139, 69, 19, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .borrow-card.open {
+        border-color: #64b5f6;
+        background: linear-gradient(135deg, #e3f2fd, #fff);
+    }
+    
+    .borrow-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(139, 69, 19, 0.15);
+    }
+    
+    .borrow-card-top {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f0e5d8;
+    }
+    
+    .borrow-card-icon {
+        font-size: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #fef9f3, #fff);
+        box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+    }
+    
+    .borrow-card-icon.open {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    }
+    
+    .borrow-card-icon.returned {
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    }
+    
+    .borrow-card-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .borrow-card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #5d3a1a;
+    }
+    
+    .borrow-card-dates {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .borrow-card-date-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .borrow-card-date-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #8b6f47;
+    }
+    
+    .borrow-card-date-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #5d3a1a;
+    }
+    
+    .borrow-card-date-value.pending {
+        color: #ccc;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-borrows-page {
+        padding: 80px 16px 24px;
+    }
+    
+    .admin-borrows-header {
+        padding: 50px 20px 20px;
+    }
+    
+    .admin-borrows-header h1 {
+        font-size: 22px;
+    }
+    
+    .header-user-name {
+        font-size: 16px;
+    }
+    
+    .back-btn {
+        top: 16px;
+        left: 16px;
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .borrows-stats-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .borrow-stat-card {
+        padding: 20px 16px;
+    }
+    
+    .borrows-table-wrapper {
+        padding: 20px;
+    }
+}

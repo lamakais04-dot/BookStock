@@ -56,7 +56,7 @@ export default function Profile() {
             {/* 🔙 BACK */}
             <button
                 className="profile-back-btn"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/book")}
             >
                 ← חזרה
             </button>

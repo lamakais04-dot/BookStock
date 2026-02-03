@@ -1,0 +1,252 @@
+/* ===============================
+   ADMIN USERS PAGE
+================================ */
+.admin-users-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
+    padding: 120px 40px 60px;
+    direction: rtl;
+    position: relative;
+}
+
+.admin-users-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 15% 25%, rgba(139, 69, 19, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 85% 75%, rgba(212, 165, 116, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(139, 69, 19, 0.02) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.admin-users-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.admin-users-header {
+    background: linear-gradient(135deg, #8b4513, #a05a2c, #d4a574);
+    padding: 40px 50px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(139, 69, 19, 0.35);
+    margin-bottom: 32px;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-users-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate-glow 20s linear infinite;
+}
+
+@keyframes rotate-glow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* BACK BUTTON – כמו שהיה */
+.back-btn {
+    position: absolute;
+    top: 22px;
+    left: 28px;
+    z-index: 2;
+    background: rgba(255,255,255,0.18);
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateX(-3px);
+}
+
+/* ===============================
+   SEARCH
+================================ */
+.admin-users-search-wrapper {
+    background: rgba(255,255,255,0.95);
+    padding: 28px 36px;
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(139,69,19,0.15);
+    margin-bottom: 32px;
+    border: 2px solid rgba(139,69,19,0.1);
+}
+
+.admin-users-search-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.search-icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-users-search {
+    flex: 1;
+    padding: 16px 24px;
+    font-size: 16px;
+    border-radius: 18px;
+    border: 2px solid #d4a574;
+    outline: none;
+}
+
+.users-count-badge {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+}
+
+/* ===============================
+   TABLE
+================================ */
+.admin-users-table-wrapper {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(139,69,19,0.15);
+    border: 2px solid rgba(139,69,19,0.1);
+    overflow: hidden;
+}
+
+.admin-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.admin-users-table thead {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+}
+
+.admin-users-table th {
+    color: white;
+    padding: 14px;
+    font-weight: 700;
+}
+
+.admin-users-table td {
+    padding: 14px;
+    text-align: center;
+    color: #5d3a1a;
+}
+
+/* 🔧 תיקון קריטי – שלא ייחתך כפתור החסימה */
+.admin-users-table td:last-child {
+    overflow: visible;
+}
+
+/* ===============================
+   NAME
+================================ */
+.user-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d4a574, #8b4513);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+/* ===============================
+   ACTION BUTTONS
+================================ */
+.user-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.user-action-btn {
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 14px;
+    cursor: pointer;
+    border: 2px solid;
+    min-width: 96px; /* ⬅ מונע חיתוך */
+}
+
+.user-action-btn.view {
+    background: #e3f2fd;
+    border-color: #64b5f6;
+    color: #2980b9;
+}
+
+.user-action-btn.block {
+    background: #ffebee;
+    border-color: #ef5350;
+    color: #c0392b;
+}
+
+.user-action-btn.unblock {
+    background: #e8f5e9;
+    border-color: #66bb6a;
+    color: #27ae60;
+}
+
+/* ===============================
+   BLOCKED ROW
+================================ */
+.admin-users-table tr.blocked {
+    background: #fff0f0;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    .admin-users-table {
+        table-layout: auto;
+    }
+
+    .user-actions {
+        flex-direction: column;
+    }
+
+    .user-action-btn {
+        width: 100%;
+    }
+}

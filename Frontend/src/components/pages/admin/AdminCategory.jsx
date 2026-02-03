@@ -1,9 +1,12 @@
-// pages/admin/AdminCategories.jsx
+// pages/admin/AdminCategory.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminCategories from "../../services/adminCategories";
 import "../../csspages/AdminCategory.css";
 
 export default function AdminCategory() {
+  const navigate = useNavigate();
+
   const [categories, setCategories] = useState([]);
   const [newName, setNewName] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -75,16 +78,21 @@ export default function AdminCategory() {
   return (
     <div className="admin-categories-page">
       <div className="admin-categories-container">
-        
-        {/* SUCCESS MESSAGE */}
+
+        {/* SUCCESS */}
         {successMessage && (
-          <div className="success-notification">
-            {successMessage}
-          </div>
+          <div className="success-notification">{successMessage}</div>
         )}
 
         {/* HEADER */}
         <div className="admin-categories-header">
+          <button
+            className="back-btn"
+            onClick={() => navigate(-1)}
+          >
+            ← חזור
+          </button>
+
           <h1>📂 ניהול קטגוריות</h1>
         </div>
 
@@ -95,9 +103,7 @@ export default function AdminCategory() {
               placeholder="הזן שם קטגוריה חדשה..."
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") addCategory();
-              }}
+              onKeyDown={(e) => e.key === "Enter" && addCategory()}
             />
             <button className="add-category-btn" onClick={addCategory}>
               ➕ הוסף קטגוריה
@@ -105,7 +111,7 @@ export default function AdminCategory() {
           </div>
         </div>
 
-        {/* CATEGORIES LIST */}
+        {/* LIST */}
         <div className="categories-list-wrapper">
           {categories.length === 0 ? (
             <div className="categories-empty">
@@ -117,20 +123,17 @@ export default function AdminCategory() {
               {categories.map((c) => (
                 <li key={c.id} className="category-item">
                   <div className="category-name">{c.name}</div>
-                  
+
                   <div className="category-actions">
-                    <button 
-                      className="category-btn edit" 
+                    <button
+                      className="category-btn edit"
                       onClick={() => openEditModal(c)}
-                      title="ערוך קטגוריה"
                     >
                       ✏️ עריכה
                     </button>
-                    
-                    <button 
-                      className="category-btn delete" 
+                    <button
+                      className="category-btn delete"
                       onClick={() => openDeleteModal(c)}
-                      title="מחק קטגוריה"
                     >
                       🗑️ מחיקה
                     </button>
@@ -150,27 +153,24 @@ export default function AdminCategory() {
               <h2>✏️ עריכת קטגוריה</h2>
               <button className="modal-close" onClick={closeEditModal}>✕</button>
             </div>
-            
+
             <div className="modal-body">
               <label className="modal-label">שם הקטגוריה:</label>
               <input
                 className="modal-input"
-                type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") updateCategory();
-                }}
+                onKeyDown={(e) => e.key === "Enter" && updateCategory()}
                 autoFocus
               />
             </div>
-            
+
             <div className="modal-footer">
               <button className="modal-btn cancel" onClick={closeEditModal}>
                 ביטול
               </button>
               <button className="modal-btn save" onClick={updateCategory}>
-                💾 שמור שינויים
+                💾 שמור
               </button>
             </div>
           </div>
@@ -181,11 +181,11 @@ export default function AdminCategory() {
       {isDeleteModalOpen && (
         <div className="modal-overlay" onClick={closeDeleteModal}>
           <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header delete-header">
+            <div className="modal-header">
               <h2>🗑️ מחיקת קטגוריה</h2>
               <button className="modal-close" onClick={closeDeleteModal}>✕</button>
             </div>
-            
+
             <div className="modal-body">
               <div className="delete-warning">
                 <div className="delete-warning-icon">⚠️</div>
@@ -193,18 +193,16 @@ export default function AdminCategory() {
                   האם אתה בטוח שברצונך למחוק את הקטגוריה
                 </p>
                 <p className="delete-category-name">"{deletingCategory?.name}"</p>
-                <p className="delete-warning-subtext">
-                  פעולה זו לא ניתנת לביטול
-                </p>
+                <p className="delete-warning-subtext">פעולה זו לא ניתנת לביטול</p>
               </div>
             </div>
-            
+
             <div className="modal-footer">
               <button className="modal-btn cancel" onClick={closeDeleteModal}>
                 ביטול
               </button>
               <button className="modal-btn delete-confirm" onClick={deleteCategory}>
-                🗑️ מחק לצמיתות
+                🗑️ מחק
               </button>
             </div>
           </div>
