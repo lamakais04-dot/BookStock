@@ -56,13 +56,14 @@ export default function Layout() {
                     />
 
                     <Route
-                        path='/favorites'
+                        path="/favorites"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute blockAdmin>
                                 <FavoritesPage />
                             </ProtectedRoute>
                         }
                     />
+
 
                     <Route
                         path="/profile"

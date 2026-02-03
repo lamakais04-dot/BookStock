@@ -20,7 +20,7 @@ export default function AllBooks() {
   const [ageGroupId, setAgeGroupId] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const { user } = useAuth();
+  const { user,isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
 
