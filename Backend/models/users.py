@@ -25,3 +25,4 @@ class Users(SQLModel, table=True):
     phonenumber: str = Field(unique=True, index=True)
     role: str = Field(default="user")
     image: Optional[str] = Field(default=None)
+    is_blocked : bool = Field(default=False)
