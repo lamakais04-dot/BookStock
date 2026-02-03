@@ -12,20 +12,29 @@
   z-index: 1000;
   border-bottom: 2px solid rgba(210, 180, 140, 0.3);
 
-  display: flex;
-  justify-content: space-between;
+  /* ✅ במקום flex -> grid כדי שהחיפוש תמיד יהיה באמצע */
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 520px) 1fr;
   align-items: center;
   direction: rtl;
+  gap: 12px;
 }
 
 /* ===============================
    RIGHT / LEFT SECTIONS
 ================================ */
-.navbar-right,
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  justify-self: start;
+}
+
 .navbar-left {
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  justify-self: end;
 }
 
 /* ===============================
@@ -54,6 +63,7 @@
   padding: 0.5rem 1.2rem;
   border-radius: 20px;
   transition: 0.3s;
+  white-space: nowrap;
 }
 
 .navbar a:hover {
@@ -67,15 +77,14 @@
 }
 
 /* ===============================
-   SEARCH BAR - משופר!
+   SEARCH BAR - באמצע באמת
 ================================ */
 .navbar-search {
   display: flex;
   align-items: center;
   position: relative;
-  flex: 1;
-  max-width: 450px;
-  margin: 0 2rem;
+  width: 100%;
+  justify-self: center;
 }
 
 .navbar-search input {
@@ -85,12 +94,12 @@
   border: 2px solid rgba(255, 255, 255, 0.25);
   outline: none;
   direction: rtl;
-  
+
   background: rgba(255, 255, 255, 0.95);
   color: #5d4e37;
   font-size: 15px;
   font-weight: 500;
-  
+
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -118,13 +127,7 @@
   transition: all 0.3s ease;
 }
 
-.navbar-search input:focus + ::before,
-.navbar-search:has(input:focus)::before {
-  opacity: 0.9;
-  transform: scale(1.1);
-}
-
-/* כפתור ניקוי (X) - מופיע רק כשיש טקסט */
+/* כפתור ניקוי (X) */
 .navbar-search .clear-search {
   position: absolute;
   right: 12px;
@@ -149,7 +152,7 @@
 }
 
 /* ===============================
-   ICON BASE (HEART + PROFILE)
+   ICON BASE
 ================================ */
 .nav-icon {
   width: 44px;
@@ -189,29 +192,12 @@
 }
 
 @keyframes heartPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-}
-
-.nav-icon.heart:hover .heart-svg {
-  transform: scale(1.15);
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
 /* ===============================
-   PROFILE ICON
-================================ */
-.profile-icon-img {
-  width: 22px;
-  height: 22px;
-  display: block;
-}
-
-/* ===============================
-   PROFILE DROPDOWN
+   PROFILE
 ================================ */
 .profile-icon-wrapper {
   position: relative;
@@ -239,6 +225,9 @@
   border-radius: 50%;
 }
 
+/* ===============================
+   DROPDOWN
+================================ */
 .profile-dropdown {
   position: absolute;
   top: 54px;
@@ -246,21 +235,15 @@
   background: #fffaf3;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  min-width: 150px;
+  min-width: 170px;
   padding: 6px;
   z-index: 2000;
   animation: dropdownSlide 0.2s ease-out;
 }
 
 @keyframes dropdownSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown-item {
@@ -282,50 +265,14 @@
 }
 
 /* ===============================
-   ADMIN ELEMENTS - עיצוב אחיד לכל כפתורי אדמין
+   ADMIN ELEMENTS
 ================================ */
-
-/* כפתורי אדמין ב-Navbar (פעילות אחרונה + ניהול מערכת) */
-.navbar-right .dropdown-item.admin-only,
 .admin-nav-link {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  
-  color: #fef8f0;
-  text-decoration: none;
-  font-size: 1.05rem;
-  font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  border-radius: 20px;
-  transition: 0.3s;
-}
-
-/* קו תחתון זהוב */
-.navbar-right .dropdown-item.admin-only::before,
-.admin-nav-link::before {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  right: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #ffd700, #ffed4e);
-  transition: width 0.3s ease;
-  border-radius: 2px;
-}
-
-.navbar-right .dropdown-item.admin-only:hover::before,
-.admin-nav-link:hover::before {
-  width: 100%;
-}
-
-/* הובר */
-.navbar-right .dropdown-item.admin-only:hover,
-.admin-nav-link:hover {
-  background: rgba(245, 222, 179, 0.15);
-  color: #f5deb3;
+  white-space: nowrap;
 }
 
 /* כתר אדמין בפרופיל */
@@ -340,18 +287,14 @@
 }
 
 @keyframes crown-float {
-  0%, 100% {
-    transform: translateY(0) rotate(-15deg);
-  }
-  50% {
-    transform: translateY(-3px) rotate(-12deg);
-  }
+  0%, 100% { transform: translateY(0) rotate(-15deg); }
+  50% { transform: translateY(-3px) rotate(-12deg); }
 }
 
 /* גבול מוזהב לאדמין */
 .nav-icon.profile.admin-border {
   border: 2.5px solid #ffd700 !important;
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(139, 69, 19, 0.18),
     0 0 15px rgba(255, 215, 0, 0.3) !important;
   animation: admin-glow 2s ease-in-out infinite;
@@ -359,72 +302,34 @@
 
 @keyframes admin-glow {
   0%, 100% {
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(139, 69, 19, 0.18),
       0 0 15px rgba(255, 215, 0, 0.3);
   }
   50% {
-    box-shadow: 
+    box-shadow:
       0 4px 12px rgba(139, 69, 19, 0.18),
       0 0 25px rgba(255, 215, 0, 0.5);
   }
 }
 
-/* פריטים אדמין בדרופדאון */
-.profile-dropdown .dropdown-item.admin-only {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 237, 78, 0.05));
-  border: 1.5px solid rgba(255, 215, 0, 0.25);
-  color: #8b6f00;
-  font-weight: 600;
-  margin: 2px 0;
-  position: relative;
-  padding-right: 24px;
-}
-
-.profile-dropdown .dropdown-item.admin-only::before {
-  content: '⭐';
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px;
-  opacity: 0.7;
-}
-
-.profile-dropdown .dropdown-item.admin-only:hover {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 237, 78, 0.1));
-  border-color: rgba(255, 215, 0, 0.4);
-  color: #8b6f00;
-  transform: translateX(-2px);
-}
-
 /* ===============================
-   WELCOME TEXT - מוקטן ומעוצב!
+   WELCOME
 ================================ */
 .welcome {
   color: #ffffff;
-  text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   transition: all 0.3s ease;
-  
   background: rgba(255, 255, 255, 0.15);
   border: 2px solid rgba(255, 255, 255, 0.25);
-  
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8px);
+  white-space: nowrap;
 }
 
-.welcome:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* תג Admin בטקסט הברכה */
 .welcome small {
   display: inline-block;
   margin-right: 6px;
@@ -434,107 +339,38 @@
   border-radius: 10px;
   font-size: 0.7rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
 }
 
 /* ===============================
    RESPONSIVE
 ================================ */
 @media (max-width: 1024px) {
-  .navbar-search {
-    max-width: 300px;
-    margin: 0 1rem;
-  }
-  
-  .navbar-right .dropdown-item.admin-only {
-    font-size: 0.95rem;
-    padding: 0.5rem 1.2rem 0.5rem 1.4rem;
+  .navbar {
+    grid-template-columns: 1fr minmax(240px, 420px) 1fr;
+    padding: 1rem 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 1rem 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 1rem 1.2rem;
+  }
+
+  .navbar-right,
+  .navbar-left {
+    justify-self: center;
     flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .navbar-logo {
-    height: 40px;
-  }
-
-  .navbar a {
-    font-size: 0.95rem;
-    padding: 0.4rem 1rem;
-  }
-
-  .nav-icon {
-    width: 40px;
-    height: 40px;
+    justify-content: center;
   }
 
   .navbar-search {
     order: 3;
     width: 100%;
-    max-width: 100%;
-    margin: 0;
-  }
-
-  .navbar-search input {
-    padding: 9px 40px 9px 18px;
-    font-size: 14px;
-  }
-
-  .welcome {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.9rem;
-  }
-  
-  .navbar-right .dropdown-item.admin-only {
-    font-size: 0.9rem;
-    padding: 0.45rem 1.1rem 0.45rem 1.3rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar {
-    padding: 0.8rem 1rem;
-  }
-
-  .navbar-right,
-  .navbar-left {
-    gap: 0.8rem;
-  }
-
-  .navbar a {
-    font-size: 0.9rem;
-    padding: 0.35rem 0.8rem;
-  }
-
-  .navbar-search input {
-    padding: 8px 38px 8px 16px;
-    font-size: 13px;
-  }
-
-  .navbar-search::before {
-    font-size: 16px;
-    left: 14px;
   }
 
   .welcome {
     display: none;
-  }
-  
-  .navbar-right .dropdown-item.admin-only {
-    font-size: 0.85rem;
-    padding: 0.4rem 1rem 0.4rem 1.2rem;
-  }
-  
-  .admin-crown {
-    font-size: 14px;
-    top: -4px;
-    right: -4px;
   }
 }

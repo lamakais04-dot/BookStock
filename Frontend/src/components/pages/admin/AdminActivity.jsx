@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminService from "../../services/admin";
 import { downloadBlob } from "../../../../utils/downloadHelper";
 import "../../csspages/adminActivity.css";
@@ -6,6 +7,7 @@ import "../../csspages/adminActivity.css";
 export default function AdminActivity() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const [action, setAction] = useState("ALL"); // ALL | BORROW | RETURN
   const [userId, setUserId] = useState("");
@@ -49,9 +51,16 @@ export default function AdminActivity() {
   return (
     <div className="admin-activity-page">
       <div className="admin-activity-container">
-        
+
         {/* HEADER */}
         <div className="admin-activity-header">
+          <button
+            className="back-btn"
+            onClick={() => navigate(-1)}
+          >
+            ← חזור
+          </button>
+
           <h1>🕘 פעילות אחרונה (השאלה / החזרה)</h1>
         </div>
 
@@ -82,13 +91,11 @@ export default function AdminActivity() {
         {loading ? (
           <div className="admin-activity-loading">טוען</div>
         ) : rows.length === 0 ? (
-          /* EMPTY STATE */
           <div className="admin-activity-empty">
             <div className="admin-activity-empty-icon">📋</div>
             <div className="admin-activity-empty-text">אין פעילות להצגה</div>
           </div>
         ) : (
-          /* TABLE */
           <div className="admin-activity-table-wrapper">
             <div className="admin-activity-table-scroll">
               <table className="admin-activity-table">
@@ -113,15 +120,25 @@ export default function AdminActivity() {
                         })}
                       </td>
                       <td>
-                        <span className={`activity-action ${r.action === "BORROW" ? "borrow" : "return"}`}>
+                        <span
+                          className={`activity-action ${
+                            r.action === "BORROW" ? "borrow" : "return"
+                          }`}
+                        >
                           {r.action === "BORROW" ? "📚 השאלה" : "✅ החזרה"}
                         </span>
                       </td>
                       <td>
-                        {r.firstname} {r.lastname} <span style={{ color: "#8b6f47", fontSize: "13px" }}>(#{r.user_id})</span>
+                        {r.firstname} {r.lastname}
+                        <span style={{ color: "#8b6f47", fontSize: "13px" }}>
+                          (#{r.user_id})
+                        </span>
                       </td>
                       <td>
-                        {r.title} <span style={{ color: "#8b6f47", fontSize: "13px" }}>(#{r.book_id})</span>
+                        {r.title}
+                        <span style={{ color: "#8b6f47", fontSize: "13px" }}>
+                          (#{r.book_id})
+                        </span>
                       </td>
                     </tr>
                   ))}
