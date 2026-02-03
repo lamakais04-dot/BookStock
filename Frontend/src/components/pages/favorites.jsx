@@ -4,13 +4,17 @@ import Favorites from "../services/favorites";
 import Books from "../services/books";
 import BookItem from "./BookItem";
 import "../csspages/favorites.css";
+import { useAuth } from "../context/AuthContext";
+
 
 export default function FavoritesPage() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isBlocked } = useAuth()
 
   useEffect(() => {
+
     async function loadFavorites() {
       try {
         const favs = await Favorites.getFavorites();
@@ -56,6 +60,13 @@ export default function FavoritesPage() {
         </button>
       </div>
 
+      {isBlocked && (
+        <div className="blocked-warning">
+          ⚠️ החשבון שלך חסום — ניתן לצפות בלבד, לא ניתן לבצע שינויים.
+        </div>
+      )}
+
+
       <div className="books-grid">
         {books.length === 0 ? (
           <div className="favorites-empty">
@@ -68,7 +79,12 @@ export default function FavoritesPage() {
           </div>
         ) : (
           books.map(book => (
-            <BookItem key={book.id} book={book} setBooks={setBooks} />
+            <BookItem
+              key={book.id}
+              book={book}
+              setBooks={setBooks}
+              readOnly={isBlocked}
+            />
           ))
         )}
       </div>
