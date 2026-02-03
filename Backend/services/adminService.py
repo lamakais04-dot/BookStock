@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlmodel import Session, select
 from sqlalchemy import or_
-
+from fastapi import HTTPException
 from db import engine
 from models.users import Users
 from models.books import books
@@ -139,3 +139,23 @@ def admin_activity_service(
 
         events.sort(key=lambda x: x.date, reverse=True)
         return events[:limit]
+
+def admin_toggle_user_block_service(user_id: int):
+    with Session(engine) as session:
+        user = session.get(Users, user_id)
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if user.role == "admin":
+            raise HTTPException(status_code=400, detail="Cannot block admin")
+
+        user.is_blocked = not user.is_blocked
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+        return {
+            "user_id": user.id,
+            "is_blocked": user.is_blocked
+        }

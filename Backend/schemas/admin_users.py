@@ -17,3 +17,8 @@ class AdminUserRow(BaseModel):
     role: str
     borrowed_now_count: int
     total_borrows: int
+
+
+class BlockUserResponse(BaseModel):
+    user_id: int
+    is_blocked: bool

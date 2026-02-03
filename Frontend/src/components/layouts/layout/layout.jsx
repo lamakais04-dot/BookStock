@@ -13,6 +13,8 @@ import Profile from '../../pages/profile'
 import AdminActivity from '../../pages/admin/AdminActivity'
 import ProtectedRoute from '../../pages/ProtectedRoute'
 import AdminCategory from '../../pages/admin/AdminCategory'
+import AdminUsers from '../../pages/admin/AdminUsers'
+import AdminUserBorrows from '../../pages/admin/AdminUsersBorrow'
 export default function Layout() {
     return (
         <div className='layout'>
@@ -73,6 +75,8 @@ export default function Layout() {
 
                     <Route path="/admin/activity" element={<AdminActivity />} />
                     <Route path="/admin/categories" element={<AdminCategory />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="/admin/users/:id" element={<AdminUserBorrows />} />
 
 
                 </Routes>

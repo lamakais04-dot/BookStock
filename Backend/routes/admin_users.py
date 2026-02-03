@@ -8,6 +8,9 @@ from services.adminService import (
     admin_get_users_service,
     admin_get_user_borrows_service,
 )
+from schemas.admin_users import BlockUserResponse
+from services.adminService import admin_toggle_user_block_service
+
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -23,3 +26,11 @@ def admin_get_user_borrows(
     only_open: bool = Query(False, description="only currently borrowed"),
 ):
     return admin_get_user_borrows_service(user_id, only_open)
+
+@router.patch(
+    "/users/{user_id}/block",
+    response_model=BlockUserResponse,
+    dependencies=[Depends(get_admin_user)]
+)
+def admin_toggle_user_block(user_id: int):
+    return admin_toggle_user_block_service(user_id)
