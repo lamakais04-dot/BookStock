@@ -12,11 +12,10 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // בדיקת אדמין
   const isAdmin = user?.role === "admin";
   const isFavoritePage = location.pathname === "/favorites";
 
-  // ניקוי חיפוש כשעוזבים את עמוד הספרים
+  /* ניקוי חיפוש כשעוזבים את עמוד הספרים */
   useEffect(() => {
     if (location.pathname !== "/book") {
       setSearch("");
@@ -56,17 +55,14 @@ export default function Navbar() {
 
         <NavLink to="/book">כל הספרים</NavLink>
 
-        {/* ✅ Admin: פעילות אחרונה */}
+        {/* 🕘 Admin – פעילויות אחרונות */}
         {isAdmin && (
-          <div
-            className="dropdown-item admin-only"
-            onClick={() => navigate("/admin/activity")}
-          >
-            🕘 פעילות אחרונה
-          </div>
+          <NavLink to="/admin/activity" className="admin-nav-link">
+            🕘 פעילויות אחרונות
+          </NavLink>
         )}
 
-        {/* ✅ Admin: ניהול מערכת → פרופיל + גלילה */}
+        {/* 🔧 Admin – ניהול מערכת */}
         {isAdmin && (
           <NavLink to="/profile#admin" className="admin-nav-link">
             🔧 ניהול מערכת
@@ -97,16 +93,18 @@ export default function Navbar() {
       <div className="navbar-left">
         {user ? (
           <>
-            {/* FAVORITES */}
-            <div
-              className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
-              title="מועדפים"
-              onClick={handleFavoriteClick}
-            >
-              <svg viewBox="0 0 24 24" className="heart-svg">
-                <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />
-              </svg>
-            </div>
+            {/* ❤️ FAVORITES – רק למשתמש רגיל */}
+            {!isAdmin && (
+              <div
+                className={`nav-icon heart ${isFavoritePage ? "filled" : ""}`}
+                title="מועדפים"
+                onClick={handleFavoriteClick}
+              >
+                <svg viewBox="0 0 24 24" className="heart-svg">
+                  <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" />
+                </svg>
+              </div>
+            )}
 
             {/* PROFILE */}
             <div className="profile-icon-wrapper">
@@ -125,7 +123,7 @@ export default function Navbar() {
               {openProfileMenu && (
                 <div className="profile-dropdown">
                   <div
-                    className={`dropdown-item ${isAdmin ? "admin-only" : ""}`}
+                    className="dropdown-item"
                     onClick={() => {
                       navigate("/profile");
                       setOpenProfileMenu(false);
@@ -134,9 +132,6 @@ export default function Navbar() {
                     הפרופיל שלי
                   </div>
 
-                  
-
-                  {/* ✅ Admin: ניהול מערכת → פרופיל#admin */}
                   {isAdmin && (
                     <div
                       className="dropdown-item admin-only"
@@ -149,7 +144,10 @@ export default function Navbar() {
                     </div>
                   )}
 
-                  <div className="dropdown-item logout" onClick={handleLogout}>
+                  <div
+                    className="dropdown-item logout"
+                    onClick={handleLogout}
+                  >
                     התנתקות
                   </div>
                 </div>

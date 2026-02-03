@@ -32,6 +32,73 @@
 }
 
 /* ===============================
+   BACK BUTTON
+================================ */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    margin-bottom: 24px;
+    margin-left: auto; /* דוחף לשמאל */
+    
+    background: linear-gradient(135deg, #fff, #fdf8f0);
+    border: 2px solid #8b4513;
+    border-radius: 16px;
+    
+    font-size: 16px;
+    font-weight: 700;
+    color: #5d3a1a;
+    
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 6px 16px rgba(139, 69, 19, 0.15);
+    
+    position: relative;
+    overflow: hidden;
+}
+
+.back-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transition: left 0.5s;
+}
+
+.back-button:hover::before {
+    left: 100%;
+}
+
+.back-button:hover {
+    background: linear-gradient(135deg, #8b4513, #a05a2c);
+    color: #fff;
+    transform: translateY(-3px) translateX(-5px);
+    box-shadow: 0 10px 28px rgba(139, 69, 19, 0.3);
+}
+
+.back-button:active {
+    transform: translateY(-1px) translateX(-3px);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
+}
+
+.back-arrow {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.back-button:hover .back-arrow {
+    transform: translateX(-5px);
+}
+
+.back-text {
+    font-weight: 700;
+}
+
+/* ===============================
    HEADER
 ================================ */
 .admin-activity-header {
@@ -397,6 +464,7 @@
         padding: 20px;
     }
     
+    .back-button,
     .admin-activity-filters,
     .admin-activity-header::before {
         display: none;
@@ -445,6 +513,11 @@
         padding: 90px 20px 30px;
     }
     
+    .back-button {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+    
     .admin-activity-header {
         padding: 24px 28px;
         border-radius: 20px;
@@ -488,6 +561,12 @@
 @media (max-width: 480px) {
     .admin-activity-page {
         padding: 80px 16px 24px;
+    }
+    
+    .back-button {
+        padding: 8px 16px;
+        font-size: 14px;
+        gap: 6px;
     }
     
     .admin-activity-header {
