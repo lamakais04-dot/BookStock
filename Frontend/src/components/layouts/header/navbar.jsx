@@ -125,7 +125,7 @@ export default function Navbar() {
               {openProfileMenu && (
                 <div className="profile-dropdown">
                   <div
-                    className="dropdown-item"
+                    className={`dropdown-item ${isAdmin ? "admin-only" : ""}`}
                     onClick={() => {
                       navigate("/profile");
                       setOpenProfileMenu(false);
@@ -134,18 +134,7 @@ export default function Navbar() {
                     הפרופיל שלי
                   </div>
 
-                  {/* ✅ Admin: לוח בקרה אדמין */}
-                  {isAdmin && (
-                    <div
-                      className="dropdown-item admin-only"
-                      onClick={() => {
-                        navigate("/admin-dashboard");
-                        setOpenProfileMenu(false);
-                      }}
-                    >
-                      לוח בקרה אדמין
-                    </div>
-                  )}
+                  
 
                   {/* ✅ Admin: ניהול מערכת → פרופיל#admin */}
                   {isAdmin && (
