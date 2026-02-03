@@ -64,7 +64,7 @@ export default function BookItem({
   mode = "all",
 }) {
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
+  const { user, setUser,isBlocked,isAdmin } = useAuth();
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);

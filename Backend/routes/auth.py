@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from fastapi.responses import Response
 from schemas.users import NewUser, LoginData
+from utils.active_user_helper import get_active_user
 from services.authService import (
     signup_user,
     login_user,
@@ -37,7 +38,7 @@ def me(user=Depends(get_user)):
 @router.post("/uploadImage")
 def upload_image(
     image_file: UploadFile = File(...),
-    user=Depends(get_user),
+    user=Depends(get_active_user),
 ):
     return upload_user_image(image_file, user["id"])
 
@@ -51,5 +52,5 @@ def get_book_by_id_route(book_id: int, user=Depends(get_user)):
 
 
 @router.put("/update-profile")
-def update_profile(data: dict, user=Depends(get_user)):
+def update_profile(data: dict, user=Depends(get_active_user)):
     return update_user_profile(user["id"], data)

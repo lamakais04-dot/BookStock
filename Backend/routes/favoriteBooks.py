@@ -5,16 +5,17 @@ from services.favoriteBooks import (
     remove_favorite,
     get_user_favorites
 )
+from utils.active_user_helper import get_active_user
 
 router = APIRouter()
 
 @router.post("/{book_id}")
-def add(book_id: int, user=Depends(get_user)):
+def add(book_id: int, user=Depends(get_active_user)):
     return add_favorite(user["id"], book_id)
 
 
 @router.delete("/{book_id}")
-def remove(book_id: int, user=Depends(get_user)):
+def remove(book_id: int, user=Depends(get_active_user)):
     return remove_favorite(user["id"], book_id)
 
 

@@ -6,7 +6,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchUser = async () => {
     setLoading(true);
@@ -19,25 +18,10 @@ export function AuthProvider({ children }) {
         }
       );
 
-      /*
-        res.data MUST include:
-        {
-          id,
-          firstname,
-          lastname,
-          email,
-          role,
-          borrowedBooks: [id1, id2],
-          canBorrow: true/false
-        }
-      */
-
+      // res.data includes: role + is_blocked (from backend)
       setUser(res.data);
-      setIsAdmin(res.data?.role === "admin");
-    } catch (err) {
-      // Not logged in / token expired
+    } catch {
       setUser(null);
-      setIsAdmin(false);
     } finally {
       setLoading(false);
     }
@@ -54,7 +38,8 @@ export function AuthProvider({ children }) {
         setUser,
         fetchUser,
         loading,
-        isAdmin
+        isAdmin: user?.role === "admin",
+        isBlocked: user?.is_blocked === true
       }}
     >
       {children}
