@@ -10,6 +10,7 @@ export default function Navbar() {
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const isBlocked = user?.is_blocked;
   const location = useLocation();
 
   // בדיקת אדמין
@@ -134,7 +135,7 @@ export default function Navbar() {
                     הפרופיל שלי
                   </div>
 
-                  
+
 
                   {/* ✅ Admin: ניהול מערכת → פרופיל#admin */}
                   {isAdmin && (
@@ -157,8 +158,11 @@ export default function Navbar() {
             </div>
 
             <label className="welcome">
-              שלום, {user.firstname}! {isAdmin && <small>(Admin)</small>}
+              שלום, {user.firstname}!
+              {isAdmin && <small>(Admin)</small>}
+              {isBlocked && <small style={{ color: "red" }}> (Read-only)</small>}
             </label>
+
           </>
         ) : (
           <>

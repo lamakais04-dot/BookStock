@@ -54,6 +54,7 @@ def login_user(login_req: LoginData, response):
         "role": user.role,
         "borrowedBooks": get_borrowed_books(user.id),
         "canBorrow": can_borrow(user.id),
+        "is_blocked": user.is_blocked,
     }
 
 
@@ -72,7 +73,6 @@ def get_user_profile(user_obj):
         user_data["canBorrow"] = len(borrowed_books) < 2
 
         return user_data
-
 
 
 def upload_user_image(image_file: UploadFile, user_id: int) -> dict:

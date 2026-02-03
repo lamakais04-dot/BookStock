@@ -72,13 +72,41 @@ export default function Layout() {
                             </ProtectedRoute>
                         }
                     />
+                    <Route
+                        path="/admin/activity"
+                        element={
+                            <ProtectedRoute requireAdmin>
+                                <AdminActivity />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                    <Route path="/admin/activity" element={<AdminActivity />} />
-                    <Route path="/admin/categories" element={<AdminCategory />} />
-                    <Route path="/admin/users" element={<AdminUsers />} />
-                    <Route path="/admin/users/:id" element={<AdminUserBorrows />} />
+                    <Route
+                        path="/admin/categories"
+                        element={
+                            <ProtectedRoute requireAdmin>
+                                <AdminCategory />
+                            </ProtectedRoute>
+                        }
+                    />
 
+                    <Route
+                        path="/admin/users"
+                        element={
+                            <ProtectedRoute requireAdmin>
+                                <AdminUsers />
+                            </ProtectedRoute>
+                        }
+                    />
 
+                    <Route
+                        path="/admin/users/:id"
+                        element={
+                            <ProtectedRoute requireAdmin>
+                                <AdminUserBorrows />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Routes>
 
 
