@@ -37,9 +37,7 @@ function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) {
 function SuccessModal({ show, onClose }) {
   useEffect(() => {
     if (show) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 2500);
+      const timer = setTimeout(onClose, 2500);
       return () => clearTimeout(timer);
     }
   }, [show, onClose]);
@@ -64,7 +62,7 @@ export default function BookItem({
   mode = "all",
 }) {
   const navigate = useNavigate();
-  const { user, setUser,isBlocked,isAdmin } = useAuth();
+  const { user, setUser, isBlocked } = useAuth();
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -75,8 +73,16 @@ export default function BookItem({
 
   const isBorrowedByMe = Boolean(user?.borrowedBooks?.includes(book.id));
 
-  // Regular click navigates to view
   const handleClick = () => navigate(`/book/${book.id}`);
+
+  /* ===== BLOCK GUARD (MUST BE FIRST) ===== */
+  const blockActionIfBlocked = (text = "החשבון שלך חסום — לא ניתן לבצע פעולה זו") => {
+    if (isBlocked) {
+      setError(text);
+      return true;
+    }
+    return false;
+  };
 
   useEffect(() => {
     if (!user || isAdmin || mode === "profile") return;
@@ -92,11 +98,11 @@ export default function BookItem({
 
   useEffect(() => {
     if (msg || error) {
-      const timer = setTimeout(() => {
+      const t = setTimeout(() => {
         setMsg("");
         setError("");
       }, 3000);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(t);
     }
   }, [msg, error]);
 
@@ -110,8 +116,6 @@ export default function BookItem({
       await Books.deleteBook(book.id);
       setShowDeleteModal(false);
       setShowSuccessModal(true);
-      
-      // Wait for success modal to show, then remove book
       setTimeout(() => {
         setBooks(prev => prev.filter(b => b.id !== book.id));
       }, 2500);
@@ -122,10 +126,13 @@ export default function BookItem({
   };
 
   const handleLike = async () => {
+    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן לשנות מועדפים")) return;
+
     if (!user) {
       setError("יש להתחבר כדי להוסיף למועדפים");
       return;
     }
+
     try {
       if (isFavorite) {
         await Favorites.remove(book.id);
@@ -138,6 +145,8 @@ export default function BookItem({
   };
 
   const handleBorrow = async () => {
+    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן להשאיל ספרים")) return;
+
     setLoading(true);
     try {
       const res = await Library.borrowBook(book.id);
@@ -146,7 +155,11 @@ export default function BookItem({
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
-      setBooks?.(prev => prev.map(b => b.id === book.id ? { ...b, quantity: b.quantity - 1 } : b));
+      setBooks?.(prev =>
+        prev.map(b =>
+          b.id === book.id ? { ...b, quantity: b.quantity - 1 } : b
+        )
+      );
       setMsg(res.message);
     } catch {
       setError("לא ניתן להשאיל את הספר");
@@ -156,6 +169,8 @@ export default function BookItem({
   };
 
   const handleReturn = async () => {
+    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן להחזיר ספרים")) return;
+
     setLoading(true);
     try {
       const res = await Library.returnBook(book.id);
@@ -164,11 +179,17 @@ export default function BookItem({
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
+
       if (mode === "profile") {
         setBooks?.(prev => prev.filter(b => b.id !== book.id));
       } else {
-        setBooks?.(prev => prev.map(b => b.id === book.id ? { ...b, quantity: b.quantity + 1 } : b));
+        setBooks?.(prev =>
+          prev.map(b =>
+            b.id === book.id ? { ...b, quantity: b.quantity + 1 } : b
+          )
+        );
       }
+
       setMsg(res.message);
     } catch {
       setError("שגיאה בהחזרת הספר");
@@ -177,7 +198,11 @@ export default function BookItem({
     }
   };
 
-  const borrowDisabled = !user || loading || book.quantity === 0 || (!user.canBorrow && !isBorrowedByMe);
+  const borrowDisabled =
+    !user ||
+    loading ||
+    book.quantity === 0 ||
+    (!user.canBorrow && !isBorrowedByMe);
 
   return (
     <>
@@ -204,28 +229,61 @@ export default function BookItem({
 
         {isAdmin ? (
           <div className="admin-actions">
-            <button className="edit-btn" onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/book/${book.id}?edit=true`);
-            }}>✏️ ערוך</button>
-            <button className="delete-btn" onClick={handleDeleteClick}>🗑 מחק</button>
+            <button
+              className="edit-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/book/${book.id}?edit=true`);
+              }}
+            >
+              ✏️ ערוך
+            </button>
+            <button className="delete-btn" onClick={handleDeleteClick}>
+              🗑 מחק
+            </button>
           </div>
         ) : (
           <div className="book-actions">
             {mode === "profile" ? (
-              <button className="return-btn" onClick={handleReturn} disabled={loading}>
+              <button
+                className="return-btn"
+                onClick={handleReturn}
+                disabled={loading}
+              >
                 {loading ? "מחזיר..." : "החזר ספר"}
               </button>
             ) : (
               <>
                 {isBorrowedByMe ? (
-                  <button className="return-btn" onClick={handleReturn} disabled={loading}>החזרה</button>
+                  <button
+                    className="return-btn"
+                    onClick={handleReturn}
+                    disabled={loading}
+                  >
+                    החזרה
+                  </button>
                 ) : (
-                  <button className="borrow-btn" onClick={handleBorrow} disabled={borrowDisabled}>
-                    {!user ? "התחברי כדי להשאיל" : book.quantity === 0 ? "לא זמין" : !user.canBorrow ? "הגעת למקסימום השאלות" : loading ? "טוען..." : "השאל ספר"}
+                  <button
+                    className="borrow-btn"
+                    onClick={handleBorrow}
+                    disabled={borrowDisabled}
+                  >
+                    {!user
+                      ? "התחברי כדי להשאיל"
+                      : book.quantity === 0
+                      ? "לא זמין"
+                      : !user.canBorrow
+                      ? "הגעת למקסימום השאלות"
+                      : loading
+                      ? "טוען..."
+                      : "השאל ספר"}
                   </button>
                 )}
-                <span onClick={handleLike} className={`heart ${isFavorite ? "active" : ""}`}>
+
+                <span
+                  className={`heart ${isFavorite ? "active" : ""}`}
+                  onClick={handleLike}
+                >
                   {isFavorite ? "❤️" : "♡"}
                 </span>
               </>
