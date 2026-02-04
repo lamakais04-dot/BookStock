@@ -5,9 +5,10 @@ import Filters from "../services/filtirs";
 import Library from "../services/library";
 import { useAuth } from "../context/AuthContext";
 import { useFavorites } from "../context/FavoritesContext";
+import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
 
-// Modal Component
+/* ================= MODAL ================= */
 function Modal({ show, onClose, title, message, type = "success", onConfirm }) {
   if (!show) return null;
 
@@ -19,7 +20,7 @@ function Modal({ show, onClose, title, message, type = "success", onConfirm }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className={`modal-icon ${type}`}>{icons[type]}</div>
         <h2 className="modal-title">{title}</h2>
         <p className="modal-message">{message}</p>
@@ -44,39 +45,31 @@ function Modal({ show, onClose, title, message, type = "success", onConfirm }) {
   );
 }
 
+/* ================= SINGLE BOOK ================= */
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
   const isNew = id === "new";
   const bookId = isNew ? null : Number(id);
 
   const { user, setUser, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
 
-  // States for data and UI
-  const [book, setBook] = useState({
-    title: "",
-    author: "",
-    summary: "",
-    pages: "",
-    quantity: "",
-    categoryid: "",
-    agesid: "",
-    image: ""
-  });
+  /* ===== DATA ===== */
+  const [book, setBook] = useState(null);
+  const [allBooks, setAllBooks] = useState([]);
+
+  const [categories, setCategories] = useState([]);
+  const [ageGroups, setAgeGroups] = useState([]);
 
   const [loading, setLoading] = useState(!isNew);
   const [isEditing, setIsEditing] = useState(
     isNew || new URLSearchParams(location.search).get("edit") === "true"
   );
 
-  // Metadata for dropdowns
-  const [categories, setCategories] = useState([]);
-  const [ageGroups, setAgeGroups] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
-
-  // Modal states
+  /* ===== MODAL ===== */
   const [modal, setModal] = useState({
     show: false,
     title: "",
@@ -84,25 +77,46 @@ export default function SingleBook() {
     type: "success"
   });
 
-  // User relations
+  const showModal = (title, message, type = "success") =>
+    setModal({ show: true, title, message, type });
+
+  const closeModal = () =>
+    setModal(prev => ({ ...prev, show: false }));
+
+  /* ===== FAVORITES / BORROW ===== */
   const isBorrowedByMe = user?.borrowedBooks?.includes(bookId);
   const { favorites, toggleFavorite } = useFavorites();
   const isFavorite = favorites.includes(bookId);
 
+  /* ================= LOAD PAGE ================= */
   useEffect(() => {
-    async function loadPageData() {
+    async function loadData() {
       try {
-        const [cats, ages] = await Promise.all([
+        const [cats, ages, booksRes] = await Promise.all([
           Filters.getCategories(),
-          Filters.getAgeGroups()
+          Filters.getAgeGroups(),
+          Books.getBooks(1, 50)
         ]);
 
         setCategories(cats);
         setAgeGroups(ages);
+        setAllBooks(booksRes.books);
+
 
         if (!isNew) {
           const data = await Books.getBookById(id);
           setBook(data);
+        } else {
+          setBook({
+            title: "",
+            author: "",
+            summary: "",
+            pages: "",
+            quantity: "",
+            categoryid: "",
+            agesid: "",
+            image: ""
+          });
         }
       } catch (err) {
         console.error(err);
@@ -111,45 +125,33 @@ export default function SingleBook() {
       }
     }
 
-    loadPageData();
+    loadData();
   }, [id, isNew]);
 
-  const showModal = (title, message, type = "success") => {
-    setModal({ show: true, title, message, type });
-  };
-
-  const closeModal = () => {
-    setModal({ ...modal, show: false });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setBook(prev => ({ ...prev, [name]: value }));
-  };
+  /* ================= ACTIONS ================= */
 
   const handleBlockedAction = () => {
     showModal(
       "הפעולה נחסמה 🚫",
-      "החשבון שלך חסום ולכן אינך יכול לבצע פעולה זו. אנא פנה למנהל המערכת.",
+      "החשבון שלך חסום ולכן אינך יכול לבצע פעולה זו.",
       "error"
     );
   };
 
-  const handleSave = async () => {
+  const handleSave = async (formData) => {
     try {
-      const dataToSend = { ...book, image: imageFile };
-
       if (isNew) {
-        await Books.addBook(dataToSend);
-        showModal("הצלחה! 🎉", "הספר נוסף בהצלחה למערכת", "success");
+        await Books.addBook(formData);
+        showModal("הצלחה! 🎉", "הספר נוסף בהצלחה", "success");
         setTimeout(() => navigate("/book"), 2000);
       } else {
-        await Books.updateBook(id, dataToSend);
-        showModal("עודכן! ✨", "פרטי הספר עודכנו בהצלחה", "success");
+        await Books.updateBook(bookId, formData);
+        showModal("עודכן! ✨", "פרטי הספר עודכנו", "success");
         setIsEditing(false);
+        setBook(prev => ({ ...prev, ...formData }));
       }
     } catch {
-      showModal("שגיאה", "אירעה שגיאה בשמירת הנתונים. נסה שוב.", "error");
+      showModal("שגיאה", "שמירת הספר נכשלה", "error");
     }
   };
 
@@ -164,9 +166,9 @@ export default function SingleBook() {
         canBorrow: res.canBorrow
       }));
       setBook(prev => ({ ...prev, quantity: prev.quantity - 1 }));
-      showModal("הושאל! 📚", "הספר הושאל בהצלחה. תהנה מהקריאה!", "success");
+      showModal("הושאל! 📚", "השאלה בוצעה בהצלחה", "success");
     } catch {
-      showModal("שגיאה", "לא ניתן להשאיל את הספר כעת.", "error");
+      showModal("שגיאה", "לא ניתן להשאיל כרגע", "error");
     }
   };
 
@@ -181,20 +183,22 @@ export default function SingleBook() {
         canBorrow: res.canBorrow
       }));
       setBook(prev => ({ ...prev, quantity: prev.quantity + 1 }));
-      showModal("הוחזר! ✅", "תודה! הספר הוחזר בהצלחה", "success");
+      showModal("הוחזר! ✅", "הספר הוחזר בהצלחה", "success");
     } catch {
-      showModal("שגיאה", "אירעה שגיאה בהחזרת הספר.", "error");
+      showModal("שגיאה", "החזרה נכשלה", "error");
     }
   };
 
-  if (loading)
+  /* ================= RENDER ================= */
+
+  if (loading || !book) {
     return (
       <div className="loading-container">
         <div className="spinner"></div>
       </div>
     );
+  }
 
-  /* ===== ID → NAME RESOLUTION (DB-BASED) ===== */
   const categoryName =
     categories.find(c => c.id === book.categoryid)?.name || "כללי";
 
@@ -203,114 +207,29 @@ export default function SingleBook() {
 
   return (
     <div className="single-book-container">
-      <Modal
-        show={modal.show}
-        onClose={closeModal}
-        title={modal.title}
-        message={modal.message}
-        type={modal.type}
-      />
+      <Modal {...modal} onClose={closeModal} />
 
       <button className="back-button" onClick={() => navigate("/book")}>
         ← חזרה לקטלוג
       </button>
 
-      <div className={`single-book ${isEditing ? "editing-active" : ""}`}>
+      <div className="single-book">
         <div className="book-image-wrapper">
-          <div className="book-image">
-            <img
-              src={
-                imageFile
-                  ? URL.createObjectURL(imageFile)
-                  : book.image || "placeholder.png"
-              }
-              alt={book.title}
-            />
-          </div>
-
-          {isEditing && (
-            <div className="image-upload-input">
-              <label>החלף תמונה:</label>
-              <input
-                type="file"
-                onChange={(e) => setImageFile(e.target.files[0])}
-              />
-            </div>
-          )}
+          <img
+            src={book.image || "placeholder.png"}
+            alt={book.title}
+          />
         </div>
 
         <div className="book-details">
           {isEditing ? (
-            <div className="edit-form-local">
-              <h2 className="edit-title">
-                {isNew ? "הוספת ספר חדש" : "עריכת פרטי ספר"}
-              </h2>
-
-              <input name="title" value={book.title} onChange={handleChange} />
-              <input name="author" value={book.author} onChange={handleChange} />
-              <textarea
-                name="summary"
-                value={book.summary}
-                onChange={handleChange}
-              />
-
-              <div className="form-row">
-                <input
-                  name="pages"
-                  type="number"
-                  value={book.pages}
-                  onChange={handleChange}
-                />
-                <input
-                  name="quantity"
-                  type="number"
-                  value={book.quantity}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-row">
-                <select
-                  name="categoryid"
-                  value={book.categoryid}
-                  onChange={handleChange}
-                >
-                  <option value="">בחר קטגוריה</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  name="agesid"
-                  value={book.agesid}
-                  onChange={handleChange}
-                >
-                  <option value="">טווח גילאים</option>
-                  {ageGroups.map(a => (
-                    <option key={a.id} value={a.id}>
-                      {a.description}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="edit-actions">
-                <button className="save-button" onClick={handleSave}>
-                  💾 שמור
-                </button>
-                {!isNew && (
-                  <button
-                    className="cancel-button"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    ביטול
-                  </button>
-                )}
-              </div>
-            </div>
+            <BookForm
+              initialData={book}
+              categories={categories}
+              ageGroups={ageGroups}
+              existingBooks={allBooks.filter(b => b.id !== bookId)}
+              onSubmit={handleSave}
+            />
           ) : (
             <>
               <h1 className="book-title">{book.title}</h1>
@@ -319,11 +238,11 @@ export default function SingleBook() {
 
               <div className="book-info-grid">
                 <div className="info-item">
-                  <span className="info-label">מספר עמודים</span>
+                  <span className="info-label">עמודים</span>
                   <span className="info-value">{book.pages}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">כמות במלאי</span>
+                  <span className="info-label">במלאי</span>
                   <span className="info-value">{book.quantity}</span>
                 </div>
                 <div className="info-item">
@@ -331,7 +250,7 @@ export default function SingleBook() {
                   <span className="info-value">{categoryName}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">טווח גילאים</span>
+                  <span className="info-label">גילאים</span>
                   <span className="info-value">{ageRangeName}</span>
                 </div>
               </div>
@@ -342,39 +261,32 @@ export default function SingleBook() {
                     className="edit-toggle-button"
                     onClick={() => setIsEditing(true)}
                   >
-                    ✏️ ערוך פרטי ספר
+                    ✏️ ערוך ספר
                   </button>
                 ) : (
                   <>
                     {isBorrowedByMe ? (
-                      <button
-                        className="borrow-button return"
-                        onClick={handleReturn}
-                      >
+                      <button className="borrow-button return" onClick={handleReturn}>
                         החזרה
                       </button>
                     ) : (
                       <button
                         className="borrow-button"
                         onClick={handleBorrow}
-                        disabled={
-                          !user || !user.canBorrow || book.quantity === 0
-                        }
+                        disabled={!user || !user.canBorrow || book.quantity === 0}
                       >
                         {!user
                           ? "התחברי כדי להשאיל"
                           : book.quantity === 0
-                          ? "אזל מהמלאי"
-                          : !user.canBorrow
-                          ? "הגעת למקסימום השאלות"
-                          : "השאלת ספר"}
+                            ? "אזל מהמלאי"
+                            : !user.canBorrow
+                              ? "הגעת למקסימום"
+                              : "השאלת ספר"}
                       </button>
                     )}
 
                     <button
-                      className={`favorite-button ${
-                        isFavorite ? "active" : ""
-                      }`}
+                      className={`favorite-button ${isFavorite ? "active" : ""}`}
                       onClick={() =>
                         isBlocked
                           ? handleBlockedAction()
