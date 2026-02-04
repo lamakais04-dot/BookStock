@@ -5,12 +5,15 @@ import Filters from "../services/filtirs";
 import Library from "../services/library";
 import { useAuth } from "../context/AuthContext";
 import { useFavorites } from "../context/FavoritesContext";
+import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
 
+/* ================= SINGLE BOOK ================= */
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
 
   const isNew = id === "new";
   const bookId = isNew ? null : Number(id);
@@ -46,18 +49,33 @@ export default function SingleBook() {
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function loadData() {
+    async function loadData() {
       try {
-        const [cats, ages] = await Promise.all([
+        const [cats, ages, booksRes] = await Promise.all([
           Filters.getCategories(),
-          Filters.getAgeGroups()
+          Filters.getAgeGroups(),
+          Books.getBooks(1, 50)
         ]);
 
         setCategories(cats);
         setAgeGroups(ages);
+        setAllBooks(booksRes.books);
+
 
         if (!isNew) {
           const data = await Books.getBookById(id);
           setBook(data);
+        } else {
+          setBook({
+            title: "",
+            author: "",
+            summary: "",
+            pages: "",
+            quantity: "",
+            categoryid: "",
+            agesid: "",
+            image: ""
+          });
         }
       } catch (err) {
         console.error(err);
@@ -66,6 +84,7 @@ export default function SingleBook() {
       }
     }
 
+    loadData();
     loadData();
   }, [id, isNew]);
 
@@ -77,7 +96,7 @@ export default function SingleBook() {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (formData) => {
     try {
       const payload = { ...book, image: imageFile };
 
@@ -141,6 +160,7 @@ export default function SingleBook() {
         ← חזרה
       </button>
 
+      <div className="single-book">
       <div className="single-book">
         <div className="book-image-wrapper">
           <div className="book-image">
@@ -325,6 +345,7 @@ export default function SingleBook() {
                       <button
                         className="borrow-button"
                         onClick={handleBorrow}
+                        disabled={!user || !user.canBorrow || book.quantity === 0}
                         disabled={!user || !user.canBorrow || book.quantity === 0}
                       >
                         📖 השאלת ספר

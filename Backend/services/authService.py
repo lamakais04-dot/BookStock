@@ -1,7 +1,6 @@
 from sqlmodel import Session, select
-from fastapi import HTTPException, UploadFile, File
+from fastapi import HTTPException, UploadFile
 from pwdlib import PasswordHash
-from services.libraryService import can_borrow, get_borrowed_books
 from datetime import datetime, timedelta, timezone
 import jwt
 import os
@@ -11,22 +10,32 @@ import boto3
 from db import engine
 from models.users import Users
 from schemas.users import NewUser, LoginData
+from services.libraryService import can_borrow, get_borrowed_books
 
 password_hash = PasswordHash.recommended()
 
 
+# ---------- SIGNUP ----------
+
 def signup_user(user_req: NewUser):
     with Session(engine) as session:
         user_dict = user_req.model_dump()
-        hashed_password = password_hash.hash(user_dict["password"])
-        del user_dict["password"]
+        hashed_password = password_hash.hash(user_dict.pop("password"))
 
         user = Users(**user_dict, hashedpass=hashed_password)
         session.add(user)
         session.commit()
         session.refresh(user)
-        return user
 
+        return {
+            "id": user.id,
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "email": user.email,
+        }
+
+
+# ---------- LOGIN ----------
 
 def login_user(login_req: LoginData, response):
     with Session(engine) as session:
@@ -46,48 +55,65 @@ def login_user(login_req: LoginData, response):
             path="/",
         )
 
-    return {
-        "id": user.id,
-        "firstname": user.firstname,
-        "lastname": user.lastname,
-        "email": user.email,
-        "role": user.role,
-        "borrowedBooks": get_borrowed_books(user.id),
-        "canBorrow": can_borrow(user.id),
-        "is_blocked": user.is_blocked,
-    }
+        return {
+            "id": user.id,
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "email": user.email,
+            "role": user.role,
+            "borrowedBooks": get_borrowed_books(user.id),
+            "canBorrow": can_borrow(user.id),
+            "is_blocked": user.is_blocked,
+        }
 
+
+# ---------- PROFILE ----------
 
 def get_user_profile(user_obj):
     with Session(engine) as session:
         user = session.get(Users, user_obj["id"])
-
         if not user:
-            raise HTTPException(status_code=404, detail="This user does not exist")
+            raise HTTPException(status_code=404, detail="User not found")
 
         user_data = user.model_dump()
+        borrowed = get_borrowed_books(user.id)
 
-        borrowed_books = get_borrowed_books(user.id)
-
-        user_data["borrowedBooks"] = borrowed_books
-        user_data["canBorrow"] = len(borrowed_books) < 2
+        user_data["borrowedBooks"] = borrowed
+        user_data["canBorrow"] = len(borrowed) < 2
 
         return user_data
 
 
-def upload_user_image(image_file: UploadFile, user_id: int) -> dict:
-    # העלאה ל-S3
-    image_url = upload_image_to_s3(image_file, "users")
-
-    # DB – בדיוק כמו get_user_profile
+def update_user_profile(user_id: int, data: dict):
     with Session(engine) as session:
         user = session.get(Users, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
+        for key, value in data.items():
+            setattr(user, key, value)
+
+        session.commit()
+        session.refresh(user)
+
+        user_data = user.model_dump()
+        user_data["borrowedBooks"] = get_borrowed_books(user.id)
+        user_data["canBorrow"] = len(user_data["borrowedBooks"]) < 2
+
+        return user_data
+
+
+# ---------- IMAGE UPLOAD ----------
+
+def upload_user_image(image_file: UploadFile, user_id: int) -> dict:
+    image_url = upload_image_to_s3(image_file, "users")
+
+    with Session(engine) as session:
+        user = session.get(Users, user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
         user.image = image_url
-        session.add(user)
         session.commit()
         session.refresh(user)
 
@@ -118,31 +144,10 @@ def upload_image_to_s3(image_file: UploadFile, folder: str) -> str:
     )
 
 
+# ---------- JWT ----------
+
 def create_token(user: Users):
     secret_key = os.getenv("JWT_SECRET")
     expire = datetime.now(timezone.utc) + timedelta(days=1)
     payload = {"userId": user.id, "exp": expire, "role": user.role}
-    jwtToken = jwt.encode(payload, secret_key, "HS256")
-    return jwtToken
-
-
-def update_user_profile(user_id: int, data: dict):
-    with Session(engine) as session:
-        user = session.get(Users, user_id)
-
-        if not user:
-            raise HTTPException(404, "User not found")
-
-        user.firstname = data.get("firstname", user.firstname)
-        user.lastname = data.get("lastname", user.lastname)
-        user.phonenumber = data.get("phonenumber", user.phonenumber)
-        user.address = data.get("address", user.address)
-
-        session.commit()
-        session.refresh(user)
-
-        user_data = user.model_dump()
-        user_data["borrowedBooks"] = get_borrowed_books(user.id)
-        user_data["canBorrow"] = len(user_data["borrowedBooks"]) < 2
-
-        return user_data
+    return jwt.encode(payload, secret_key, "HS256")
