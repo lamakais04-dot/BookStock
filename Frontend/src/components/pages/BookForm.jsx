@@ -1,9 +1,11 @@
 import { useState } from "react";
+import '../csspages/BookForm.css'
 
 export default function BookForm({
   initialData = {},
   categories = [],
   ageGroups = [],
+  existingBooks = [], // ⬅️ רשימת ספרים קיימים (לבדיקת כפילות)
   onSubmit
 }) {
   const [form, setForm] = useState({
@@ -17,11 +19,21 @@ export default function BookForm({
     imageFile: null
   });
 
+  const [errors, setErrors] = useState({});
+
+  /* ================= HANDLERS ================= */
+
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value
     });
+
+    // ניקוי שגיאה בזמן הקלדה
+    setErrors(prev => ({
+      ...prev,
+      [e.target.name]: ""
+    }));
   };
 
   const handleFileChange = (e) => {
@@ -31,12 +43,51 @@ export default function BookForm({
     });
   };
 
+  /* ================= VALIDATION ================= */
+
+  const validate = () => {
+    const newErrors = {};
+
+    // שם ספר חובה
+    if (!form.title.trim()) {
+      newErrors.title = "שם הספר הוא שדה חובה";
+    }
+
+    // בדיקת כפילות שם
+    const isDuplicate = existingBooks.some(
+      b => b.title.toLowerCase() === form.title.trim().toLowerCase()
+    );
+    if (isDuplicate) {
+      newErrors.title = "ספר עם שם זה כבר קיים";
+    }
+
+    // קטגוריה חובה
+    if (!form.categoryid) {
+      newErrors.categoryid = "חובה לבחור קטגוריה";
+    }
+
+    // כמות – מספר תקין ולא שלילי
+    if (form.quantity === "" || isNaN(form.quantity)) {
+      newErrors.quantity = "יש להזין מספר תקין";
+    } else if (Number(form.quantity) < 0) {
+      newErrors.quantity = "כמות לא יכולה להיות שלילית";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  /* ================= SUBMIT ================= */
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // כרגע – רק פרונט
+    if (!validate()) return;
+
     onSubmit(form);
   };
+
+  /* ================= JSX ================= */
 
   return (
     <form className="book-form" onSubmit={handleSubmit}>
@@ -45,8 +96,8 @@ export default function BookForm({
         placeholder="שם הספר"
         value={form.title}
         onChange={handleChange}
-        required
       />
+      {errors.title && <span className="error">{errors.title}</span>}
 
       <textarea
         name="summary"
@@ -54,7 +105,6 @@ export default function BookForm({
         value={form.summary}
         onChange={handleChange}
         rows={3}
-        required
       />
 
       <input
@@ -62,7 +112,6 @@ export default function BookForm({
         placeholder="שם המחבר"
         value={form.author}
         onChange={handleChange}
-        required
       />
 
       <input
@@ -71,7 +120,6 @@ export default function BookForm({
         placeholder="מספר עמודים"
         value={form.pages}
         onChange={handleChange}
-        required
       />
 
       <input
@@ -80,15 +128,14 @@ export default function BookForm({
         placeholder="כמות ספרים"
         value={form.quantity}
         onChange={handleChange}
-        required
       />
+      {errors.quantity && <span className="error">{errors.quantity}</span>}
 
       {/* ===== Category ===== */}
       <select
         name="categoryid"
         value={form.categoryid}
         onChange={handleChange}
-        required
       >
         <option value="">בחר קטגוריה</option>
         {categories.map(cat => (
@@ -97,13 +144,15 @@ export default function BookForm({
           </option>
         ))}
       </select>
+      {errors.categoryid && (
+        <span className="error">{errors.categoryid}</span>
+      )}
 
       {/* ===== Age Group ===== */}
       <select
         name="agesid"
         value={form.agesid}
         onChange={handleChange}
-        required
       >
         <option value="">בחר קבוצת גיל</option>
         {ageGroups.map(age => (
