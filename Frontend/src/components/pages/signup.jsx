@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import SignupClass from "../services/signup";
-import axios from "axios";
 import "../csspages/signup.css";
 import { useNavigate } from "react-router-dom";
 
-
 export default function Signup() {
-
   const navigate = useNavigate();
 
   const initialState = {
@@ -27,21 +24,28 @@ export default function Signup() {
 
   const MAX_BIRTHDATE = "2015-12-31";
 
+  // ✅ Password validation like the image:
+  // min 8 chars, starts with uppercase letter, at least 1 special char
+  const validatePassword = (v) => {
+    if (!v || v.length < 8) return "הסיסמה חייבת להכיל לפחות 8 תווים";
+    if (!/^[A-Z]/.test(v)) return "הסיסמה חייבת להתחיל באות גדולה באנגלית (A-Z)";
+    if (!/[^A-Za-z0-9]/.test(v)) return "הסיסמה חייבת להכיל לפחות תו מיוחד אחד (לדוגמה: !@#)";
+    return true;
+  };
+
   const validators = {
     firstname: (v) => v.length > 1 || "שם פרטי קצר מדי",
     lastname: (v) => v.length > 1 || "שם משפחה קצר מדי",
     birthdate: (v) => (v && v <= MAX_BIRTHDATE) || "שנת לידה חייבת להיות עד 2015",
     gender: (v) => v !== "" || "חובה לבחור מגדר",
     email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
-    password: (v) => v.length >= 6 || "הסיסמה חייבת להכיל לפחות 6 תווים",
+    password: validatePassword, // ✅ updated
     phonenumber: (v) => /^\d{10}$/.test(v) || "מספר טלפון חייב להכיל 10 ספרות",
     address: (v) => v.length > 3 || "כתובת קצרה מדי"
   };
 
-
   const handleChange = async (e) => {
     const { name, value } = e.target;
-
 
     let newValue = value;
     if (name === "phonenumber") {
@@ -69,15 +73,10 @@ export default function Signup() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      /* =========================
-         SIGNUP — JSON ONLY
-         ========================= */
       const { ...signupPayload } = formData;
 
-      // optional: if we already got uploadedImageUrl, you can send it as imageurl
-      // only if your schema uses imageurl in NewUser
       const finalPayload = {
-        ...signupPayload,
+        ...signupPayload
       };
 
       await SignupClass.signup(finalPayload);
@@ -85,12 +84,9 @@ export default function Signup() {
       setShowSuccess(true);
       setErrors({});
 
-      // give the user a short success feedback, then redirect
       setTimeout(() => {
         navigate("/login");
       }, 1500);
-
-
     } catch (err) {
       setErrors({ general: "הרשמה נכשלה, נסה שוב" });
       setShowSuccess(false);
@@ -107,8 +103,9 @@ export default function Signup() {
         </div>
 
         {errors.general && <div className="signup-alert error">{errors.general}</div>}
-        {showSuccess && <div className="signup-alert success">✔ נרשמת בהצלחה! הינך מועבר לדף התחברות...</div>}
-
+        {showSuccess && (
+          <div className="signup-alert success">✔ נרשמת בהצלחה! הינך מועבר לדף התחברות...</div>
+        )}
 
         <form className="signup-form" onSubmit={handleSubmit}>
           {/* פרטים */}
@@ -199,9 +196,7 @@ export default function Signup() {
                 value={formData.phonenumber}
                 onChange={handleChange}
               />
-              {errors.phonenumber && (
-                <span className="error-text">{errors.phonenumber}</span>
-              )}
+              {errors.phonenumber && <span className="error-text">{errors.phonenumber}</span>}
             </div>
           </div>
 
@@ -213,7 +208,13 @@ export default function Signup() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="לדוגמה: Abcdef!1"
             />
+            {/* hint like the requirements */}
+            <small style={{ display: "block", marginTop: "6px", opacity: 0.8 }}>
+              מינימום 8 תווים, מתחיל באות גדולה באנגלית, ולפחות תו מיוחד אחד
+            </small>
+
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
