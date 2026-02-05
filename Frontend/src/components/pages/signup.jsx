@@ -15,7 +15,7 @@ export default function Signup() {
     email: "",
     password: "",
     phonenumber: "",
-    image: null
+    image: null,
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -36,7 +36,8 @@ export default function Signup() {
   const validators = {
     firstname: (v) => v.length > 1 || "שם פרטי קצר מדי",
     lastname: (v) => v.length > 1 || "שם משפחה קצר מדי",
-    birthdate: (v) => (v && v <= MAX_BIRTHDATE) || "שנת לידה חייבת להיות עד 2015",
+    birthdate: (v) =>
+      (v && v <= MAX_BIRTHDATE) || "שנת לידה חייבת להיות עד 2015",
     gender: (v) => v !== "" || "חובה לבחור מגדר",
     email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
     password: validatePassword, // ✅ updated
@@ -56,7 +57,10 @@ export default function Signup() {
 
     if (validators[name]) {
       const valid = validators[name](newValue);
-      setErrors((prev) => ({ ...prev, [name]: valid === true ? "" : valid }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: valid === true ? "" : valid,
+      }));
     }
   };
 
@@ -88,7 +92,11 @@ export default function Signup() {
         navigate("/login");
       }, 1500);
     } catch (err) {
-      setErrors({ general: "הרשמה נכשלה, נסה שוב" });
+      const msg =
+        err?.response?.data?.detail === "Already logged in"
+          ? "את/ה כבר מחובר/ת, אין צורך להירשם שוב"
+          : "הרשמה נכשלה, נסה שוב";
+      setErrors({ general: msg });
       setShowSuccess(false);
     }
   };
@@ -108,7 +116,6 @@ export default function Signup() {
         )}
 
         <form className="signup-form" onSubmit={handleSubmit}>
-          {/* פרטים */}
           <div className="form-row">
             <div className="input-group">
               <label className="input-label">שם פרטי</label>
@@ -118,7 +125,9 @@ export default function Signup() {
                 value={formData.firstname}
                 onChange={handleChange}
               />
-              {errors.firstname && <span className="error-text">{errors.firstname}</span>}
+              {errors.firstname && (
+                <span className="error-text">{errors.firstname}</span>
+              )}
             </div>
 
             <div className="input-group">
@@ -129,7 +138,9 @@ export default function Signup() {
                 value={formData.lastname}
                 onChange={handleChange}
               />
-              {errors.lastname && <span className="error-text">{errors.lastname}</span>}
+              {errors.lastname && (
+                <span className="error-text">{errors.lastname}</span>
+              )}
             </div>
           </div>
 
@@ -144,7 +155,9 @@ export default function Signup() {
                 value={formData.birthdate}
                 onChange={handleChange}
               />
-              {errors.birthdate && <span className="error-text">{errors.birthdate}</span>}
+              {errors.birthdate && (
+                <span className="error-text">{errors.birthdate}</span>
+              )}
             </div>
 
             <div className="input-group">
@@ -160,7 +173,9 @@ export default function Signup() {
                 <option value="נקבה">נקבה</option>
                 <option value="אחר">אחר</option>
               </select>
-              {errors.gender && <span className="error-text">{errors.gender}</span>}
+              {errors.gender && (
+                <span className="error-text">{errors.gender}</span>
+              )}
             </div>
           </div>
 
@@ -172,7 +187,9 @@ export default function Signup() {
               value={formData.address}
               onChange={handleChange}
             />
-            {errors.address && <span className="error-text">{errors.address}</span>}
+            {errors.address && (
+              <span className="error-text">{errors.address}</span>
+            )}
           </div>
 
           <div className="form-row">
@@ -185,7 +202,9 @@ export default function Signup() {
                 value={formData.email}
                 onChange={handleChange}
               />
-              {errors.email && <span className="error-text">{errors.email}</span>}
+              {errors.email && (
+                <span className="error-text">{errors.email}</span>
+              )}
             </div>
 
             <div className="input-group">

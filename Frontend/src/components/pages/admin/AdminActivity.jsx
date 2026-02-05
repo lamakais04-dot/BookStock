@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+// pages/admin/AdminActivity.jsx
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminService from "../../services/admin";
 import { downloadBlob } from "../../../../utils/downloadHelper";
 import "../../csspages/adminActivity.css";
+import { socket } from "../../services/socket";
 
 export default function AdminActivity() {
   const [rows, setRows] = useState([]);
@@ -12,26 +14,46 @@ export default function AdminActivity() {
   const [action, setAction] = useState("ALL"); // ALL | BORROW | RETURN
   const [userId, setUserId] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const data = await AdminService.getActivity({
-          action,
-          user_id: userId ? Number(userId) : undefined,
-          limit: 200
-        });
-        setRows(data);
-      } finally {
-        setLoading(false);
-      }
-    })();
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await AdminService.getActivity({
+        action,
+        user_id: userId ? Number(userId) : undefined,
+        limit: 200,
+      });
+      setRows(data);
+    } finally {
+      setLoading(false);
+    }
   }, [action, userId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // live updates when borrow/return happens
+  useEffect(() => {
+    function handleBorrowReturnChanged(data) {
+    console.log("borrow_return_changed event:", data);  // <‑‑ log here
+        if (data){
+            console.log("data",data)
+            load();
+        }
+    
+  }
+
+    socket.on("borrow_return_changed", handleBorrowReturnChanged);
+
+    return () => {
+      socket.off("borrow_return_changed", handleBorrowReturnChanged);
+    };
+  }, [load]);
 
   const handleExcel = async () => {
     const blob = await AdminService.exportActivityExcel({
       action,
-      user_id: userId ? Number(userId) : undefined
+      user_id: userId ? Number(userId) : undefined,
     });
     downloadBlob(blob, "activity.xlsx");
   };
@@ -39,7 +61,7 @@ export default function AdminActivity() {
   const handlePdf = async () => {
     const blob = await AdminService.exportActivityPdf({
       action,
-      user_id: userId ? Number(userId) : undefined
+      user_id: userId ? Number(userId) : undefined,
     });
     downloadBlob(blob, "activity.pdf");
   };
@@ -51,13 +73,9 @@ export default function AdminActivity() {
   return (
     <div className="admin-activity-page">
       <div className="admin-activity-container">
-
         {/* HEADER */}
         <div className="admin-activity-header">
-          <button
-            className="back-btn"
-            onClick={() => navigate(-1)}
-          >
+          <button className="back-btn" onClick={() => navigate(-1)}>
             ← חזור
           </button>
 
@@ -87,7 +105,7 @@ export default function AdminActivity() {
 
         <hr className="admin-activity-divider" />
 
-        {/* LOADING */}
+        {/* LOADING / TABLE */}
         {loading ? (
           <div className="admin-activity-loading">טוען</div>
         ) : rows.length === 0 ? (
@@ -115,7 +133,6 @@ export default function AdminActivity() {
                           day: "2-digit",
                           month: "2-digit",
                           year: "numeric",
-
                         })}
                       </td>
                       <td>

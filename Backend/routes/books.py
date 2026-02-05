@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, Depends, Query
+from fastapi import APIRouter, UploadFile, File, Form, Depends, Query, BackgroundTasks
 from utils.auth_helper import get_user
 from utils.admin_helper import get_admin_user
 from services.bookService import (
@@ -10,12 +10,13 @@ from services.bookService import (
     delete_book,
 )
 from schemas.books import BookCreate, BookUpdate
+from socketio_app import sio
 
 router = APIRouter()
 
-
 @router.post("/", dependencies=[Depends(get_admin_user)])
-def add_book(
+async def add_book(
+    background_tasks: BackgroundTasks,
     title: str = Form(...),
     summary: str = Form(...),
     author: str = Form(...),
@@ -34,12 +35,15 @@ def add_book(
         categoryid=categoryid,
         agesid=agesid,
     )
-    return create_book(data, image)
-
+    new_book = create_book(data, image)
+    # notify all clients that books list changed
+    background_tasks.add_task(sio.emit, "books_changed", {"reason": "created", "id": new_book.id})
+    return new_book
 
 @router.put("/{book_id}", dependencies=[Depends(get_admin_user)])
-def edit_book(
+async def edit_book(
     book_id: int,
+    background_tasks: BackgroundTasks,
     title: str | None = Form(None),
     summary: str | None = Form(None),
     author: str | None = Form(None),
@@ -58,13 +62,15 @@ def edit_book(
         categoryid=categoryid,
         agesid=agesid,
     )
-    return update_book(book_id, data, image)
-
+    updated = update_book(book_id, data, image)
+    background_tasks.add_task(sio.emit, "books_changed", {"reason": "updated", "id": book_id})
+    return updated
 
 @router.delete("/{book_id}", dependencies=[Depends(get_admin_user)])
-def remove_book(book_id: int):
-    return delete_book(book_id)
-
+async def remove_book(book_id: int, background_tasks: BackgroundTasks):
+    result = delete_book(book_id)
+    background_tasks.add_task(sio.emit, "books_changed", {"reason": "deleted", "id": book_id})
+    return result
 
 @router.get("/")
 def list_books(
@@ -77,11 +83,9 @@ def list_books(
 ):
     return get_books(page, limit, category_id, age_group_id, search)
 
-
 @router.get("/random/limit")
 def random_books(limit: int = 10, user=Depends(get_user)):
     return get_random_books(limit)
-
 
 @router.get("/{book_id}")
 def single_book(book_id: int, user=Depends(get_user)):

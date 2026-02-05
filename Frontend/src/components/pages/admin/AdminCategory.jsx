@@ -1,8 +1,9 @@
 // pages/admin/AdminCategory.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminCategories from "../../services/adminCategories";
 import "../../csspages/AdminCategory.css";
+import { socket } from "../../services/socket";
 
 export default function AdminCategory() {
   const navigate = useNavigate();
@@ -16,14 +17,27 @@ export default function AdminCategory() {
   const [editName, setEditName] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
+  const load = useCallback(async () => {
     const data = await AdminCategories.getAll();
     setCategories(data);
-  };
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // live updates from other admins
+  useEffect(() => {
+    function handleCategoriesChanged() {
+      load();
+    }
+
+    socket.on("categories_changed", handleCategoriesChanged);
+
+    return () => {
+      socket.off("categories_changed", handleCategoriesChanged);
+    };
+  }, [load]);
 
   const showSuccess = (message) => {
     setSuccessMessage(message);
@@ -78,7 +92,6 @@ export default function AdminCategory() {
   return (
     <div className="admin-categories-page">
       <div className="admin-categories-container">
-
         {/* SUCCESS */}
         {successMessage && (
           <div className="success-notification">{successMessage}</div>
@@ -86,10 +99,7 @@ export default function AdminCategory() {
 
         {/* HEADER */}
         <div className="admin-categories-header">
-          <button
-            className="back-btn"
-            onClick={() => navigate(-1)}
-          >
+          <button className="back-btn" onClick={() => navigate(-1)}>
             ← חזור
           </button>
 
@@ -151,7 +161,9 @@ export default function AdminCategory() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>✏️ עריכת קטגוריה</h2>
-              <button className="modal-close" onClick={closeEditModal}>✕</button>
+              <button className="modal-close" onClick={closeEditModal}>
+                ✕
+              </button>
             </div>
 
             <div className="modal-body">
@@ -180,10 +192,15 @@ export default function AdminCategory() {
       {/* DELETE MODAL */}
       {isDeleteModalOpen && (
         <div className="modal-overlay" onClick={closeDeleteModal}>
-          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content delete-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
               <h2>🗑️ מחיקת קטגוריה</h2>
-              <button className="modal-close" onClick={closeDeleteModal}>✕</button>
+              <button className="modal-close" onClick={closeDeleteModal}>
+                ✕
+              </button>
             </div>
 
             <div className="modal-body">
@@ -192,8 +209,12 @@ export default function AdminCategory() {
                 <p className="delete-warning-text">
                   האם אתה בטוח שברצונך למחוק את הקטגוריה
                 </p>
-                <p className="delete-category-name">"{deletingCategory?.name}"</p>
-                <p className="delete-warning-subtext">פעולה זו לא ניתנת לביטול</p>
+                <p className="delete-category-name">
+                  "{deletingCategory?.name}"
+                </p>
+                <p className="delete-warning-subtext">
+                  פעולה זו לא ניתנת לביטול
+                </p>
               </div>
             </div>
 
@@ -201,7 +222,10 @@ export default function AdminCategory() {
               <button className="modal-btn cancel" onClick={closeDeleteModal}>
                 ביטול
               </button>
-              <button className="modal-btn delete-confirm" onClick={deleteCategory}>
+              <button
+                className="modal-btn delete-confirm"
+                onClick={deleteCategory}
+              >
                 🗑️ מחק
               </button>
             </div>

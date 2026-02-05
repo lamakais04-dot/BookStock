@@ -89,7 +89,7 @@ def borrow_book(user_id: int, book_id: int):
         borrowed_books = [
             b for b in [library.book1id, library.book2id] if b is not None
         ]
-
+        print(f"bowrrowed book{book_id}")
         return {
             "message": "📚 הספר הושאל בהצלחה",
             "borrowedBooks": borrowed_books,
@@ -203,7 +203,7 @@ def return_book(user_id: int, book_id: int):
         new_qty = session.exec(
             select(books.quantity).where(books.id == book_id)
         ).one()
-
+        print(f"returned book{book_id}")
         return {
             "message": "📦 הספר הוחזר בהצלחה",
             "borrowedBooks": borrowed_books,

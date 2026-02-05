@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Library from "../services/library";
 import Login from "../services/login";
 import "../csspages/profile.css";
 import BookItem from "./BookItem";
 import { useAuth } from "../context/AuthContext";
+import { socket } from "../services/socket";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -20,19 +21,39 @@ export default function Profile() {
 
   const isAdmin = user?.role === "admin";
 
+  const loadBorrowedBooks = useCallback(async () => {
+    if (isAdmin) {
+      setBooks([]);
+      return;
+    }
+    const b = await Library.getMyBooks();
+    setBooks(b);
+  }, [isAdmin]);
+
   /* ===== Load profile + books ===== */
   useEffect(() => {
     async function loadData() {
       const p = await Login.getProfile();
       setProfile(p);
-
-      if (!isAdmin) {
-        const b = await Library.getMyBooks();
-        setBooks(b);
-      }
+      await loadBorrowedBooks();
     }
     loadData();
-  }, [isAdmin]);
+  }, [loadBorrowedBooks]);
+
+  /* Live updates when this user borrows/returns in another tab */
+  useEffect(() => {
+    function handleBorrowReturnChanged(data) {
+      if (!user || data?.user_id !== user.id) return;
+      loadBorrowedBooks();
+      fetchUser(); // refresh canBorrow / borrowedBooks in context
+    }
+
+    socket.on("borrow_return_changed", handleBorrowReturnChanged);
+
+    return () => {
+      socket.off("borrow_return_changed", handleBorrowReturnChanged);
+    };
+  }, [user, loadBorrowedBooks, fetchUser]);
 
   /* ===== Auto clear error ===== */
   useEffect(() => {
@@ -58,7 +79,6 @@ export default function Profile() {
     return <div className="profile-loading">טוען...</div>;
   }
 
-  /* ===== HANDLE IMAGE CLICK ===== */
   const handleImageClick = () => {
     if (isBlocked) {
       setErrorMsg("החשבון שלך חסום — לא ניתן להעלות תמונה");
@@ -69,13 +89,10 @@ export default function Profile() {
 
   return (
     <div className="profile-page-wrapper">
-
-      {/* 🔙 BACK */}
       <button className="profile-back-btn" onClick={() => navigate("/book")}>
         ← חזרה
       </button>
 
-      {/* FLOATING BOOKS */}
       <div className="floating-books">
         {[...Array(30)].map((_, i) => (
           <div key={i} className={`floating-book fb-${i + 1}`}>📚</div>
@@ -83,10 +100,8 @@ export default function Profile() {
       </div>
 
       <div className="profile-page">
-
         {/* PROFILE CARD */}
         <div className="profile-card">
-
           {/* AVATAR */}
           <div className="profile-avatar">
             <img
@@ -99,7 +114,6 @@ export default function Profile() {
               <div className="admin-badge-label">מנהל מערכת</div>
             )}
 
-            {/* 👇 THIS IS THE FIX */}
             <button
               className={`upload-btn ${isBlocked ? "blocked" : ""}`}
               onClick={handleImageClick}
@@ -108,7 +122,6 @@ export default function Profile() {
               החלף תמונה
             </button>
 
-            {/* HIDDEN INPUT */}
             <input
               ref={fileInputRef}
               type="file"
@@ -123,7 +136,7 @@ export default function Profile() {
 
                 try {
                   const res = await Login.uploadImage(formData);
-                  setProfile(prev => ({ ...prev, image: res.image }));
+                  setProfile((prev) => ({ ...prev, image: res.image }));
                   fetchUser();
                 } catch {
                   setErrorMsg("שגיאה בהעלאת תמונה");
@@ -153,7 +166,7 @@ export default function Profile() {
               {isEditing ? (
                 <input
                   value={profile.firstname}
-                  onChange={e =>
+                  onChange={(e) =>
                     setProfile({ ...profile, firstname: e.target.value })
                   }
                 />
@@ -167,7 +180,7 @@ export default function Profile() {
               {isEditing ? (
                 <input
                   value={profile.lastname}
-                  onChange={e =>
+                  onChange={(e) =>
                     setProfile({ ...profile, lastname: e.target.value })
                   }
                 />
@@ -186,7 +199,7 @@ export default function Profile() {
               {isEditing ? (
                 <input
                   value={profile.phonenumber || ""}
-                  onChange={e =>
+                  onChange={(e) =>
                     setProfile({ ...profile, phonenumber: e.target.value })
                   }
                 />
@@ -200,13 +213,16 @@ export default function Profile() {
                 className="save-btn"
                 onClick={async () => {
                   if (isBlocked) {
-                    setErrorMsg("החשבון שלך חסום — לא ניתן לשמור שינויים");
+                    setErrorMsg(
+                      "החשבון שלך חסום — לא ניתן לשמור שינויים",
+                    );
                     return;
                   }
 
                   const updated = await Login.updateProfile(profile);
                   setProfile(updated);
                   setIsEditing(false);
+                  fetchUser();
                 }}
               >
                 שמור שינויים
@@ -216,7 +232,9 @@ export default function Profile() {
                 className="edit-btn"
                 onClick={() => {
                   if (isBlocked) {
-                    setErrorMsg("החשבון שלך חסום — לא ניתן לערוך פרטים");
+                    setErrorMsg(
+                      "החשבון שלך חסום — לא ניתן לערוך פרטים",
+                    );
                     return;
                   }
                   setIsEditing(true);
@@ -230,19 +248,27 @@ export default function Profile() {
 
         <hr className="profile-divider" />
 
-        {/* ADMIN / USER CONTENT */}
         {isAdmin ? (
           <div id="admin" className="admin-controls-section">
             <h2 className="profile-section-title">🛠️ ניהול מערכת</h2>
 
             <div className="admin-actions-grid">
-              <button className="admin-action-btn" onClick={() => navigate("/admin/users")}>
+              <button
+                className="admin-action-btn"
+                onClick={() => navigate("/admin/users")}
+              >
                 👥 כל המשתמשים
               </button>
-              <button className="admin-action-btn" onClick={() => navigate("/admin/categories")}>
+              <button
+                className="admin-action-btn"
+                onClick={() => navigate("/admin/categories")}
+              >
                 📂 קטגוריות
               </button>
-              <button className="admin-action-btn" onClick={() => navigate("/admin/activity")}>
+              <button
+                className="admin-action-btn"
+                onClick={() => navigate("/admin/activity")}
+              >
                 📜 פעילויות אחרונות
               </button>
             </div>
@@ -255,7 +281,7 @@ export default function Profile() {
               <p className="profile-empty">אין ספרים מושאלים</p>
             ) : (
               <div className="profile-books-grid">
-                {books.map(book => (
+                {books.map((book) => (
                   <BookItem
                     key={book.id}
                     book={book}

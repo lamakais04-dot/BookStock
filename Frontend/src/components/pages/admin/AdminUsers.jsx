@@ -1,17 +1,36 @@
 // pages/admin/AdminUsers.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Admin from "../../services/admin";
 import "../../csspages/AdminUsers.css";
+import { socket } from "../../services/socket";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    Admin.getUsers(q).then(setUsers);
+  const load = useCallback(async () => {
+    const data = await Admin.getUsers(q);
+    setUsers(data);
   }, [q]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // live update when any user's block status changes
+  useEffect(() => {
+    function handleUsersChanged() {
+      load();
+    }
+
+    socket.on("users_changed", handleUsersChanged);
+
+    return () => {
+      socket.off("users_changed", handleUsersChanged);
+    };
+  }, [load]);
 
   const toggleBlock = async (userId) => {
     const res = await Admin.toggleUserBlock(userId);
@@ -30,7 +49,6 @@ export default function AdminUsers() {
   return (
     <div className="admin-users-page">
       <div className="admin-users-container">
-
         {/* HEADER */}
         <div className="admin-users-header">
           <button
@@ -73,7 +91,7 @@ export default function AdminUsers() {
                 <th style={{ width: "24%" }}>אימייל</th>
                 <th style={{ width: "11%" }}>תפקיד</th>
                 <th style={{ width: "12%" }}>שאולים כעת</th>
-                <th style={{ width: "12%" }}>סה"כ שאולים</th>
+                <th style={{ width: "12%" }}>סה\"כ שאולים</th>
                 <th style={{ width: "17%" }}>פעולות</th>
               </tr>
             </thead>
@@ -129,10 +147,8 @@ export default function AdminUsers() {
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
-
       </div>
     </div>
   );
