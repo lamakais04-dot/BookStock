@@ -2,306 +2,259 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
-import Library from "../services/library";
-import { useAuth } from "../context/AuthContext";
-import { useFavorites } from "../context/FavoritesContext";
-import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
 
-/* ================= MODAL ================= */
-function Modal({ show, onClose, title, message, type = "success", onConfirm }) {
-  if (!show) return null;
-
-  const icons = {
-    success: "✅",
-    error: "❌",
-    confirm: "❓"
-  };
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className={`modal-icon ${type}`}>{icons[type]}</div>
-        <h2 className="modal-title">{title}</h2>
-        <p className="modal-message">{message}</p>
-        <div className="modal-buttons">
-          {type === "confirm" ? (
-            <>
-              <button className="modal-btn modal-btn-danger" onClick={onConfirm}>
-                כן, מחק
-              </button>
-              <button className="modal-btn modal-btn-secondary" onClick={onClose}>
-                ביטול
-              </button>
-            </>
-          ) : (
-            <button className="modal-btn modal-btn-primary" onClick={onClose}>
-              סגור
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ================= SINGLE BOOK ================= */
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
   const isNew = id === "new";
-  const bookId = isNew ? null : Number(id);
-
-  const { user, setUser, isBlocked } = useAuth();
-  const isAdmin = user?.role === "admin";
-
-  /* ===== DATA ===== */
-  const [book, setBook] = useState(null);
-  const [allBooks, setAllBooks] = useState([]);
-
-  const [categories, setCategories] = useState([]);
-  const [ageGroups, setAgeGroups] = useState([]);
 
   const [loading, setLoading] = useState(!isNew);
   const [isEditing, setIsEditing] = useState(
     isNew || new URLSearchParams(location.search).get("edit") === "true"
   );
 
-  /* ===== MODAL ===== */
-  const [modal, setModal] = useState({
-    show: false,
+  const [categories, setCategories] = useState([]);
+  const [ageGroups, setAgeGroups] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [book, setBook] = useState({
     title: "",
-    message: "",
-    type: "success"
+    author: "",
+    summary: "",
+    pages: "",
+    quantity: "",
+    categoryid: "",
+    agesid: "",
+    image: ""
   });
 
-  const showModal = (title, message, type = "success") =>
-    setModal({ show: true, title, message, type });
-
-  const closeModal = () =>
-    setModal(prev => ({ ...prev, show: false }));
-
-  /* ===== FAVORITES / BORROW ===== */
-  const isBorrowedByMe = user?.borrowedBooks?.includes(bookId);
-  const { favorites, toggleFavorite } = useFavorites();
-  const isFavorite = favorites.includes(bookId);
-
-  /* ================= LOAD PAGE ================= */
+  /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function loadData() {
-      try {
-        const [cats, ages, booksRes] = await Promise.all([
-          Filters.getCategories(),
-          Filters.getAgeGroups(),
-          Books.getBooks(1, 50)
-        ]);
+      const [cats, ages] = await Promise.all([
+        Filters.getCategories(),
+        Filters.getAgeGroups()
+      ]);
 
-        setCategories(cats);
-        setAgeGroups(ages);
-        setAllBooks(booksRes.books);
+      setCategories(cats);
+      setAgeGroups(ages);
 
-
-        if (!isNew) {
-          const data = await Books.getBookById(id);
-          setBook(data);
-        } else {
-          setBook({
-            title: "",
-            author: "",
-            summary: "",
-            pages: "",
-            quantity: "",
-            categoryid: "",
-            agesid: "",
-            image: ""
-          });
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+      if (!isNew) {
+        const data = await Books.getBookById(id);
+        setBook(data);
       }
-    }
 
+      setLoading(false);
+    }
     loadData();
   }, [id, isNew]);
 
-  /* ================= ACTIONS ================= */
+  /* ================= VALIDATION ================= */
+  const validateForm = () => {
+    const e = {};
 
-  const handleBlockedAction = () => {
-    showModal(
-      "הפעולה נחסמה 🚫",
-      "החשבון שלך חסום ולכן אינך יכול לבצע פעולה זו.",
-      "error"
-    );
+    if (!book.title.trim()) e.title = "חובה להזין שם ספר";
+    if (!book.author.trim()) e.author = "חובה להזין שם מחבר";
+    if (!book.pages || Number(book.pages) <= 0)
+      e.pages = "מספר עמודים חייב להיות גדול מ־0";
+    if (!book.quantity || Number(book.quantity) <= 0)
+      e.quantity = "כמות חייבת להיות גדולה מ־0";
+    if (!book.categoryid) e.categoryid = "חובה לבחור קטגוריה";
+    if (!book.agesid) e.agesid = "חובה לבחור טווח גילאים";
+
+    if (imageFile) {
+      const allowed = ["image/jpeg", "image/png", "image/jpg"];
+      if (!allowed.includes(imageFile.type))
+        e.image = "ניתן להעלות רק JPG או PNG";
+      if (imageFile.size > 5 * 1024 * 1024)
+        e.image = "גודל תמונה עד 5MB";
+    }
+
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSave = async (formData) => {
-    try {
-      if (isNew) {
-        await Books.addBook(formData);
-        showModal("הצלחה! 🎉", "הספר נוסף בהצלחה", "success");
-        setTimeout(() => navigate("/book"), 2000);
-      } else {
-        await Books.updateBook(bookId, formData);
-        showModal("עודכן! ✨", "פרטי הספר עודכנו", "success");
-        setIsEditing(false);
-        setBook(prev => ({ ...prev, ...formData }));
-      }
-    } catch {
-      showModal("שגיאה", "שמירת הספר נכשלה", "error");
+  /* ================= HANDLERS ================= */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setBook(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: "" }));
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) return;
+
+    const payload = { ...book, image: imageFile };
+
+    if (isNew) {
+      await Books.addBook(payload);
+      setShowSuccessModal(true);
+
+      setTimeout(() => {
+        navigate("/book");
+      }, 2000);
+    } else {
+      await Books.updateBook(id, payload);
+      setIsEditing(false);
     }
   };
 
-  const handleBorrow = async () => {
-    if (isBlocked) return handleBlockedAction();
+  if (loading) return <div>טוען...</div>;
 
-    try {
-      const res = await Library.borrowBook(bookId);
-      setUser(prev => ({
-        ...prev,
-        borrowedBooks: res.borrowedBooks,
-        canBorrow: res.canBorrow
-      }));
-      setBook(prev => ({ ...prev, quantity: prev.quantity - 1 }));
-      showModal("הושאל! 📚", "השאלה בוצעה בהצלחה", "success");
-    } catch {
-      showModal("שגיאה", "לא ניתן להשאיל כרגע", "error");
-    }
-  };
-
-  const handleReturn = async () => {
-    if (isBlocked) return handleBlockedAction();
-
-    try {
-      const res = await Library.returnBook(bookId);
-      setUser(prev => ({
-        ...prev,
-        borrowedBooks: res.borrowedBooks,
-        canBorrow: res.canBorrow
-      }));
-      setBook(prev => ({ ...prev, quantity: prev.quantity + 1 }));
-      showModal("הוחזר! ✅", "הספר הוחזר בהצלחה", "success");
-    } catch {
-      showModal("שגיאה", "החזרה נכשלה", "error");
-    }
-  };
-
-  /* ================= RENDER ================= */
-
-  if (loading || !book) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
-  const categoryName =
-    categories.find(c => c.id === book.categoryid)?.name || "כללי";
-
-  const ageRangeName =
-    ageGroups.find(a => a.id === book.agesid)?.description || "כל הגילאים";
-
+  /* ================= JSX ================= */
   return (
     <div className="single-book-container">
-      <Modal {...modal} onClose={closeModal} />
-
       <button className="back-button" onClick={() => navigate("/book")}>
-        ← חזרה לקטלוג
+        ← חזרה
       </button>
 
       <div className="single-book">
+        {/* IMAGE + UPLOAD */}
         <div className="book-image-wrapper">
-          <img
-            src={book.image || "placeholder.png"}
-            alt={book.title}
-          />
+          <div className="book-image">
+            <img
+              src={
+                imageFile
+                  ? URL.createObjectURL(imageFile)
+                  : book.image || "/placeholder.png"
+              }
+              alt={book.title || "ספר"}
+            />
+          </div>
+
+          {isEditing && (
+            <div className="image-upload-section">
+              <div className="image-upload-input">
+                <label>
+                  <span className="upload-icon">📤</span>
+                  <span className="upload-text">העלה תמונת ספר</span>
+                  <span className="upload-hint">PNG / JPG עד 5MB</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files[0])}
+                  />
+                </label>
+              </div>
+              {errors.image && (
+                <small style={{ color: "crimson" }}>{errors.image}</small>
+              )}
+            </div>
+          )}
         </div>
 
+        {/* FORM */}
         <div className="book-details">
-          {isEditing ? (
-            <BookForm
-              initialData={book}
-              categories={categories}
-              ageGroups={ageGroups}
-              existingBooks={allBooks.filter(b => b.id !== bookId)}
-              onSubmit={handleSave}
-            />
-          ) : (
-            <>
-              <h1 className="book-title">{book.title}</h1>
-              <p className="book-author">מאת {book.author}</p>
-              <div className="book-summary">{book.summary}</div>
+          {isEditing && (
+            <div className="edit-form-local">
+              <h2 className="edit-title">הוספת ספר חדש</h2>
 
-              <div className="book-info-grid">
-                <div className="info-item">
-                  <span className="info-label">עמודים</span>
-                  <span className="info-value">{book.pages}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">במלאי</span>
-                  <span className="info-value">{book.quantity}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">קטגוריה</span>
-                  <span className="info-value">{categoryName}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">גילאים</span>
-                  <span className="info-value">{ageRangeName}</span>
-                </div>
+              <label className="form-label">שם הספר:</label>
+              <input
+                className="form-input"
+                name="title"
+                value={book.title}
+                onChange={handleChange}
+                placeholder="לדוגמה: הארי פוטר ואבן החכמים"
+              />
+              {errors.title && <small style={{ color: "crimson" }}>{errors.title}</small>}
+
+              <label className="form-label">שם המחבר:</label>
+              <input
+                className="form-input"
+                name="author"
+                value={book.author}
+                onChange={handleChange}
+                placeholder="לדוגמה: ג'יי. קיי. רולינג"
+              />
+              {errors.author && <small style={{ color: "crimson" }}>{errors.author}</small>}
+
+              <label className="form-label">תקציר הספר:</label>
+              <textarea
+                className="form-textarea"
+                name="summary"
+                value={book.summary}
+                onChange={handleChange}
+                placeholder="תיאור קצר של תוכן הספר"
+              />
+
+              <label className="form-label">מספר עמודים:</label>
+              <input
+                type="number"
+                className="form-input"
+                name="pages"
+                value={book.pages}
+                onChange={handleChange}
+                placeholder="לדוגמה: 320"
+              />
+              {errors.pages && <small style={{ color: "crimson" }}>{errors.pages}</small>}
+
+              <label className="form-label">כמות זמינה:</label>
+              <input
+                type="number"
+                className="form-input"
+                name="quantity"
+                value={book.quantity}
+                onChange={handleChange}
+                placeholder="לדוגמה: 5"
+              />
+              {errors.quantity && <small style={{ color: "crimson" }}>{errors.quantity}</small>}
+
+              <label className="form-label">קטגוריה:</label>
+              <select
+                className="form-select"
+                name="categoryid"
+                value={book.categoryid}
+                onChange={handleChange}
+              >
+                <option value="">בחרי קטגוריה</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              {errors.categoryid && <small style={{ color: "crimson" }}>{errors.categoryid}</small>}
+
+              <label className="form-label">טווח גילאים:</label>
+              <select
+                className="form-select"
+                name="agesid"
+                value={book.agesid}
+                onChange={handleChange}
+              >
+                <option value="">בחרי טווח גילאים</option>
+                {ageGroups.map(a => (
+                  <option key={a.id} value={a.id}>{a.description}</option>
+                ))}
+              </select>
+              {errors.agesid && <small style={{ color: "crimson" }}>{errors.agesid}</small>}
+
+              <div className="edit-actions">
+                <button className="save-button" onClick={handleSave}>
+                  💾 שמור
+                </button>
               </div>
-
-              <div className="book-actions">
-                {isAdmin ? (
-                  <button
-                    className="edit-toggle-button"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    ✏️ ערוך ספר
-                  </button>
-                ) : (
-                  <>
-                    {isBorrowedByMe ? (
-                      <button className="borrow-button return" onClick={handleReturn}>
-                        החזרה
-                      </button>
-                    ) : (
-                      <button
-                        className="borrow-button"
-                        onClick={handleBorrow}
-                        disabled={!user || !user.canBorrow || book.quantity === 0}
-                      >
-                        {!user
-                          ? "התחברי כדי להשאיל"
-                          : book.quantity === 0
-                            ? "אזל מהמלאי"
-                            : !user.canBorrow
-                              ? "הגעת למקסימום"
-                              : "השאלת ספר"}
-                      </button>
-                    )}
-
-                    <button
-                      className={`favorite-button ${isFavorite ? "active" : ""}`}
-                      onClick={() =>
-                        isBlocked
-                          ? handleBlockedAction()
-                          : toggleFavorite(bookId)
-                      }
-                    >
-                      {isFavorite ? "❤️ במועדפים" : "♡ הוספה למועדפים"}
-                    </button>
-                  </>
-                )}
-              </div>
-            </>
+            </div>
           )}
         </div>
       </div>
+
+      {/* ===== SUCCESS MODAL ===== */}
+      {showSuccessModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-icon success">✓</div>
+            <h3 className="modal-title">הספר נוסף בהצלחה!</h3>
+            <p className="modal-message">
+              הספר נוסף למערכת ויופיע ברשימת הספרים
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -24,21 +24,28 @@ export default function Signup() {
 
   const MAX_BIRTHDATE = "2015-12-31";
 
+  // ✅ Password validation like the image:
+  // min 8 chars, starts with uppercase letter, at least 1 special char
+  const validatePassword = (v) => {
+    if (!v || v.length < 8) return "הסיסמה חייבת להכיל לפחות 8 תווים";
+    if (!/^[A-Z]/.test(v)) return "הסיסמה חייבת להתחיל באות גדולה באנגלית (A-Z)";
+    if (!/[^A-Za-z0-9]/.test(v)) return "הסיסמה חייבת להכיל לפחות תו מיוחד אחד (לדוגמה: !@#)";
+    return true;
+  };
+
   const validators = {
     firstname: (v) => v.length > 1 || "שם פרטי קצר מדי",
     lastname: (v) => v.length > 1 || "שם משפחה קצר מדי",
     birthdate: (v) =>
       (v && v <= MAX_BIRTHDATE) || "שנת לידה חייבת להיות עד 2015",
     gender: (v) => v !== "" || "חובה לבחור מגדר",
-    email: (v) =>
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
-    password: (v) => v.length >= 6 || "הסיסמה חייבת להכיל לפחות 6 תווים",
-    phonenumber: (v) =>
-      /^\d{10}$/.test(v) || "מספר טלפון חייב להכיל 10 ספרות",
-    address: (v) => v.length > 3 || "כתובת קצרה מדי",
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
+    password: validatePassword, // ✅ updated
+    phonenumber: (v) => /^\d{10}$/.test(v) || "מספר טלפון חייב להכיל 10 ספרות",
+    address: (v) => v.length > 3 || "כתובת קצרה מדי"
   };
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
 
     let newValue = value;
@@ -70,7 +77,12 @@ export default function Signup() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      const finalPayload = { ...formData };
+      const { ...signupPayload } = formData;
+
+      const finalPayload = {
+        ...signupPayload
+      };
+
       await SignupClass.signup(finalPayload);
 
       setShowSuccess(true);
@@ -98,13 +110,9 @@ export default function Signup() {
           <p className="signup-subtitle">צור חשבון חדש בספרייה</p>
         </div>
 
-        {errors.general && (
-          <div className="signup-alert error">{errors.general}</div>
-        )}
+        {errors.general && <div className="signup-alert error">{errors.general}</div>}
         {showSuccess && (
-          <div className="signup-alert success">
-            ✔ נרשמת בהצלחה! הינך מועבר לדף התחברות...
-          </div>
+          <div className="signup-alert success">✔ נרשמת בהצלחה! הינך מועבר לדף התחברות...</div>
         )}
 
         <form className="signup-form" onSubmit={handleSubmit}>
@@ -207,9 +215,7 @@ export default function Signup() {
                 value={formData.phonenumber}
                 onChange={handleChange}
               />
-              {errors.phonenumber && (
-                <span className="error-text">{errors.phonenumber}</span>
-              )}
+              {errors.phonenumber && <span className="error-text">{errors.phonenumber}</span>}
             </div>
           </div>
 
@@ -221,10 +227,14 @@ export default function Signup() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="לדוגמה: Abcdef!1"
             />
-            {errors.password && (
-              <span className="error-text">{errors.password}</span>
-            )}
+            {/* hint like the requirements */}
+            <small style={{ display: "block", marginTop: "6px", opacity: 0.8 }}>
+              מינימום 8 תווים, מתחיל באות גדולה באנגלית, ולפחות תו מיוחד אחד
+            </small>
+
+            {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
           <button className="signup-button" type="submit">

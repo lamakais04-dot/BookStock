@@ -6,20 +6,29 @@ import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { fetchUser, user } = useAuth();
+  const { fetchUser } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const validators = {
-    email: (v) =>
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
-    password: (v) =>
-      v.length >= 6 || "הסיסמה חייבת להכיל לפחות 6 תווים",
+  // ✅ Same password validation like Signup:
+  // min 8 chars, starts with uppercase letter, at least 1 special char
+  const validatePassword = (v) => {
+    if (!v || v.length < 8) return "הסיסמה חייבת להכיל לפחות 8 תווים";
+    if (!/^[A-Z]/.test(v)) return "הסיסמה חייבת להתחיל באות גדולה באנגלית (A-Z)";
+    if (!/[^A-Za-z0-9]/.test(v)) return "הסיסמה חייבת להכיל לפחות תו מיוחד אחד (לדוגמה: !@#)";
+    return true;
   };
 
+  // ===== Validators =====
+  const validators = {
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
+    password: validatePassword
+  };
+
+  // ===== Handle Submit =====
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -46,12 +55,8 @@ export default function Login() {
       setTimeout(() => {
         navigate("/");
       }, 2000);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.detail === "Already logged in"
-          ? "את/ה כבר מחובר/ת"
-          : "אימייל או סיסמה שגויים";
-      setErrors({ general: msg });
+    } catch {
+      setErrors({ general: "אימייל או סיסמה שגויים" });
       setShowSuccess(false);
     }
   };
@@ -65,15 +70,11 @@ export default function Login() {
           <p className="login-subtitle">התחבר לחשבון שלך</p>
         </div>
 
-        {/* ALERTS */}
-        {errors.general && (
-          <div className="login-alert error">❌ {errors.general}</div>
-        )}
+        {/* ===== ALERTS ===== */}
+        {errors.general && <div className="login-alert error">❌ {errors.general}</div>}
 
         {showSuccess && (
-          <div className="login-alert success">
-            ✔ התחברת בהצלחה! מועבר לאתר...
-          </div>
+          <div className="login-alert success">✔ התחברת בהצלחה! מועבר לאתר...</div>
         )}
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -85,17 +86,18 @@ export default function Login() {
               placeholder="example@gmail.com"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value);
-                const valid = validators.email(e.target.value);
-                setErrors({
-                  ...errors,
+                const v = e.target.value;
+                setEmail(v);
+
+                const valid = validators.email(v);
+                setErrors((prev) => ({
+                  ...prev,
                   email: valid === true ? "" : valid,
-                });
+                  general: ""
+                }));
               }}
             />
-            {errors.email && (
-              <span className="error-text">{errors.email}</span>
-            )}
+            {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
 
           <div className="input-group">
@@ -103,20 +105,26 @@ export default function Login() {
             <input
               className="login-input"
               type="password"
-              placeholder="לפחות 6 תווים"
+              placeholder="לדוגמה: Abcdef!1"
               value={password}
               onChange={(e) => {
-                setPassword(e.target.value);
-                const valid = validators.password(e.target.value);
-                setErrors({
-                  ...errors,
+                const v = e.target.value;
+                setPassword(v);
+
+                const valid = validators.password(v);
+                setErrors((prev) => ({
+                  ...prev,
                   password: valid === true ? "" : valid,
-                });
+                  general: ""
+                }));
               }}
             />
-            {errors.password && (
-              <span className="error-text">{errors.password}</span>
-            )}
+
+            <small style={{ display: "block", marginTop: "6px", opacity: 0.8 }}>
+              מינימום 8 תווים, מתחיל באות גדולה באנגלית, ולפחות תו מיוחד אחד
+            </small>
+
+            {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
           <button className="login-button" type="submit">
