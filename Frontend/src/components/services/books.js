@@ -1,11 +1,9 @@
+// services/books.js
 import axios from "axios";
 
 const BASE_URL = "http://localhost:8000/api/book";
 
 class Books {
-
-  /* ================= PUBLIC ================= */
-
   static async getBooks(
     page = 1,
     limit = 8,
@@ -22,16 +20,15 @@ class Books {
         age_group_id: ageGroupId,
         search: search || undefined,
       },
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: "123456789apikeysecure" },
     });
-
     return res.data;
   }
 
   static async getBookById(id) {
     const res = await axios.get(`${BASE_URL}/${id}`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: "123456789apikeysecure" },
     });
     return res.data;
   }
@@ -40,12 +37,10 @@ class Books {
     const res = await axios.get(`${BASE_URL}/random/limit`, {
       params: { limit },
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: "123456789apikeysecure" },
     });
     return res.data;
   }
-
-  /* ================= ADMIN ================= */
 
   static async addBook(data) {
     const formData = new FormData();
@@ -58,13 +53,13 @@ class Books {
     formData.append("categoryid", data.categoryid);
     formData.append("agesid", data.agesid);
 
-    if (data.image) {
-      formData.append("image", data.image);
+    if (data.imageFile) {
+      formData.append("image", data.imageFile);
     }
 
     const res = await axios.post(BASE_URL, formData, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: "123456789apikeysecure" },
     });
 
     return res.data;
@@ -78,16 +73,17 @@ class Books {
     if (data.author !== undefined) formData.append("author", data.author);
     if (data.quantity !== undefined) formData.append("quantity", data.quantity);
     if (data.pages !== undefined) formData.append("pages", data.pages);
-    if (data.categoryid !== undefined) formData.append("categoryid", data.categoryid);
+    if (data.categoryid !== undefined)
+      formData.append("categoryid", data.categoryid);
     if (data.agesid !== undefined) formData.append("agesid", data.agesid);
 
-    if (data.image) {
-      formData.append("image", data.image);
+    if (data.imageFile) {
+      formData.append("image", data.imageFile);
     }
 
     const res = await axios.put(`${BASE_URL}/${id}`, formData, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: "123456789apikeysecure" },
     });
 
     return res.data;
@@ -96,7 +92,7 @@ class Books {
   static async deleteBook(id) {
     await axios.delete(`${BASE_URL}/${id}`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: "123456789apikeysecure" },
     });
   }
 }

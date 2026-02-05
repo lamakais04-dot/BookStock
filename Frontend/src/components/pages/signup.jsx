@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import SignupClass from "../services/signup";
-import axios from "axios";
 import "../csspages/signup.css";
 import { useNavigate } from "react-router-dom";
 
-
 export default function Signup() {
-
   const navigate = useNavigate();
 
   const initialState = {
@@ -18,7 +15,7 @@ export default function Signup() {
     email: "",
     password: "",
     phonenumber: "",
-    image: null
+    image: null,
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -30,18 +27,19 @@ export default function Signup() {
   const validators = {
     firstname: (v) => v.length > 1 || "שם פרטי קצר מדי",
     lastname: (v) => v.length > 1 || "שם משפחה קצר מדי",
-    birthdate: (v) => (v && v <= MAX_BIRTHDATE) || "שנת לידה חייבת להיות עד 2015",
+    birthdate: (v) =>
+      (v && v <= MAX_BIRTHDATE) || "שנת לידה חייבת להיות עד 2015",
     gender: (v) => v !== "" || "חובה לבחור מגדר",
-    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
+    email: (v) =>
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "אימייל לא תקין",
     password: (v) => v.length >= 6 || "הסיסמה חייבת להכיל לפחות 6 תווים",
-    phonenumber: (v) => /^\d{10}$/.test(v) || "מספר טלפון חייב להכיל 10 ספרות",
-    address: (v) => v.length > 3 || "כתובת קצרה מדי"
+    phonenumber: (v) =>
+      /^\d{10}$/.test(v) || "מספר טלפון חייב להכיל 10 ספרות",
+    address: (v) => v.length > 3 || "כתובת קצרה מדי",
   };
 
-
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-
 
     let newValue = value;
     if (name === "phonenumber") {
@@ -52,7 +50,10 @@ export default function Signup() {
 
     if (validators[name]) {
       const valid = validators[name](newValue);
-      setErrors((prev) => ({ ...prev, [name]: valid === true ? "" : valid }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: valid === true ? "" : valid,
+      }));
     }
   };
 
@@ -69,30 +70,21 @@ export default function Signup() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      /* =========================
-         SIGNUP — JSON ONLY
-         ========================= */
-      const { ...signupPayload } = formData;
-
-      // optional: if we already got uploadedImageUrl, you can send it as imageurl
-      // only if your schema uses imageurl in NewUser
-      const finalPayload = {
-        ...signupPayload,
-      };
-
+      const finalPayload = { ...formData };
       await SignupClass.signup(finalPayload);
 
       setShowSuccess(true);
       setErrors({});
 
-      // give the user a short success feedback, then redirect
       setTimeout(() => {
         navigate("/login");
       }, 1500);
-
-
     } catch (err) {
-      setErrors({ general: "הרשמה נכשלה, נסה שוב" });
+      const msg =
+        err?.response?.data?.detail === "Already logged in"
+          ? "את/ה כבר מחובר/ת, אין צורך להירשם שוב"
+          : "הרשמה נכשלה, נסה שוב";
+      setErrors({ general: msg });
       setShowSuccess(false);
     }
   };
@@ -106,12 +98,16 @@ export default function Signup() {
           <p className="signup-subtitle">צור חשבון חדש בספרייה</p>
         </div>
 
-        {errors.general && <div className="signup-alert error">{errors.general}</div>}
-        {showSuccess && <div className="signup-alert success">✔ נרשמת בהצלחה! הינך מועבר לדף התחברות...</div>}
-
+        {errors.general && (
+          <div className="signup-alert error">{errors.general}</div>
+        )}
+        {showSuccess && (
+          <div className="signup-alert success">
+            ✔ נרשמת בהצלחה! הינך מועבר לדף התחברות...
+          </div>
+        )}
 
         <form className="signup-form" onSubmit={handleSubmit}>
-          {/* פרטים */}
           <div className="form-row">
             <div className="input-group">
               <label className="input-label">שם פרטי</label>
@@ -121,7 +117,9 @@ export default function Signup() {
                 value={formData.firstname}
                 onChange={handleChange}
               />
-              {errors.firstname && <span className="error-text">{errors.firstname}</span>}
+              {errors.firstname && (
+                <span className="error-text">{errors.firstname}</span>
+              )}
             </div>
 
             <div className="input-group">
@@ -132,7 +130,9 @@ export default function Signup() {
                 value={formData.lastname}
                 onChange={handleChange}
               />
-              {errors.lastname && <span className="error-text">{errors.lastname}</span>}
+              {errors.lastname && (
+                <span className="error-text">{errors.lastname}</span>
+              )}
             </div>
           </div>
 
@@ -147,7 +147,9 @@ export default function Signup() {
                 value={formData.birthdate}
                 onChange={handleChange}
               />
-              {errors.birthdate && <span className="error-text">{errors.birthdate}</span>}
+              {errors.birthdate && (
+                <span className="error-text">{errors.birthdate}</span>
+              )}
             </div>
 
             <div className="input-group">
@@ -163,7 +165,9 @@ export default function Signup() {
                 <option value="נקבה">נקבה</option>
                 <option value="אחר">אחר</option>
               </select>
-              {errors.gender && <span className="error-text">{errors.gender}</span>}
+              {errors.gender && (
+                <span className="error-text">{errors.gender}</span>
+              )}
             </div>
           </div>
 
@@ -175,7 +179,9 @@ export default function Signup() {
               value={formData.address}
               onChange={handleChange}
             />
-            {errors.address && <span className="error-text">{errors.address}</span>}
+            {errors.address && (
+              <span className="error-text">{errors.address}</span>
+            )}
           </div>
 
           <div className="form-row">
@@ -188,7 +194,9 @@ export default function Signup() {
                 value={formData.email}
                 onChange={handleChange}
               />
-              {errors.email && <span className="error-text">{errors.email}</span>}
+              {errors.email && (
+                <span className="error-text">{errors.email}</span>
+              )}
             </div>
 
             <div className="input-group">
@@ -214,7 +222,9 @@ export default function Signup() {
               value={formData.password}
               onChange={handleChange}
             />
-            {errors.password && <span className="error-text">{errors.password}</span>}
+            {errors.password && (
+              <span className="error-text">{errors.password}</span>
+            )}
           </div>
 
           <button className="signup-button" type="submit">

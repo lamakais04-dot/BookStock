@@ -12,7 +12,6 @@ from models.borrow_history import BorrowHistory
 from schemas.admin_users import AdminUserRow, BorrowRow
 from schemas.admin_activity import ActivityRow
 
-
 def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
     with Session(engine) as session:
         stmt = select(Users)
@@ -57,7 +56,6 @@ def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
             for u in users
         ]
 
-
 def admin_get_user_borrows_service(user_id: int, only_open: bool = False) -> List[BorrowRow]:
     with Session(engine) as session:
         stmt = (
@@ -81,7 +79,6 @@ def admin_get_user_borrows_service(user_id: int, only_open: bool = False) -> Lis
             )
             for (h, b) in rows
         ]
-
 
 def admin_activity_service(
     user_id: Optional[int] = None,

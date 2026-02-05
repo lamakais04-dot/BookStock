@@ -30,6 +30,7 @@ export default function Navbar() {
     LoginClass.handleLogout();
     navigate("/login");
     window.location.reload();
+    
   };
 
   const handleSearchChange = (value) => {

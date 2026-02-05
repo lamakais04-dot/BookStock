@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+// pages/books.jsx
+import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import BookItem from "./BookItem";
 import { useAuth } from "../context/AuthContext";
-
+import { socket } from "../services/socket";
 
 import "../csspages/books.css";
 import "../csspages/filters.css";
@@ -21,7 +22,7 @@ export default function AllBooks() {
   const [ageGroupId, setAgeGroupId] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const { user,isBlocked } = useAuth();
+  const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
 
@@ -29,37 +30,38 @@ export default function AllBooks() {
   const location = useLocation();
   const search = new URLSearchParams(location.search).get("search") || "";
 
-  /* ===== Fetch books ===== */
-  useEffect(() => {
+  const loadBooks = useCallback(async () => {
     setLoading(true);
-    const delay = setTimeout(async () => {
-      try {
-        const data = await Books.getBooks(
-          currentPage,
-          booksPerPage,
-          categoryId,
-          ageGroupId,
-          search
-        );
-        setBooks(data?.books || []);
-        setTotalPages(data?.totalPages || 1);
-      } catch (err) {
-        console.error(err);
-        setBooks([]);
-        setTotalPages(1);
-      } finally {
-        setLoading(false);
-      }
-    }, 400);
-    return () => clearTimeout(delay);
+    try {
+      const data = await Books.getBooks(
+        currentPage,
+        booksPerPage,
+        categoryId,
+        ageGroupId,
+        search
+      );
+      setBooks(data?.books || []);
+      setTotalPages(data?.totalPages || 1);
+    } catch (err) {
+      console.error(err);
+      setBooks([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
   }, [currentPage, categoryId, ageGroupId, search]);
 
-  /* Reset page on filter change */
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      loadBooks();
+    }, 400);
+    return () => clearTimeout(delay);
+  }, [loadBooks]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryId, ageGroupId, search]);
 
-  /* ===== Load filters ===== */
   useEffect(() => {
     async function loadFilters() {
       try {
@@ -74,25 +76,41 @@ export default function AllBooks() {
     loadFilters();
   }, []);
 
+  // live updates when books change anywhere
+  useEffect(() => {
+    function handleBooksChanged() {
+      loadBooks();
+    }
+
+    socket.on("books_changed", handleBooksChanged);
+
+    return () => {
+      socket.off("books_changed", handleBooksChanged);
+    };
+  }, [loadBooks]);
+
   return (
     <>
-      {/* ===== Admin Add Button - צף בפינה ===== */}
       {isAdmin && (
         <div className="add-book-wrapper">
-          <button className="add-book-btn" onClick={() => navigate("/book/new")}>
+          <button
+            className="add-book-btn"
+            onClick={() => navigate("/book/new")}
+          >
             <span className="icon">➕</span>
             הוסף ספר חדש
           </button>
         </div>
       )}
 
-      {/* ===== Age Filter ===== */}
       <div className="age-filter">
         {ageGroups.map((age) => (
           <button
             key={age.id}
             className={`age-btn ${ageGroupId === age.id ? "active" : ""}`}
-            onClick={() => setAgeGroupId(ageGroupId === age.id ? null : age.id)}
+            onClick={() =>
+              setAgeGroupId(ageGroupId === age.id ? null : age.id)
+            }
           >
             <span className="star">★</span>
             {age.description}
@@ -100,7 +118,6 @@ export default function AllBooks() {
         ))}
       </div>
 
-      {/* ===== Clear Filters ===== */}
       {(categoryId || ageGroupId || search) && (
         <div className="clear-filters-wrapper">
           <button
@@ -116,7 +133,6 @@ export default function AllBooks() {
         </div>
       )}
 
-      {/* ===== Books Grid ===== */}
       <div className="books-grid">
         {loading ? (
           <div className="books-loading">
@@ -141,7 +157,6 @@ export default function AllBooks() {
         )}
       </div>
 
-      {/* ===== Pagination ===== */}
       {!loading && totalPages > 1 && (
         <div className="pagination">
           <button
@@ -168,7 +183,6 @@ export default function AllBooks() {
         </div>
       )}
 
-      {/* ===== Categories Menu (Floating/Hover Logic) ===== */}
       <div className="category-menu">
         <button
           className="menu-btn"

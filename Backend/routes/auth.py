@@ -1,5 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from fastapi.responses import Response
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File,
+    Depends,
+    HTTPException,
+    Response,
+    Cookie,
+)
 from schemas.users import NewUser, LoginData, UserUpdate
 from utils.active_user_helper import get_active_user
 from utils.auth_helper import get_user
@@ -12,18 +19,48 @@ from services.authService import (
 )
 from services.bookService import get_book_by_id
 
+from socketio_app import sio
+
+
 router = APIRouter()
+
+
+# ---------- helper: user or None ----------
+
+def get_user_or_none(access_token: str | None = Cookie(default=None)):
+    # reuse existing get_user, but turn 401 into None
+    if access_token is None:
+        return None
+    try:
+        return get_user(access_token)
+    except HTTPException as e:
+        if e.status_code == 401:
+            return None
+        raise
 
 
 # ---------- AUTH ----------
 
 @router.post("/signup", status_code=201)
-def sign_up(user_req: NewUser):
+def sign_up(
+    user_req: NewUser,
+    user=Depends(get_user_or_none),
+):
+    # If already logged in, block signup
+    if user:
+        raise HTTPException(status_code=400, detail="Already logged in")
     return signup_user(user_req)
 
 
 @router.post("/login")
-def login(login_req: LoginData, response: Response):
+def login(
+    login_req: LoginData,
+    response: Response,
+    user=Depends(get_user_or_none),
+):
+    # If already logged in, block login
+    if user:
+        raise HTTPException(status_code=400, detail="Already logged in")
     return login_user(login_req, response)
 
 
@@ -41,19 +78,24 @@ def me(user=Depends(get_user)):
 
 
 @router.put("/update-profile")
-def update_profile(
+async def update_profile(
     data: UserUpdate,
     user=Depends(get_active_user),
 ):
-    return update_user_profile(user["id"], data.model_dump(exclude_none=True))
+    updated = update_user_profile(user["id"], data.model_dump(exclude_none=True))
+    # notify this user (and other sessions) that profile changed
+    await sio.emit("profile_updated", {"user_id": user["id"]})
+    return updated
 
 
 @router.post("/uploadImage")
-def upload_image(
+async def upload_image(
     image_file: UploadFile = File(...),
     user=Depends(get_active_user),
 ):
-    return upload_user_image(image_file, user["id"])
+    result = upload_user_image(image_file, user["id"])
+    await sio.emit("profile_updated", {"user_id": user["id"]})
+    return result
 
 
 # ---------- BOOK ----------

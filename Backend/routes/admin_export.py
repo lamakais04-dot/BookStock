@@ -20,26 +20,17 @@ from services.adminService import admin_activity_service
 
 router = APIRouter(prefix="/admin/export", tags=["admin"])
 
-
-# =========================
 # Register Hebrew / English font
-# =========================
 pdfmetrics.registerFont(
     TTFont("DejaVu", "fonts/DejaVuSans.ttf")
 )
 
-
-# =========================
 # RTL helper (CORRECT – BiDi)
-# =========================
 def rtl(text: str) -> str:
     reshaped = arabic_reshaper.reshape(text)
     return get_display(reshaped)
 
-
-# =========================
 # EXCEL EXPORT (UNCHANGED)
-# =========================
 @router.get("/activity.xlsx", dependencies=[Depends(get_admin_user)])
 def export_activity_excel(
     user_id: Optional[int] = None,
@@ -83,10 +74,7 @@ def export_activity_excel(
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
-
-# =========================
 # PDF EXPORT (FIXED + STYLED)
-# =========================
 @router.get("/activity.pdf", dependencies=[Depends(get_admin_user)])
 def export_activity_pdf(
     action: str = "ALL",
@@ -111,9 +99,7 @@ def export_activity_pdf(
     text_color = HexColor("#2F2F2F")
     line_color = HexColor("#D0D0D0")
 
-    # =========================
     # TITLE
-    # =========================
     c.setFont("DejaVu", 18)
     c.setFillColor(title_color)
     c.drawRightString(
@@ -140,9 +126,7 @@ def export_activity_pdf(
 
     y -= 24
 
-    # =========================
     # CONTENT
-    # =========================
     c.setFont("DejaVu", 10)
     c.setFillColor(text_color)
 
@@ -168,9 +152,7 @@ def export_activity_pdf(
             c.setFillColor(text_color)
             y = height - margin_y
 
-    # =========================
     # FOOTER
-    # =========================
     c.setFont("DejaVu", 9)
     c.setFillColor(HexColor("#7F8C8D"))
     c.drawCentredString(

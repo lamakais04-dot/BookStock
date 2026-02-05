@@ -35,28 +35,30 @@
    BACK BUTTON
 ================================ */
 .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
-    margin-bottom: 24px;
-    margin-left: auto; /* דוחף לשמאל */
-    
-    background: linear-gradient(135deg, #fff, #fdf8f0);
-    border: 2px solid #8b4513;
-    border-radius: 16px;
-    
-    font-size: 16px;
-    font-weight: 700;
-    color: #5d3a1a;
-    
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 6px 16px rgba(139, 69, 19, 0.15);
-    
-    position: relative;
-    overflow: hidden;
+  position: fixed;
+  top: 120px;
+
+  left: 24px;        /* שמאל אמיתי */
+  right: auto;       /* 🔴 חובה – מבטל RTL */
+
+  direction: ltr;    /* 🔴 מונע היפוך חצים/טקסט */
+
+  padding: 0.6rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #fef3e2 0%, #fdefd5 100%);
+  color: #8b4513;
+  border: 2px solid #8b4513;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 3px 10px rgba(139, 69, 19, 0.14);
+  transition: all 0.3s ease;
+  z-index: 1000;
 }
+
 
 .back-button::before {
     content: '';
