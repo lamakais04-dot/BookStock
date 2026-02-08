@@ -1,10 +1,9 @@
 /* ===============================
    SINGLE BOOK PAGE - IMPROVED
-   שיפורים מודרניים עם שמירה על הצבעים המקוריים
+   עיצוב מודרני ומלוטש
 ================================ */
 
 :root {
-  /* צבעים מקוריים - חמים וספרותיים */
   --primary: #8b4513;
   --primary-dark: #5d3a1a;
   --primary-light: #a05a2c;
@@ -12,8 +11,7 @@
   --success: #2ecc71;
   --warning: #f39c12;
   --danger: #e74c3c;
-  
-  /* רקעים */
+
   --bg-primary: #ffffff;
   --bg-secondary: #fef9f3;
   --bg-tertiary: #fef6e7;
@@ -21,12 +19,37 @@
   --text-secondary: #8b6f47;
   --text-muted: #b8a690;
   --border: #e8dcc8;
-  
-  /* צללים */
+
   --shadow-sm: 0 2px 4px rgba(139, 69, 19, 0.08);
   --shadow-md: 0 4px 12px rgba(139, 69, 19, 0.12);
   --shadow-lg: 0 10px 30px rgba(139, 69, 19, 0.2);
   --shadow-xl: 0 20px 40px rgba(139, 69, 19, 0.25);
+}
+
+/* ===============================
+   LOADING STATE
+================================ */
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
+}
+
+.loading-container::after {
+  content: '📚';
+  font-size: 80px;
+  animation: loadingSpin 2s ease-in-out infinite;
+}
+
+@keyframes loadingSpin {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(15deg) scale(1.1);
+  }
 }
 
 /* ===============================
@@ -53,11 +76,11 @@
 
 /* ספרים מרחפים ברקע */
 .single-book-container::after {
-  content: '📚 📖 📕 📗 📘 📙 📚 📖 📕 📗 📘 📙 📚 📖 📕';
+  content: '📚 📖 📕 📗 📘 📙 📚 📖 📕 📗 📘 📙';
   position: fixed;
   inset: 0;
   font-size: 40px;
-  opacity: 0.08;
+  opacity: 0.06;
   pointer-events: none;
   z-index: 0;
   display: flex;
@@ -139,7 +162,18 @@
   z-index: 1;
 }
 
-/* ספרים מעוטרים בפינות הכרטיס */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ספרים מעוטרים בפינות */
 .single-book::before {
   content: '📖';
   position: absolute;
@@ -171,25 +205,9 @@
   }
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* ===============================
-   IMAGE WRAPPER
+   IMAGE
 ================================ */
-.book-image-wrapper {
-  flex-shrink: 0;
-}
-
 .book-image {
   width: 100%;
   aspect-ratio: 3/4;
@@ -243,8 +261,7 @@
 
 .book-image:hover {
   transform: translateY(-8px);
-  box-shadow: 
-    0 20px 48px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 20px 48px rgba(139, 69, 19, 0.3);
 }
 
 .book-image img {
@@ -253,18 +270,22 @@
   object-fit: contain;
   display: block;
   border-radius: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ===============================
    DETAILS
 ================================ */
 .book-details {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/* ===============================
+   TITLE - נקי ללא אימוג'י
+================================ */
 .book-title {
   font-size: 42px;
   font-weight: 800;
@@ -274,45 +295,34 @@
   background-clip: text;
   margin: 0;
   line-height: 1.2;
-  position: relative;
-  padding-right: 60px;
 }
 
-/* אימוגי מעוטר ליד הכותרת */
-.book-title::before {
-  content: '📚';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 48px;
-  filter: drop-shadow(0 4px 12px rgba(139, 69, 19, 0.3));
-  animation: bookPulse 3s ease-in-out infinite;
-}
-
-@keyframes bookPulse {
-  0%, 100% {
-    transform: translateY(-50%) scale(1);
-  }
-  50% {
-    transform: translateY(-50%) scale(1.1);
-  }
-}
-
+/* ===============================
+   AUTHOR - עיצוב כמו info-item
+================================ */
 .book-author {
-  font-size: 22px;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--bg-secondary), #fff);
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  width: fit-content;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  transition: all 0.3s ease;
 }
 
-.book-author::before {
-  content: '✍️';
+.book-author:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
 }
 
+/* ===============================
+   SUMMARY - ללא אימוג'י ספר
+================================ */
 .book-summary {
   font-size: 16px;
   line-height: 1.8;
@@ -329,18 +339,6 @@
 .book-summary:hover {
   box-shadow: var(--shadow-md);
   transform: translateX(-4px);
-}
-
-.book-summary::before {
-  content: '📖';
-  position: absolute;
-  top: -14px;
-  right: 20px;
-  font-size: 24px;
-  background: white;
-  padding: 6px 12px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
 }
 
 /* ===============================
@@ -383,7 +381,7 @@
 }
 
 /* ===============================
-   ACTIONS
+   ACTIONS - כפתורים משופרים
 ================================ */
 .book-actions {
   display: flex;
@@ -391,383 +389,165 @@
   margin-top: 24px;
 }
 
-.borrow-button,
-.favorite-button {
+.book-actions button {
   flex: 1;
-  padding: 16px 28px;
-  font-size: 16px;
+  padding: 18px 32px;
+  font-size: 17px;
   font-weight: 700;
-  border-radius: 50px;
+  border-radius: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: all 0.3s ease;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   font-family: inherit;
-}
-
-.borrow-button {
-  background: linear-gradient(135deg, var(--success), #27ae60);
-  color: #ffffff;
-  box-shadow: 
-    var(--shadow-md),
-    0 0 20px rgba(46, 204, 113, 0.3);
   position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
-.borrow-button::after {
-  content: '📖';
-  position: absolute;
-  right: -30px;
-  top: 50%;
-  transform: translateY(-50%) scale(0);
-  font-size: 24px;
-  opacity: 0;
-  transition: all 0.4s ease;
+/* כפתור השאלה */
+.book-actions button:first-child {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
 }
 
-.borrow-button:hover::after {
-  transform: translateY(-50%) scale(1) rotate(360deg);
-  opacity: 1;
-  right: -40px;
-}
-
-.borrow-button:hover {
+.book-actions button:first-child:hover:not(:disabled) {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
   transform: translateY(-3px);
-  box-shadow: 
-    var(--shadow-lg),
-    0 0 30px rgba(46, 204, 113, 0.4);
+  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
 }
 
-.favorite-button {
-  background: linear-gradient(135deg, #fff, var(--bg-secondary));
+.book-actions button:first-child:disabled {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* כפתור מועדפים */
+.book-actions button:last-child {
+  background: white;
   color: var(--primary);
   border: 2px solid var(--primary);
   box-shadow: var(--shadow-sm);
-  position: relative;
 }
 
-.favorite-button::after {
-  content: '❤️';
-  position: absolute;
-  left: -30px;
-  top: 50%;
-  transform: translateY(-50%) scale(0);
-  font-size: 24px;
-  opacity: 0;
-  transition: all 0.4s ease;
-}
-
-.favorite-button:hover::after {
-  transform: translateY(-50%) scale(1);
-  opacity: 1;
-  left: -40px;
-  animation: heartBeat 1s ease infinite;
-}
-
-@keyframes heartBeat {
-  0%, 100% {
-    transform: translateY(-50%) scale(1);
-  }
-  50% {
-    transform: translateY(-50%) scale(1.2);
-  }
-}
-
-.favorite-button:hover {
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  color: #fff;
+.book-actions button:last-child:hover {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border-color: transparent;
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
 
-.borrow-button:active,
-.favorite-button:active {
+/* אפקט לחיצה */
+.book-actions button:active:not(:disabled) {
   transform: translateY(-1px) scale(0.98);
 }
 
 /* ===============================
-   EDIT MODE
+   EDIT BUTTON (ADMIN)
 ================================ */
-.edit-form-local {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 28px;
-  background: var(--bg-secondary);
-  border-radius: 20px;
-  box-shadow: inset 0 2px 8px rgba(139, 69, 19, 0.05);
-}
-
-.edit-title {
-  font-size: 32px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-align: center;
-  margin-bottom: 12px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--border);
-  position: relative;
-}
-
-.edit-title::before {
-  content: '✏️';
-  position: absolute;
-  top: -16px;
-  right: 50%;
-  transform: translateX(50%);
-  font-size: 40px;
-  filter: drop-shadow(0 4px 8px rgba(139, 69, 19, 0.2));
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.form-label .required {
-  color: var(--danger);
-  margin-right: 4px;
-}
-
-.form-input,
-.form-textarea,
-.form-select {
-  width: 100%;
-  padding: 14px 20px;
-  font-size: 15px;
-  font-weight: 500;
-  border-radius: 16px;
-  border: 2px solid var(--border);
-  background: #ffffff;
-  color: var(--text-primary);
-  transition: all 0.3s ease;
-  outline: none;
-  font-family: inherit;
-  box-shadow: var(--shadow-sm);
-}
-
-.form-input::placeholder,
-.form-textarea::placeholder {
-  color: var(--text-muted);
-  font-weight: 400;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-  border-color: var(--primary);
-  box-shadow: 
-    0 0 0 3px rgba(139, 69, 19, 0.1),
-    var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.form-input:hover:not(:focus),
-.form-textarea:hover:not(:focus),
-.form-select:hover:not(:focus) {
-  border-color: var(--accent);
-}
-
-.form-textarea {
-  min-height: 130px;
-  resize: vertical;
-  line-height: 1.6;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.form-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='12' viewBox='0 0 20 12'%3E%3Cpath fill='%238b4513' d='M2 2l8 8 8-8' stroke='%238b4513' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: left 20px center;
-  padding-left: 50px;
-  cursor: pointer;
-}
-
-/* העלאת תמונה */
-.image-upload-section {
-  margin-top: 8px;
-  padding: 28px;
-  background: #ffffff;
-  border-radius: 16px;
-  border: 2px dashed var(--accent);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.image-upload-section:hover {
-  border-color: var(--primary);
-  background: var(--bg-secondary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.image-upload-input {
-  text-align: center;
-}
-
-.image-upload-input label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.image-upload-input label .upload-icon {
-  font-size: 40px;
-  filter: drop-shadow(0 4px 8px rgba(139, 69, 19, 0.25));
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.image-upload-input label .upload-text {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.image-upload-input label .upload-hint {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.image-upload-input input[type="file"] {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  cursor: pointer;
-}
-
-.file-selected-preview {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  border-radius: 14px;
-  margin-top: 14px;
-  border: 2px solid var(--success);
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.file-selected-preview::before {
-  content: '✓';
-  font-size: 20px;
-  color: var(--success);
-  font-weight: bold;
-}
-
-.file-selected-preview span {
-  font-size: 14px;
-  font-weight: 600;
-  color: #065f46;
-}
-
-/* כפתורי פעולה */
-.edit-actions {
-  display: flex;
-  gap: 14px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 2px solid var(--border);
-}
-
-.save-button,
-.cancel-button,
 .edit-toggle-button {
-  flex: 1;
-  padding: 15px 28px;
-  font-size: 15px;
+  width: 100%;
+  padding: 18px 32px;
+  font-size: 17px;
   font-weight: 700;
-  border-radius: 50px;
+  border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   font-family: inherit;
-}
-
-.save-button {
-  background: linear-gradient(135deg, var(--success), #27ae60);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.save-button:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
-
-.cancel-button {
-  background: linear-gradient(135deg, var(--danger), #c0392b);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.cancel-button:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
-
-.edit-toggle-button {
-  background: linear-gradient(135deg, var(--warning), #e67e22);
+  margin-top: 24px;
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
   color: white;
   box-shadow: var(--shadow-md);
 }
 
 .edit-toggle-button:hover {
+  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
   transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
 }
 
-.save-button:active,
-.cancel-button:active,
 .edit-toggle-button:active {
   transform: translateY(-1px) scale(0.98);
 }
 
+/* כפתור ביטול עריכה */
+.cancel-button {
+  width: 100%;
+  padding: 18px 32px;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid var(--danger);
+  font-family: inherit;
+  margin-top: 16px;
+  background: white;
+  color: var(--danger);
+  box-shadow: var(--shadow-sm);
+}
+
+.cancel-button:hover {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.cancel-button:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
 /* ===============================
-   MODAL
+   SUCCESS/ERROR MESSAGES
+================================ */
+.borrow-success,
+.borrow-error {
+  padding: 16px 20px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  animation: slideIn 0.3s ease;
+  margin-top: 16px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.borrow-success {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+  border: 2px solid var(--success);
+}
+
+.borrow-error {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+  border: 2px solid var(--danger);
+}
+
+/* ===============================
+   MODAL - SUCCESS/ERROR MESSAGES
 ================================ */
 .modal-overlay {
   position: fixed;
@@ -782,19 +562,24 @@
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
   background: #ffffff;
   border-radius: 24px;
-  padding: 36px;
+  padding: 40px;
   max-width: 500px;
   width: 90%;
   box-shadow: var(--shadow-xl);
   animation: modalSlideUp 0.4s ease;
   border: 1px solid rgba(139, 69, 19, 0.1);
+  text-align: center;
 }
 
 @keyframes modalSlideUp {
@@ -802,7 +587,6 @@
     opacity: 0;
     transform: translateY(30px) scale(0.95);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -810,132 +594,63 @@
 }
 
 .modal-icon {
-  font-size: 64px;
-  text-align: center;
+  font-size: 80px;
   margin-bottom: 20px;
   animation: iconPop 0.5s ease;
+  display: block;
 }
 
 @keyframes iconPop {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-
-.modal-icon.success {
-  filter: drop-shadow(0 6px 16px rgba(46, 204, 113, 0.35));
-}
-
-.modal-icon.error {
-  filter: drop-shadow(0 6px 16px rgba(231, 76, 60, 0.35));
-}
-
-.modal-icon.confirm {
-  filter: drop-shadow(0 6px 16px rgba(243, 156, 18, 0.35));
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .modal-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
-  text-align: center;
   color: var(--text-primary);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .modal-message {
-  font-size: 16px;
-  text-align: center;
+  font-size: 17px;
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 28px;
 }
 
-.modal-buttons {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-}
-
-.modal-btn {
-  padding: 14px 28px;
+.modal-close-button {
+  padding: 14px 32px;
   font-size: 15px;
   font-weight: 700;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
-  min-width: 130px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  box-shadow: var(--shadow-md);
   font-family: inherit;
 }
 
-.modal-btn-primary {
-  background: linear-gradient(135deg, var(--success), #27ae60);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.modal-btn-primary:hover {
+.modal-close-button:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
-.modal-btn-secondary {
-  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.modal-btn-secondary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.modal-btn-danger {
-  background: linear-gradient(135deg, var(--danger), #c0392b);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.modal-btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.modal-btn:active {
+.modal-close-button:active {
   transform: translateY(-1px) scale(0.98);
-}
-
-/* ===============================
-   BLOCKED MESSAGE
-================================ */
-.blocked-on-page-message {
-  background: linear-gradient(135deg, #ffebee, #ffcdd2);
-  color: #c62828;
-  padding: 16px 20px;
-  border-radius: 14px;
-  border: 2px solid var(--danger);
-  margin-bottom: 24px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 15px;
-  animation: slideDown 0.4s ease;
-  box-shadow: var(--shadow-md);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.blocked-on-page-message::before {
-  content: '⚠️ ';
-  margin-left: 8px;
 }
 
 /* ===============================
@@ -980,14 +695,9 @@
   }
 
   .book-author {
-    justify-content: center;
+    margin: 0 auto;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .edit-actions,
   .book-actions {
     flex-direction: column;
   }
@@ -1009,24 +719,22 @@
     padding: 28px;
   }
 
+  /* הסתרת הספרים המרחפים במובייל */
+  .single-book-container::after {
+    display: none;
+  }
+
+  .single-book::before,
+  .single-book::after {
+    font-size: 35px;
+  }
+
   .book-title {
     font-size: 32px;
   }
 
-  .book-author {
-    font-size: 19px;
-  }
-
   .book-info-grid {
     grid-template-columns: 1fr;
-  }
-
-  .modal-buttons {
-    flex-direction: column;
-  }
-
-  .modal-btn {
-    width: 100%;
   }
 }
 

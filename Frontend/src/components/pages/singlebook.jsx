@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import Library from "../services/library";
@@ -247,9 +247,20 @@ export default function SingleBook() {
                   <span className="info-label">קטגוריה</span>
                   <span className="info-value">{book.categoryName || "כללי"}</span>
                 </div>
+
                 <div className="info-item">
                   <span className="info-label">טווח גילאים</span>
                   <span className="info-value">{book.ageRangeName || "כל הגילאים"}</span>
+                </div>
+
+                <div className="info-item">
+                  <div className="info-label">עמודים</div>
+                  <div className="info-value">{book.pages}</div>
+                </div>
+
+                <div className="info-item">
+                  <div className="info-label">כמות זמינה</div>
+                  <div className="info-value">{book.quantity}</div>
                 </div>
               </div>
 
@@ -280,6 +291,8 @@ export default function SingleBook() {
               </div>
             </>
           )}
+
+          {error && <p className="borrow-error">{error}</p>}
         </div>
       </div>
     </div>
