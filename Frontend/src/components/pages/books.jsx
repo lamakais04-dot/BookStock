@@ -21,6 +21,8 @@ export default function AllBooks() {
   const [categoryId, setCategoryId] = useState(null);
   const [ageGroupId, setAgeGroupId] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [totalBooksCount, setTotalBooksCount] = useState(0);
+  const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
 
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -42,6 +44,8 @@ export default function AllBooks() {
       );
       setBooks(data?.books || []);
       setTotalPages(data?.totalPages || 1);
+      setTotalBooksCount(data?.totalBooks || 0);
+      setBorrowedBooksCount(data?.borrowedBooks || 0);
     } catch (err) {
       console.error(err);
       setBooks([]);
@@ -89,8 +93,37 @@ export default function AllBooks() {
     };
   }, [loadBooks]);
 
+  const availableBooksCount = totalBooksCount - borrowedBooksCount;
+
   return (
     <>
+      {/* Inventory Stats Section */}
+      <div className="inventory-stats">
+        <div className="stat-card stat-total">
+          <div className="stat-icon">📚</div>
+          <div className="stat-content">
+            <div className="stat-number">{totalBooksCount}</div>
+            <div className="stat-label">סה"כ ספרים</div>
+          </div>
+        </div>
+        
+        <div className="stat-card stat-borrowed">
+          <div className="stat-icon">📖</div>
+          <div className="stat-content">
+            <div className="stat-number">{borrowedBooksCount}</div>
+            <div className="stat-label">ספרים מושאלים</div>
+          </div>
+        </div>
+        
+        <div className="stat-card stat-available">
+          <div className="stat-icon">✨</div>
+          <div className="stat-content">
+            <div className="stat-number">{availableBooksCount}</div>
+            <div className="stat-label">ספרים זמינים</div>
+          </div>
+        </div>
+      </div>
+
       {isAdmin && (
         <div className="add-book-wrapper">
           <button

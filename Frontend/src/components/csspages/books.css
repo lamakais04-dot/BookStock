@@ -62,6 +62,157 @@
 }
 
 /* ===============================
+   INVENTORY STATS - ניהול מלאי
+================================ */
+.inventory-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  animation: slideDown 0.6s ease-out;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border-radius: 20px;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.12);
+  border: 2px solid #e8dcc8;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  min-width: 240px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* אפקט ברק בהובר */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 70%
+  );
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+  left: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(139, 69, 19, 0.2);
+}
+
+.stat-icon {
+  font-size: 48px;
+  line-height: 1;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-number {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #8b4513, #a05a2c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8b6f47;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* צבעים שונים לכל סטטיסטיקה */
+.stat-total {
+  border-color: #d4a574;
+}
+
+.stat-total:hover {
+  border-color: #8b4513;
+  background: linear-gradient(135deg, #fef9f3 0%, #ffffff 100%);
+}
+
+.stat-borrowed {
+  border-color: #e74c3c;
+}
+
+.stat-borrowed:hover {
+  border-color: #c0392b;
+  background: linear-gradient(135deg, #fef5f5 0%, #ffffff 100%);
+}
+
+.stat-borrowed .stat-number {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-available {
+  border-color: #27ae60;
+}
+
+.stat-available:hover {
+  border-color: #229954;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.stat-available .stat-number {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===============================
    ADD BOOK BUTTON - מעוצב ומושקע
 ================================ */
 .add-book-wrapper {
@@ -400,6 +551,24 @@
     top: 140px;
     left: 16px;
   }
+
+  .inventory-stats {
+    gap: 20px;
+    padding: 16px;
+  }
+
+  .stat-card {
+    min-width: 200px;
+    padding: 20px 24px;
+  }
+
+  .stat-icon {
+    font-size: 42px;
+  }
+
+  .stat-number {
+    font-size: 32px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -413,6 +582,30 @@
 
   .books-header p {
     font-size: 16px;
+  }
+
+  .inventory-stats {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .stat-card {
+    flex: 1;
+    min-width: 160px;
+    padding: 18px 20px;
+  }
+
+  .stat-icon {
+    font-size: 38px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+  }
+
+  .stat-label {
+    font-size: 13px;
   }
 
   .age-filter {
@@ -452,6 +645,28 @@
     font-size: 30px;
   }
 
+  .inventory-stats {
+    gap: 12px;
+  }
+
+  .stat-card {
+    min-width: 140px;
+    padding: 16px 18px;
+    gap: 14px;
+  }
+
+  .stat-icon {
+    font-size: 34px;
+  }
+
+  .stat-number {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
   .books-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
@@ -479,6 +694,35 @@
 
   .books-header p {
     font-size: 15px;
+  }
+
+  /* Inventory stats במובייל - עמודה */
+  .inventory-stats {
+    flex-direction: row;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 14px;
+    min-width: auto;
+    flex: 1;
+  }
+
+  .stat-icon {
+    font-size: 32px;
+  }
+
+  .stat-number {
+    font-size: 22px;
+  }
+
+  .stat-label {
+    font-size: 11px;
   }
 
   /* פילטר גילאים במובייל - בשורה */

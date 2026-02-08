@@ -4,6 +4,8 @@ from sqlalchemy import or_
 from fastapi import HTTPException, UploadFile
 from db import engine
 from models.books import books
+from models.library import Library              # ✅ added
+from models.borrow_history import BorrowHistory
 from schemas.books import BookCreate, BookUpdate
 from services.authService import upload_image_to_s3
 
@@ -43,10 +45,29 @@ def get_books(
             query.offset(offset).limit(limit)
         ).all()
 
+        # ✅ available copies = sum of quantity column (not borrowed)
+        available_books = session.exec(
+            select(func.coalesce(func.sum(books.quantity), 0))
+        ).one()
+
+        # ✅ borrowed copies = how many Library slots are currently filled
+        borrowed_slots = session.exec(
+            select(
+                func.coalesce(func.count(Library.book1id), 0)
+                + func.coalesce(func.count(Library.book2id), 0)
+            ).select_from(Library)
+        ).one()
+
+        # ✅ total physical copies in system = available + borrowed
+        total_books = available_books + borrowed_slots
+
         return {
             "books": books_list,
             "totalPages": (total + limit - 1) // limit,
             "currentPage": page,
+            "totalBooks": total_books,          # all copies (available + borrowed)
+            "borrowedBooks": borrowed_slots,    # how many copies currently borrowed
+            "availableBooks": available_books,  # how many copies currently available
         }
 
 
