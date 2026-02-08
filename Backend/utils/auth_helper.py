@@ -14,7 +14,6 @@ def get_user(access_token: str | None = Cookie(default=None)):
         payload = jwt.decode(access_token, os.getenv("JWT_SECRET"), algorithms=["HS256"])
         user_id = payload["userId"]
 
-        # ✅ fetch fresh user from DB (role + is_blocked can't be faked)
         with Session(engine) as session:
             db_user = session.get(Users, user_id)
 
