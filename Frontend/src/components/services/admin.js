@@ -2,6 +2,7 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8000";
 
 export default class AdminService {
+
     static async getUsers(q = "") {
         const res = await axios.get(`${BASE_URL}/admin/users`, {
             withCredentials: true,
@@ -49,7 +50,7 @@ export default class AdminService {
         return res.data;
     }
 
-
+    // ✅ זה החיבור לדאטאבייס לחסימה / ביטול חסימה
     static async toggleUserBlock(userId) {
         const res = await axios.patch(
             `${BASE_URL}/admin/users/${userId}/block`,
@@ -59,6 +60,6 @@ export default class AdminService {
                 headers: { apiKey: "123456789apikeysecure" }
             }
         );
-        return res.data;
+        return res.data; // { is_blocked: true / false }
     }
 }

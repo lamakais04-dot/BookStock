@@ -738,46 +738,42 @@
   }
 }
 
-@media (max-width: 480px) {
-  .single-book-container {
-    padding: 70px 16px 30px;
-  }
+/* ריווח בין כרטיסי מידע */
+.book-info-grid {
+  gap: 16px;
+}
 
-  .back-button {
-    top: 16px;
-    left: 16px;
-    padding: 8px 16px;
-    font-size: 13px;
-  }
+/* ריווח בין כפתורים */
+.book-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
 
-  .single-book {
-    padding: 24px;
-  }
+/* ריווח בין שורות טופס בעריכה */
+.edit-form-local input,
+.edit-form-local textarea,
+.edit-form-local select {
+  margin-bottom: 12px;
+}
 
-  /* הסתרת ספרים מעוטרים במסכים קטנים */
-  .single-book::before,
-  .single-book::after {
-    display: none;
-  }
+/* ריווח בין בלוקים בטופס */
+.edit-form-local .form-row {
+  gap: 12px;
+}
+.blocked-on-page-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ef9a9a;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  animation: fadeIn 0.3s ease-in;
+}
 
-  .book-title {
-    font-size: 28px;
-  }
-
-  .modal-content {
-    padding: 32px 24px;
-  }
-
-  .modal-icon {
-    font-size: 64px;
-  }
-
-  .modal-title {
-    font-size: 24px;
-  }
-  
-  .book-actions button {
-    padding: 16px 24px;
-    font-size: 16px;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
