@@ -54,6 +54,14 @@ export default function SingleBook() {
     loadData();
   }, [id, isNew]);
 
+  /* helpers to show names instead of ids */
+  const categoryName =
+    categories.find((c) => String(c.id) === String(book.categoryid))?.name ||
+    "";
+  const ageGroupName =
+    ageGroups.find((a) => String(a.id) === String(book.agesid))?.description ||
+    "";
+
   /* ================= VALIDATION ================= */
   const validateForm = () => {
     const e = {};
@@ -82,14 +90,14 @@ export default function SingleBook() {
   /* ================= HANDLERS ================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBook(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: "" }));
+    setBook((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSave = async () => {
     if (!validateForm()) return;
 
-    const payload = { ...book, image: imageFile };
+    const payload = { ...book, image: imageFile || book.image };
 
     if (isNew) {
       await Books.addBook(payload);
@@ -148,11 +156,14 @@ export default function SingleBook() {
           )}
         </div>
 
-        {/* FORM */}
+        {/* DETAILS + EDIT */}
         <div className="book-details">
-          {isEditing && (
+          {isEditing ? (
+            /* ========== EDIT / ADD MODE ========== */
             <div className="edit-form-local">
-              <h2 className="edit-title">הוספת ספר חדש</h2>
+              <h2 className="edit-title">
+                {isNew ? "הוספת ספר חדש" : "עריכת ספר"}
+              </h2>
 
               <label className="form-label">שם הספר:</label>
               <input
@@ -162,7 +173,9 @@ export default function SingleBook() {
                 onChange={handleChange}
                 placeholder="לדוגמה: הארי פוטר ואבן החכמים"
               />
-              {errors.title && <small style={{ color: "crimson" }}>{errors.title}</small>}
+              {errors.title && (
+                <small style={{ color: "crimson" }}>{errors.title}</small>
+              )}
 
               <label className="form-label">שם המחבר:</label>
               <input
@@ -172,7 +185,9 @@ export default function SingleBook() {
                 onChange={handleChange}
                 placeholder="לדוגמה: ג'יי. קיי. רולינג"
               />
-              {errors.author && <small style={{ color: "crimson" }}>{errors.author}</small>}
+              {errors.author && (
+                <small style={{ color: "crimson" }}>{errors.author}</small>
+              )}
 
               <label className="form-label">תקציר הספר:</label>
               <textarea
@@ -192,7 +207,9 @@ export default function SingleBook() {
                 onChange={handleChange}
                 placeholder="לדוגמה: 320"
               />
-              {errors.pages && <small style={{ color: "crimson" }}>{errors.pages}</small>}
+              {errors.pages && (
+                <small style={{ color: "crimson" }}>{errors.pages}</small>
+              )}
 
               <label className="form-label">כמות זמינה:</label>
               <input
@@ -203,7 +220,9 @@ export default function SingleBook() {
                 onChange={handleChange}
                 placeholder="לדוגמה: 5"
               />
-              {errors.quantity && <small style={{ color: "crimson" }}>{errors.quantity}</small>}
+              {errors.quantity && (
+                <small style={{ color: "crimson" }}>{errors.quantity}</small>
+              )}
 
               <label className="form-label">קטגוריה:</label>
               <select
@@ -213,11 +232,15 @@ export default function SingleBook() {
                 onChange={handleChange}
               >
                 <option value="">בחרי קטגוריה</option>
-                {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
-              {errors.categoryid && <small style={{ color: "crimson" }}>{errors.categoryid}</small>}
+              {errors.categoryid && (
+                <small style={{ color: "crimson" }}>{errors.categoryid}</small>
+              )}
 
               <label className="form-label">טווח גילאים:</label>
               <select
@@ -227,11 +250,15 @@ export default function SingleBook() {
                 onChange={handleChange}
               >
                 <option value="">בחרי טווח גילאים</option>
-                {ageGroups.map(a => (
-                  <option key={a.id} value={a.id}>{a.description}</option>
+                {ageGroups.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.description}
+                  </option>
                 ))}
               </select>
-              {errors.agesid && <small style={{ color: "crimson" }}>{errors.agesid}</small>}
+              {errors.agesid && (
+                <small style={{ color: "crimson" }}>{errors.agesid}</small>
+              )}
 
               <div className="edit-actions">
                 <button className="save-button" onClick={handleSave}>
@@ -239,6 +266,47 @@ export default function SingleBook() {
                 </button>
               </div>
             </div>
+          ) : (
+            /* ========== VIEW MODE ========== */
+            <>
+              <h1 className="book-title">{book.title}</h1>
+              <p className="book-author">{book.author}</p>
+
+              {book.summary && (
+                <p className="book-summary">{book.summary}</p>
+              )}
+
+              <div className="book-info-grid">
+                <div className="info-item">
+                  <div className="info-label">מספר עמודים</div>
+                  <div className="info-value">{book.pages}</div>
+                </div>
+                <div className="info-item">
+                  <div className="info-label">כמות זמינה</div>
+                  <div className="info-value">{book.quantity}</div>
+                </div>
+                <div className="info-item">
+                  <div className="info-label">קטגוריה</div>
+                  <div className="info-value">
+                    {categoryName || book.categoryid || "-"}
+                  </div>
+                </div>
+                <div className="info-item">
+                  <div className="info-label">טווח גילאים</div>
+                  <div className="info-value">
+                    {ageGroupName || book.agesid || "-"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Edit button – only for admin if you have roles */}
+              <button
+                className="edit-toggle-button"
+                onClick={() => setIsEditing(true)}
+              >
+                ✏️ עריכה
+              </button>
+            </>
           )}
         </div>
       </div>
