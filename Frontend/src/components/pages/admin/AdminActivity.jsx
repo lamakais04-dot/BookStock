@@ -91,12 +91,6 @@ export default function AdminActivity() {
               <option value="RETURN">החזרות</option>
             </select>
 
-            <input
-              placeholder="סינון לפי User ID (אופציונלי)"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-
             <button onClick={handleExcel}>📤 Export Excel</button>
             <button onClick={handlePdf}>📄 Export PDF</button>
             <button onClick={handlePrint}>🖨️ Print</button>
