@@ -17,6 +17,8 @@ export default function BookForm({
     imageFile: null
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -31,21 +33,29 @@ export default function BookForm({
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    // כרגע – רק פרונט
-    onSubmit(form);
+    try {
+      await onSubmit(form);
+    } catch (error) {
+      console.error("Form submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <form className="book-form" onSubmit={handleSubmit}>
       <input
+        type="text"
         name="title"
         placeholder="שם הספר"
         value={form.title}
         onChange={handleChange}
         required
+        disabled={isSubmitting}
       />
 
       <textarea
@@ -53,16 +63,19 @@ export default function BookForm({
         placeholder="תקציר הספר"
         value={form.summary}
         onChange={handleChange}
-        rows={3}
+        rows={4}
         required
+        disabled={isSubmitting}
       />
 
       <input
+        type="text"
         name="author"
         placeholder="שם המחבר"
         value={form.author}
         onChange={handleChange}
         required
+        disabled={isSubmitting}
       />
 
       <input
@@ -71,7 +84,9 @@ export default function BookForm({
         placeholder="מספר עמודים"
         value={form.pages}
         onChange={handleChange}
+        min="1"
         required
+        disabled={isSubmitting}
       />
 
       <input
@@ -80,15 +95,17 @@ export default function BookForm({
         placeholder="כמות ספרים"
         value={form.quantity}
         onChange={handleChange}
+        min="0"
         required
+        disabled={isSubmitting}
       />
 
-      {/* ===== Category ===== */}
       <select
         name="categoryid"
         value={form.categoryid}
         onChange={handleChange}
         required
+        disabled={isSubmitting}
       >
         <option value="">בחר קטגוריה</option>
         {categories.map(cat => (
@@ -98,12 +115,12 @@ export default function BookForm({
         ))}
       </select>
 
-      {/* ===== Age Group ===== */}
       <select
         name="agesid"
         value={form.agesid}
         onChange={handleChange}
         required
+        disabled={isSubmitting}
       >
         <option value="">בחר קבוצת גיל</option>
         {ageGroups.map(age => (
@@ -113,20 +130,20 @@ export default function BookForm({
         ))}
       </select>
 
-      {/* ===== Image Upload ===== */}
       <input
         type="file"
         accept="image/*"
         onChange={handleFileChange}
+        disabled={isSubmitting}
       />
 
       {form.imageFile && (
-        <p style={{ fontSize: 12 }}>
-          קובץ נבחר: {form.imageFile.name}
-        </p>
+        <p>{form.imageFile.name}</p>
       )}
 
-      <button type="submit">שמור ספר</button>
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "שומר..." : "שמור ספר"}
+      </button>
     </form>
   );
 }
