@@ -1,12 +1,10 @@
 import { useState } from "react";
-import "../csspages/BookForm.css";
 
 export default function BookForm({
   initialData = {},
   categories = [],
   ageGroups = [],
-  existingBooks = [],
-  onSubmit,
+  onSubmit
 }) {
   const [form, setForm] = useState({
     title: initialData.title || "",
@@ -16,60 +14,27 @@ export default function BookForm({
     quantity: initialData.quantity || "",
     categoryid: initialData.categoryid || "",
     agesid: initialData.agesid || "",
-    imageFile: null,
+    imageFile: null
   });
-
-  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
-    setErrors((prev) => ({
-      ...prev,
-      [e.target.name]: "",
-    }));
   };
 
   const handleFileChange = (e) => {
     setForm({
       ...form,
-      imageFile: e.target.files[0],
+      imageFile: e.target.files[0]
     });
-  };
-
-  const validate = () => {
-    const newErrors = {};
-
-    if (!form.title.trim()) {
-      newErrors.title = "שם הספר הוא שדה חובה";
-    }
-
-    const isDuplicate = existingBooks.some(
-      (b) => b.title.toLowerCase() === form.title.trim().toLowerCase(),
-    );
-    if (isDuplicate) {
-      newErrors.title = "ספר עם שם זה כבר קיים";
-    }
-
-    if (!form.categoryid) {
-      newErrors.categoryid = "חובה לבחור קטגוריה";
-    }
-
-    if (form.quantity === "" || isNaN(form.quantity)) {
-      newErrors.quantity = "יש להזין מספר תקין";
-    } else if (Number(form.quantity) < 0) {
-      newErrors.quantity = "כמות לא יכולה להיות שלילית";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
+
+    // כרגע – רק פרונט
     onSubmit(form);
   };
 
@@ -80,8 +45,8 @@ export default function BookForm({
         placeholder="שם הספר"
         value={form.title}
         onChange={handleChange}
+        required
       />
-      {errors.title && <span className="error">{errors.title}</span>}
 
       <textarea
         name="summary"
@@ -89,6 +54,7 @@ export default function BookForm({
         value={form.summary}
         onChange={handleChange}
         rows={3}
+        required
       />
 
       <input
@@ -96,6 +62,7 @@ export default function BookForm({
         placeholder="שם המחבר"
         value={form.author}
         onChange={handleChange}
+        required
       />
 
       <input
@@ -104,6 +71,7 @@ export default function BookForm({
         placeholder="מספר עמודים"
         value={form.pages}
         onChange={handleChange}
+        required
       />
 
       <input
@@ -112,36 +80,50 @@ export default function BookForm({
         placeholder="כמות ספרים"
         value={form.quantity}
         onChange={handleChange}
+        required
       />
-      {errors.quantity && <span className="error">{errors.quantity}</span>}
 
+      {/* ===== Category ===== */}
       <select
         name="categoryid"
         value={form.categoryid}
         onChange={handleChange}
+        required
       >
         <option value="">בחר קטגוריה</option>
-        {categories.map((cat) => (
+        {categories.map(cat => (
           <option key={cat.id} value={cat.id}>
             {cat.name}
           </option>
         ))}
       </select>
-      {errors.categoryid && <span className="error">{errors.categoryid}</span>}
 
-      <select name="agesid" value={form.agesid} onChange={handleChange}>
+      {/* ===== Age Group ===== */}
+      <select
+        name="agesid"
+        value={form.agesid}
+        onChange={handleChange}
+        required
+      >
         <option value="">בחר קבוצת גיל</option>
-        {ageGroups.map((age) => (
+        {ageGroups.map(age => (
           <option key={age.id} value={age.id}>
             {age.description}
           </option>
         ))}
       </select>
 
-      <input type="file" accept="image/*" onChange={handleFileChange} />
+      {/* ===== Image Upload ===== */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
 
       {form.imageFile && (
-        <p style={{ fontSize: 12 }}>קובץ נבחר: {form.imageFile.name}</p>
+        <p style={{ fontSize: 12 }}>
+          קובץ נבחר: {form.imageFile.name}
+        </p>
       )}
 
       <button type="submit">שמור ספר</button>

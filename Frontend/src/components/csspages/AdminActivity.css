@@ -4,7 +4,7 @@
 .admin-activity-page {
     min-height: 100vh;
     background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
-    padding: 120px 40px 60px;
+    padding: 120px 20px 60px;
     direction: rtl;
     position: relative;
 }
@@ -25,7 +25,7 @@
    CONTAINER
 ================================ */
 .admin-activity-container {
-    max-width: 1400px;
+    max-width: 95%;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -311,7 +311,7 @@
 .admin-activity-table-wrapper {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 24px;
-    padding: 32px;
+    padding: 20px;
     box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
     overflow: hidden;
     border: 2px solid rgba(139, 69, 19, 0.1);
@@ -345,7 +345,6 @@
    TABLE
 ================================ */
 .admin-activity-table {
-    width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 15px;
@@ -358,8 +357,8 @@
 }
 
 .admin-activity-table th {
-    padding: 18px 20px;
-    font-size: 16px;
+    padding: 14px 12px;
+    font-size: 15px;
     font-weight: 700;
     text-align: right;
     border-bottom: 3px solid #d4a574;
@@ -392,7 +391,7 @@
 }
 
 .admin-activity-table td {
-    padding: 16px 20px;
+    padding: 12px 12px;
     border-bottom: 1px solid #f0e5d8;
     color: #5d3a1a;
     font-weight: 500;

@@ -5,13 +5,19 @@ from datetime import datetime
 from sqlmodel import Session, select
 from sqlalchemy import or_
 from fastapi import HTTPException
+
 from db import engine
 from models.users import Users
 from models.books import books
 from models.borrow_history import BorrowHistory
+
 from schemas.admin_users import AdminUserRow, BorrowRow
 from schemas.admin_activity import ActivityRow
 
+
+# =========================
+# GET ALL USERS (ADMIN)
+# =========================
 def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
     with Session(engine) as session:
         stmt = select(Users)
@@ -28,21 +34,26 @@ def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
 
         users = session.exec(stmt).all()
 
+        # --- borrowed now ---
         borrowed_now = session.exec(
             select(BorrowHistory.user_id)
             .where(BorrowHistory.returned_at.is_(None))
         ).all()
 
-        total_borrows = session.exec(select(BorrowHistory.user_id)).all()
-
         borrowed_now_map = {}
         for uid in borrowed_now:
             borrowed_now_map[uid] = borrowed_now_map.get(uid, 0) + 1
+
+        # --- total borrows ---
+        total_borrows = session.exec(
+            select(BorrowHistory.user_id)
+        ).all()
 
         total_borrows_map = {}
         for uid in total_borrows:
             total_borrows_map[uid] = total_borrows_map.get(uid, 0) + 1
 
+        # 🔥🔥🔥 כאן היה הבאג – is_blocked לא הוחזר
         return [
             AdminUserRow(
                 id=u.id,
@@ -50,13 +61,23 @@ def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
                 lastname=u.lastname,
                 email=u.email,
                 role=u.role,
+
+                is_blocked=u.is_blocked,  # ✅ חובה
+
                 borrowed_now_count=borrowed_now_map.get(u.id, 0),
                 total_borrows=total_borrows_map.get(u.id, 0),
             )
             for u in users
         ]
 
-def admin_get_user_borrows_service(user_id: int, only_open: bool = False) -> List[BorrowRow]:
+
+# =========================
+# GET USER BORROWS (ADMIN)
+# =========================
+def admin_get_user_borrows_service(
+    user_id: int,
+    only_open: bool = False
+) -> List[BorrowRow]:
     with Session(engine) as session:
         stmt = (
             select(BorrowHistory, books)
@@ -80,9 +101,13 @@ def admin_get_user_borrows_service(user_id: int, only_open: bool = False) -> Lis
             for (h, b) in rows
         ]
 
+
+# =========================
+# ADMIN ACTIVITY
+# =========================
 def admin_activity_service(
     user_id: Optional[int] = None,
-    action: str = "ALL",  # ALL|BORROW|RETURN
+    action: str = "ALL",  # ALL | BORROW | RETURN
     date_from: Optional[datetime] = None,
     date_to: Optional[datetime] = None,
     limit: int = 200,
@@ -137,6 +162,10 @@ def admin_activity_service(
         events.sort(key=lambda x: x.date, reverse=True)
         return events[:limit]
 
+
+# =========================
+# BLOCK / UNBLOCK USER
+# =========================
 def admin_toggle_user_block_service(user_id: int):
     with Session(engine) as session:
         user = session.get(Users, user_id)

@@ -1,6 +1,6 @@
 # schemas/admin_users.py
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 from pydantic import BaseModel
 
 class BorrowRow(BaseModel):
@@ -9,12 +9,16 @@ class BorrowRow(BaseModel):
     borrowed_at: datetime
     returned_at: Optional[datetime]
 
+
 class AdminUserRow(BaseModel):
     id: int
     firstname: str
     lastname: str
     email: str
     role: str
+
+    is_blocked: bool  # 🔥🔥🔥 חובה – זה מה שהיה חסר
+
     borrowed_now_count: int
     total_borrows: int
 
