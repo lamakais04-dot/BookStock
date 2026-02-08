@@ -6,6 +6,7 @@ import Library from "../services/library";
 import { useAuth } from "../context/AuthContext";
 import { useFavorites } from "../context/FavoritesContext";
 import "../csspages/singleBook.css";
+import { useLocation } from "react-router-dom";
 
 // Modal Component
 function Modal({ show, onClose, title, message, type = "success", onConfirm }) {
@@ -50,7 +51,7 @@ export default function SingleBook() {
   const location = useLocation();
   const isNew = id === "new";
   const bookId = isNew ? null : Number(id);
-
+  const error = ""
   const { user, setUser } = useAuth();
   const isAdmin = user?.role === "admin";
   
