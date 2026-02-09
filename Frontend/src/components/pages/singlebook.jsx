@@ -1,3 +1,4 @@
+// SingleBook.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import Books from "../services/books";
@@ -66,7 +67,7 @@ export default function SingleBook() {
     async function loadFavs() {
       try {
         const favs = await Favorites.getFavorites();
-        setIsFavorite(favs.some(f => f.bookid === Number(id)));
+        setIsFavorite(favs.some((f) => f.bookid === Number(id)));
       } catch {}
     }
 
@@ -83,13 +84,13 @@ export default function SingleBook() {
     try {
       const res = await Library.borrowBook(book.id);
 
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
 
-      setBook(prev => ({ ...prev, quantity: prev.quantity - 1 }));
+      setBook((prev) => ({ ...prev, quantity: prev.quantity - 1 }));
     } catch {
       setError("לא ניתן להשאיל את הספר");
     } finally {
@@ -102,13 +103,13 @@ export default function SingleBook() {
     try {
       const res = await Library.returnBook(book.id);
 
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
 
-      setBook(prev => ({ ...prev, quantity: prev.quantity + 1 }));
+      setBook((prev) => ({ ...prev, quantity: prev.quantity + 1 }));
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
@@ -196,25 +197,33 @@ export default function SingleBook() {
 
       <div className="single-book">
         <div className="book-image">
-          <img src={book.image || "/placeholder.png"} alt={book.title} />
+          {!isNew && (
+            <img src={book.image || "/placeholder.png"} alt={book.title} />
+          )}
         </div>
 
         <div className="book-details">
           {isAdmin && isEditMode ? (
             <>
+              <h1 className="book-title">
+                {isNew ? "הוסף ספר חדש" : "עריכת ספר"}
+              </h1>
+
               <BookForm
-                initialData={book}
+                initialData={isNew ? {} : book}
                 categories={categories}
                 ageGroups={ageGroups}
-                onSubmit={handleUpdateBook}
+                onSubmit={isNew ? handleCreateBook : handleUpdateBook}
               />
 
-              <button
-                className="cancel-button"
-                onClick={() => setSearchParams({})}
-              >
-                ביטול עריכה
-              </button>
+              {!isNew && (
+                <button
+                  className="cancel-button"
+                  onClick={() => setSearchParams({})}
+                >
+                  ביטול עריכה
+                </button>
+              )}
             </>
           ) : (
             <>
@@ -229,14 +238,16 @@ export default function SingleBook() {
                 <div className="info-item">
                   <div className="info-label">קטגוריה</div>
                   <div className="info-value">
-                    {categories.find(c => c.id === book.categoryid)?.name || "-"}
+                    {categories.find((c) => c.id === book.categoryid)?.name ||
+                      "-"}
                   </div>
                 </div>
 
                 <div className="info-item">
                   <div className="info-label">טווח גילאים</div>
                   <div className="info-value">
-                    {ageGroups.find(a => a.id === book.agesid)?.description || "-"}
+                    {ageGroups.find((a) => a.id === book.agesid)
+                      ?.description || "-"}
                   </div>
                 </div>
 

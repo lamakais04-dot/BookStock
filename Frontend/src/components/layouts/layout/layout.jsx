@@ -20,129 +20,140 @@ import GuestOnlyRoute from '../../pages/guestOnly';
 import { socket } from '../../services/socket'; // <-- path as you created it
 
 export default function Layout() {
-    useEffect(() => {
-        socket.on('connect', () => {
-            console.log('Connected with id:', socket.id);
-            socket.emit('ping_from_client', { msg: 'hello from React' });
-        });
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected with id:', socket.id);
+      socket.emit('ping_from_client', { msg: 'hello from React' });
+    });
 
-        socket.on('pong_from_server', (data) => {
-            console.log('PONG from server:', data);
-        });
+    socket.on('pong_from_server', (data) => {
+      console.log('PONG from server:', data);
+    });
 
-        return () => {
-            socket.off('connect');
-            socket.off('pong_from_server');
-        };
-    }, []);
+    return () => {
+      socket.off('connect');
+      socket.off('pong_from_server');
+    };
+  }, []);
 
-    return (
-        <div className='layout'>
-            <Navbar />
+  return (
+    <div className='layout'>
+      <Navbar />
 
-            <div id="component">
-                <Routes>
-                    <Route
-                        path="/login"
-                        element={
-                            <GuestOnlyRoute>
-                                <Login />
-                            </GuestOnlyRoute>
-                        }
-                    />
+      <div id="component">
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <GuestOnlyRoute>
+                <Login />
+              </GuestOnlyRoute>
+            }
+          />
 
-                    <Route
-                        path="/signup"
-                        element={
-                            <GuestOnlyRoute>
-                                <Signup />
-                            </GuestOnlyRoute>
-                        }
-                    />
+          <Route
+            path="/signup"
+            element={
+              <GuestOnlyRoute>
+                <Signup />
+              </GuestOnlyRoute>
+            }
+          />
 
-                    {/* נעולים */}
-                    <Route
-                        path='/'
-                        element={
-                            <ProtectedRoute>
-                                <HomePage />
-                            </ProtectedRoute>
-                        }
-                    />
+          {/* נעולים */}
+          <Route
+            path='/'
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/book'
-                        element={
-                            <ProtectedRoute>
-                                <AllBooks />
-                            </ProtectedRoute>
-                        }
-                    />
+          <Route
+            path='/book'
+            element={
+              <ProtectedRoute>
+                <AllBooks />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/book/:id'
-                        element={
-                            <ProtectedRoute>
-                                <SingleBook />
-                            </ProtectedRoute>
-                        }
-                    />
+          {/* ADD NEW BOOK (admin, uses SingleBook in create mode with id="new") */}
+          <Route
+            path='/book/new'
+            element={
+              <ProtectedRoute requireAdmin>
+                <SingleBook />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/favorites'
-                        element={
-                            <ProtectedRoute blockAdmin>
-                                <FavoritesPage />
-                            </ProtectedRoute>
-                        }
-                    />
+          {/* VIEW / EDIT EXISTING BOOK */}
+          <Route
+            path='/book/:id'
+            element={
+              <ProtectedRoute>
+                <SingleBook />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/profile'
-                        element={
-                            <ProtectedRoute>
-                                <Profile />
-                            </ProtectedRoute>
-                        }
-                    />
+          <Route
+            path='/favorites'
+            element={
+              <ProtectedRoute blockAdmin>
+                <FavoritesPage />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/admin/activity'
-                        element={
-                            <ProtectedRoute requireAdmin>
-                                <AdminActivity />
-                            </ProtectedRoute>
-                        }
-                    />
+          <Route
+            path='/profile'
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/admin/categories'
-                        element={
-                            <ProtectedRoute requireAdmin>
-                                <AdminCategory />
-                            </ProtectedRoute>
-                        }
-                    />
+          <Route
+            path='/admin/activity'
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminActivity />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/admin/users'
-                        element={
-                            <ProtectedRoute requireAdmin>
-                                <AdminUsers />
-                            </ProtectedRoute>
-                        }
-                    />
+          <Route
+            path='/admin/categories'
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminCategory />
+              </ProtectedRoute>
+            }
+          />
 
-                    <Route
-                        path='/admin/users/:id'
-                        element={
-                            <ProtectedRoute requireAdmin>
-                                <AdminUserBorrows />
-                            </ProtectedRoute>
-                        }
-                    />
-                </Routes>
-            </div>
-        </div>
-    );
+          <Route
+            path='/admin/users'
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/admin/users/:id'
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminUserBorrows />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
+    </div>
+  );
 }

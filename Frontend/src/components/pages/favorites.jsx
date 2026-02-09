@@ -47,10 +47,18 @@ export default function FavoritesPage() {
       loadFavorites();
     }
 
-    function handleBooksChanged() {
-      // quantities/titles might have changed
-      loadFavorites();
+    function handleBooksChanged(payload) {
+      if (!payload?.bookId) return;
+
+      setBooks(prev =>
+        prev.map(b =>
+          b.id === payload.bookId
+            ? { ...b, quantity: payload.quantity }
+            : b
+        )
+      );
     }
+
 
     socket.on("favorites_changed", handleFavoritesChanged);
     socket.on("books_changed", handleBooksChanged);

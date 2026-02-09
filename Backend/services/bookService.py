@@ -4,7 +4,7 @@ from sqlalchemy import or_
 from fastapi import HTTPException, UploadFile
 from db import engine
 from models.books import books
-from models.library import Library              # ✅ added
+from models.library import Library  # ✅ added
 from models.borrow_history import BorrowHistory
 from schemas.books import BookCreate, BookUpdate
 from services.authService import upload_image_to_s3
@@ -37,20 +37,16 @@ def get_books(
                 )
             )
 
-        total = session.exec(
-            select(func.count()).select_from(query.subquery())
-        ).one()
+        total = session.exec(select(func.count()).select_from(query.subquery())).one()
 
-        books_list = session.exec(
-            query.offset(offset).limit(limit)
-        ).all()
+        books_list = session.exec(query.offset(offset).limit(limit)).all()
 
-        # ✅ available copies = sum of quantity column (not borrowed)
+        # available copies (quantity field, all books)
         available_books = session.exec(
-            select(func.coalesce(func.sum(books.quantity), 0))
+            select(func.coalesce(func.sum(books.quantity), 0)).select_from(books)
         ).one()
 
-        # ✅ borrowed copies = how many Library slots are currently filled
+        # borrowed copies (all occupied slots in Library)
         borrowed_slots = session.exec(
             select(
                 func.coalesce(func.count(Library.book1id), 0)
@@ -58,24 +54,21 @@ def get_books(
             ).select_from(Library)
         ).one()
 
-        # ✅ total physical copies in system = available + borrowed
         total_books = available_books + borrowed_slots
 
         return {
             "books": books_list,
             "totalPages": (total + limit - 1) // limit,
             "currentPage": page,
-            "totalBooks": total_books,          # all copies (available + borrowed)
-            "borrowedBooks": borrowed_slots,    # how many copies currently borrowed
-            "availableBooks": available_books,  # how many copies currently available
+            "totalBooks": total_books,
+            "borrowedBooks": borrowed_slots,
+            "availableBooks": available_books,
         }
 
 
 def get_random_books(limit: int = 10):
     with Session(engine) as session:
-        return session.exec(
-            select(books).order_by(func.random()).limit(limit)
-        ).all()
+        return session.exec(select(books).order_by(func.random()).limit(limit)).all()
 
 
 def get_book_by_id(book_id: int):

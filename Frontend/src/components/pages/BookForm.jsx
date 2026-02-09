@@ -1,10 +1,11 @@
+// BookForm.jsx
 import { useState } from "react";
 
 export default function BookForm({
   initialData = {},
   categories = [],
   ageGroups = [],
-  onSubmit
+  onSubmit,
 }) {
   const [form, setForm] = useState({
     title: initialData.title || "",
@@ -14,23 +15,23 @@ export default function BookForm({
     quantity: initialData.quantity || "",
     categoryid: initialData.categoryid || "",
     agesid: initialData.agesid || "",
-    imageFile: null
+    imageFile: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleFileChange = (e) => {
-    setForm({
-      ...form,
-      imageFile: e.target.files[0]
-    });
+    setForm((prev) => ({
+      ...prev,
+      imageFile: e.target.files?.[0] || null,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -39,8 +40,8 @@ export default function BookForm({
 
     try {
       await onSubmit(form);
-    } catch (error) {
-      console.error("Form submission error:", error);
+    } catch (err) {
+      console.error("Form submit error:", err);
     } finally {
       setIsSubmitting(false);
     }
