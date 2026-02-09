@@ -9,6 +9,8 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
   const [message, setMessage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({ userId: null, isBlocked: false, userName: "" });
   const navigate = useNavigate();
 
   /* ================= LOAD USERS ================= */
@@ -34,12 +36,21 @@ export default function AdminUsers() {
     };
   }, [load]);
 
-  /* ================= BLOCK / UNBLOCK ================= */
-  const toggleBlock = async (userId, isBlocked) => {
-    if (!isBlocked) {
-      const ok = window.confirm("האם את בטוחה שברצונך לחסום משתמש זה?");
-      if (!ok) return;
-    }
+  /* ================= OPEN MODAL ================= */
+  const openModal = (userId, isBlocked, userName) => {
+    setModalData({ userId, isBlocked, userName });
+    setShowModal(true);
+  };
+
+  /* ================= CLOSE MODAL ================= */
+  const closeModal = () => {
+    setShowModal(false);
+    setModalData({ userId: null, isBlocked: false, userName: "" });
+  };
+
+  /* ================= CONFIRM BLOCK / UNBLOCK ================= */
+  const confirmToggleBlock = async () => {
+    const { userId } = modalData;
 
     try {
       const res = await Admin.toggleUserBlock(userId);
@@ -61,6 +72,8 @@ export default function AdminUsers() {
       setMessage("❌ שגיאה בעדכון סטטוס המשתמש");
       setTimeout(() => setMessage(null), 3000);
     }
+
+    closeModal();
   };
 
   const getInitials = (first, last) =>
@@ -76,7 +89,7 @@ export default function AdminUsers() {
         <div className="admin-users-header">
           <button
             className="back-btn"
-            onClick={() => navigate("/profile#admin")}
+            onClick={() => navigate(-1)}
           >
             ← חזור
           </button>
@@ -163,7 +176,7 @@ export default function AdminUsers() {
                         className={`user-action-btn ${
                           u.is_blocked ? "unblock" : "block"
                         }`}
-                        onClick={() => toggleBlock(u.id, u.is_blocked)}
+                        onClick={() => openModal(u.id, u.is_blocked, `${u.firstname} ${u.lastname}`)}
                       >
                         {u.is_blocked ? "✅ ביטול חסימה" : "🚫 חסום"}
                       </button>
@@ -176,6 +189,43 @@ export default function AdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* ================= MODAL ================= */}
+      {showModal && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">
+              {modalData.isBlocked ? "✅" : "🚫"}
+            </div>
+            
+            <h2 className="modal-title">
+              {modalData.isBlocked ? "ביטול חסימת משתמש" : "חסימת משתמש"}
+            </h2>
+            
+            <p className="modal-text">
+              {modalData.isBlocked 
+                ? `האם את בטוחה שברצונך לבטל את החסימה של ${modalData.userName}?`
+                : `האם את בטוחה שברצונך לחסום את ${modalData.userName}?`
+              }
+            </p>
+
+            <div className="modal-buttons">
+              <button 
+                className="modal-btn cancel"
+                onClick={closeModal}
+              >
+                ביטול
+              </button>
+              <button 
+                className={`modal-btn confirm ${modalData.isBlocked ? "unblock" : "block"}`}
+                onClick={confirmToggleBlock}
+              >
+                {modalData.isBlocked ? "✅ בטל חסימה" : "🚫 חסום משתמש"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

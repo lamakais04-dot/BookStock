@@ -229,7 +229,6 @@ export default function Signup() {
               onChange={handleChange}
               placeholder="לדוגמה: Abcdef!1"
             />
-            {/* hint like the requirements */}
             <small style={{ display: "block", marginTop: "6px", opacity: 0.8 }}>
               מינימום 8 תווים, מתחיל באות גדולה באנגלית, ולפחות תו מיוחד אחד
             </small>

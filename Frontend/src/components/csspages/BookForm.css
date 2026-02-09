@@ -1,5 +1,30 @@
 /* ===============================
-   BOOK FORM - עיצוב מודרני
+   CSS VARIABLES - משתנים גלובליים
+================================ */
+
+:root {
+  --primary: #8b4513;
+  --primary-light: #a0522d;
+  --accent: #d2691e;
+  --success: #2ecc71;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+  --purple: #9b59b6;
+  
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-muted: #95a5a6;
+  --bg-secondary: #f8f9fa;
+  --border: #e1e8ed;
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
+   BOOK FORM - עיצוב ממורכז וצבעוני
 ================================ */
 
 .book-form {
@@ -7,7 +32,14 @@
   flex-direction: column;
   gap: 20px;
   width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px;
+  background: linear-gradient(135deg, #ffffff 0%, #fef9f3 100%);
+  border-radius: 32px;
+  box-shadow: var(--shadow-lg);
   animation: formFadeIn 0.5s ease-out;
+  border: 2px solid rgba(139, 69, 19, 0.1);
 }
 
 @keyframes formFadeIn {
@@ -22,110 +54,216 @@
 }
 
 /* ===============================
-   INPUT FIELDS - שדות קלט
+   INPUT FIELDS - שדות קלט צבעוניים
 ================================ */
 
 .book-form input[type="text"],
 .book-form input[type="number"],
-.book-form input:not([type="file"]):not([type="submit"]),
 .book-form textarea,
 .book-form select {
   width: 100%;
-  padding: 16px 20px;
+  padding: 18px 24px 18px 60px;
   font-size: 16px;
   font-family: inherit;
   color: var(--text-primary);
-  background: linear-gradient(135deg, #ffffff 0%, var(--bg-secondary) 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border: 2px solid var(--border);
-  border-radius: 14px;
+  border-radius: 20px;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-sm);
   outline: none;
+  direction: rtl;
+  text-align: right;
+  position: relative;
 }
 
-.book-form input::placeholder,
-.book-form textarea::placeholder,
-.book-form select option:first-child {
+/* אימוג'ים בשדות הקלט */
+.book-form input[type="text"]::placeholder {
   color: var(--text-muted);
   font-weight: 500;
 }
 
-/* Focus State */
-.book-form input:focus,
-.book-form textarea:focus,
-.book-form select:focus {
-  border-color: var(--primary);
-  box-shadow: 
-    var(--shadow-md),
-    0 0 0 4px rgba(139, 69, 19, 0.1);
-  transform: translateY(-2px);
+/* שם הספר */
+.book-form input[name="title"] {
+  border-color: #3498db;
+  background: linear-gradient(135deg, #ebf5fb, #ffffff);
+}
+
+.book-form input[name="title"]:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
   background: #ffffff;
 }
 
-/* Hover State */
-.book-form input:hover,
-.book-form textarea:hover,
-.book-form select:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-md);
+/* שם המחבר */
+.book-form input[name="author"] {
+  border-color: #9b59b6;
+  background: linear-gradient(135deg, #f4ecf7, #ffffff);
 }
 
-/* ===============================
-   TEXTAREA - תיבת טקסט
-================================ */
+.book-form input[name="author"]:focus {
+  border-color: #9b59b6;
+  box-shadow: 0 0 0 4px rgba(155, 89, 182, 0.1);
+  background: #ffffff;
+}
 
+/* מספר עמודים */
+.book-form input[name="pages"] {
+  border-color: #e67e22;
+  background: linear-gradient(135deg, #fef5e7, #ffffff);
+}
+
+.book-form input[name="pages"]:focus {
+  border-color: #e67e22;
+  box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.1);
+  background: #ffffff;
+}
+
+/* כמות ספרים */
+.book-form input[name="quantity"] {
+  border-color: #2ecc71;
+  background: linear-gradient(135deg, #eafaf1, #ffffff);
+}
+
+.book-form input[name="quantity"]:focus {
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.1);
+  background: #ffffff;
+}
+
+/* תקציר */
 .book-form textarea {
+  border-color: #f39c12;
+  background: linear-gradient(135deg, #fef9e7, #ffffff);
   resize: vertical;
-  min-height: 100px;
+  min-height: 120px;
   line-height: 1.6;
-  font-family: inherit;
+  padding: 18px 24px;
 }
 
-/* ===============================
-   SELECT - תפריט נפתח
-================================ */
+.book-form textarea:focus {
+  border-color: #f39c12;
+  box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.1);
+  background: #ffffff;
+}
 
+/* Select */
 .book-form select {
+  border-color: #e74c3c;
+  background: linear-gradient(135deg, #fdedec, #ffffff);
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238b4513' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: left 20px center;
-  padding-left: 45px;
+  background-position: left 24px center;
+  padding-left: 50px;
+}
+
+.book-form select:focus {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+  background: #ffffff;
 }
 
 .book-form select option {
   padding: 12px;
   background: #ffffff;
   color: var(--text-primary);
+  direction: rtl;
 }
 
-.book-form select option:first-child {
-  color: var(--text-muted);
+/* Hover State */
+.book-form input:hover,
+.book-form textarea:hover,
+.book-form select:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ===============================
-   FILE INPUT - העלאת קובץ
+   LABELS WITH EMOJIS - תוויות עם אימוג'ים
+================================ */
+
+.book-form-wrapper {
+  position: relative;
+}
+
+.book-form input[name="title"],
+.book-form input[name="author"],
+.book-form input[name="pages"],
+.book-form input[name="quantity"],
+.book-form textarea,
+.book-form select {
+  position: relative;
+}
+
+/* אימוג'י בתוך השדה */
+.book-form input[name="title"]::before,
+.book-form input[name="author"]::before,
+.book-form input[name="pages"]::before,
+.book-form input[name="quantity"]::before,
+.book-form textarea::before,
+.book-form select::before {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  pointer-events: none;
+}
+
+/* ===============================
+   INPUT WRAPPER - עטיפה לשדות
+================================ */
+
+.input-group {
+  position: relative;
+}
+
+.input-group::before {
+  content: attr(data-emoji);
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===============================
+   FILE INPUT - העלאת קובץ מעוצבת
 ================================ */
 
 .book-form input[type="file"] {
   padding: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
+  border: 3px dashed var(--border);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  direction: rtl;
+  text-align: center;
+  padding: 32px;
   position: relative;
 }
 
-/* מעטפת מותאמת אישית לקובץ */
+.book-form input[type="file"]:hover {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, #ffffff, #fef9f3);
+  transform: translateY(-2px);
+}
+
+/* כפתור בחירת קובץ */
 .book-form input[type="file"]::file-selector-button {
-  padding: 14px 28px;
-  font-size: 15px;
+  padding: 14px 32px;
+  font-size: 16px;
   font-weight: 700;
   font-family: inherit;
   color: white;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   border: none;
-  border-radius: 12px;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-sm);
@@ -138,66 +276,68 @@
   box-shadow: var(--shadow-md);
 }
 
-.book-form input[type="file"]::file-selector-button:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* טקסט שם הקובץ */
-.book-form input[type="file"] {
-  color: var(--text-secondary);
-  font-weight: 600;
-  cursor: pointer;
+.book-form input[type="file"]::file-selector-button::before {
+  content: '📁 ';
+  margin-left: 8px;
 }
 
 /* ===============================
-   FILE NAME DISPLAY - הצגת שם קובץ
+   FILE NAME DISPLAY
 ================================ */
 
 .book-form p {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-secondary);
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, #ffffff 100%);
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, #e8f5e9, #ffffff);
+  padding: 14px 20px;
+  border-radius: 50px;
+  border: 2px solid #2ecc71;
   box-shadow: var(--shadow-sm);
-  margin: -8px 0 0 0;
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
 }
 
 .book-form p::before {
-  content: "📎";
-  font-size: 16px;
+  content: "✅";
+  font-size: 20px;
 }
 
 /* ===============================
-   SUBMIT BUTTON - כפתור שליחה
+   SUBMIT BUTTON - כפתור שליחה צבעוני
 ================================ */
 
 .book-form button[type="submit"] {
   width: 100%;
-  padding: 18px 32px;
-  font-size: 17px;
+  padding: 20px 40px;
+  font-size: 18px;
   font-weight: 800;
   font-family: inherit;
   color: white;
-  background: linear-gradient(135deg, var(--success) 0%, #27ae60 100%);
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
   border: none;
-  border-radius: 16px;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
     var(--shadow-md),
     0 0 20px rgba(46, 204, 113, 0.3);
-  margin-top: 8px;
+  margin-top: 12px;
   position: relative;
   overflow: hidden;
 }
 
-/* אפקט גלים */
 .book-form button[type="submit"]::before {
+  content: '💾 ';
+  margin-left: 10px;
+  font-size: 22px;
+}
+
+/* אפקט גלים */
+.book-form button[type="submit"]::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -210,21 +350,21 @@
   transition: width 0.6s ease, height 0.6s ease;
 }
 
-.book-form button[type="submit"]:hover::before {
+.book-form button[type="submit"]:hover::after {
   width: 400px;
   height: 400px;
 }
 
 .book-form button[type="submit"]:hover {
   background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: 
     var(--shadow-lg),
-    0 0 30px rgba(46, 204, 113, 0.4);
+    0 0 30px rgba(46, 204, 113, 0.5);
 }
 
 .book-form button[type="submit"]:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-2px) scale(0.98);
 }
 
 .book-form button[type="submit"]:disabled {
@@ -240,14 +380,39 @@
 }
 
 /* ===============================
-   VALIDATION STATES - מצבי תקינות
+   FORM TITLE - כותרת הטופס
+================================ */
+
+.form-title {
+  font-size: 36px;
+  font-weight: 900;
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.form-title::before {
+  content: '📚 ';
+}
+
+.form-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* ===============================
+   VALIDATION STATES
 ================================ */
 
 .book-form input:invalid:not(:placeholder-shown),
-.book-form textarea:invalid:not(:placeholder-shown),
-.book-form select:invalid:not(:focus) {
+.book-form textarea:invalid:not(:placeholder-shown) {
   border-color: var(--danger);
-  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #fdedec, #ffffff);
 }
 
 .book-form input:valid:not(:placeholder-shown),
@@ -256,38 +421,45 @@
 }
 
 /* ===============================
-   LABELS - תוויות (אם תרצה להוסיף)
-================================ */
-
-.book-form label {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: -12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.book-form label::before {
-  content: "📝";
-  font-size: 16px;
-}
-
-/* ===============================
    RESPONSIVE - התאמה למובייל
 ================================ */
 
 @media (max-width: 768px) {
   .book-form {
-    gap: 16px;
+    padding: 32px 24px;
+    gap: 18px;
   }
 
   .book-form input,
   .book-form textarea,
   .book-form select {
-    padding: 14px 18px;
+    padding: 16px 20px 16px 55px;
     font-size: 15px;
+  }
+
+  .book-form button[type="submit"] {
+    padding: 18px 32px;
+    font-size: 17px;
+  }
+
+  .form-title {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-form {
+    padding: 28px 20px;
+    gap: 16px;
+    border-radius: 24px;
+  }
+
+  .book-form input,
+  .book-form textarea,
+  .book-form select {
+    padding: 14px 18px 14px 50px;
+    font-size: 14px;
+    border-radius: 16px;
   }
 
   .book-form button[type="submit"] {
@@ -295,54 +467,33 @@
     font-size: 16px;
   }
 
-  .book-form input[type="file"]::file-selector-button {
-    padding: 12px 24px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .book-form {
-    gap: 14px;
-  }
-
-  .book-form input,
-  .book-form textarea,
-  .book-form select {
-    padding: 12px 16px;
-    font-size: 14px;
-    border-radius: 12px;
-  }
-
-  .book-form button[type="submit"] {
-    padding: 14px 24px;
-    font-size: 15px;
+  .form-title {
+    font-size: 28px;
   }
 
   .book-form select {
-    background-position: left 16px center;
-    padding-left: 40px;
+    background-position: left 18px center;
+    padding-left: 45px;
   }
 }
 
 /* ===============================
-   GRID LAYOUT - פריסת רשת (אופציונלי)
+   ENHANCED INPUT STYLES
 ================================ */
 
-/* אם תרצה שדות בשורה אחת */
-.book-form.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+/* אנימציה לפוקוס */
+.book-form input:focus,
+.book-form textarea:focus,
+.book-form select:focus {
+  transform: translateY(-3px);
 }
 
-.book-form.form-grid textarea,
-.book-form.form-grid button[type="submit"] {
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 768px) {
-  .book-form.form-grid {
-    grid-template-columns: 1fr;
-  }
-}
+/* סטייל מיוחד לכל שדה */
+.book-form > *:nth-child(1) { animation-delay: 0.1s; }
+.book-form > *:nth-child(2) { animation-delay: 0.15s; }
+.book-form > *:nth-child(3) { animation-delay: 0.2s; }
+.book-form > *:nth-child(4) { animation-delay: 0.25s; }
+.book-form > *:nth-child(5) { animation-delay: 0.3s; }
+.book-form > *:nth-child(6) { animation-delay: 0.35s; }
+.book-form > *:nth-child(7) { animation-delay: 0.4s; }
+.book-form > *:nth-child(8) { animation-delay: 0.45s; }

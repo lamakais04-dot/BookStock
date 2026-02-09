@@ -17,6 +17,7 @@ export default function SingleBook() {
   const { user, setUser, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const isEditMode = searchParams.get("edit") === "true";
+  const isNew = id === "new";
 
   /* ================= STATE ================= */
   const [loading, setLoading] = useState(true);
@@ -27,35 +28,40 @@ export default function SingleBook() {
   const [error, setError] = useState("");
   const [book, setBook] = useState(null);
 
-  const isBorrowedByMe = Boolean(user?.borrowedBooks?.includes(Number(id)));
+  const isBorrowedByMe = Boolean(
+    user?.borrowedBooks?.includes(Number(id))
+  );
 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function loadData() {
       try {
-        const [cats, ages, bookData] = await Promise.all([
+        const [cats, ages] = await Promise.all([
           Filters.getCategories(),
           Filters.getAgeGroups(),
-          Books.getBookById(id),
         ]);
 
         setCategories(cats);
         setAgeGroups(ages);
-        setBook(bookData);
+
+        if (!isNew) {
+          const bookData = await Books.getBookById(id);
+          setBook(bookData);
+        }
       } catch (err) {
         console.error(err);
-        setError("שגיאה בטעינת הספר");
+        setError("שגיאה בטעינת הנתונים");
       } finally {
         setLoading(false);
       }
     }
 
     loadData();
-  }, [id]);
+  }, [id, isNew]);
 
   /* ================= FAVORITES ================= */
   useEffect(() => {
-    if (!user || isAdmin) return;
+    if (!user || isAdmin || isNew) return;
 
     async function loadFavs() {
       try {
@@ -65,7 +71,7 @@ export default function SingleBook() {
     }
 
     loadFavs();
-  }, [id, user, isAdmin]);
+  }, [id, user, isAdmin, isNew]);
 
   /* ================= ACTIONS ================= */
 
@@ -127,7 +133,8 @@ export default function SingleBook() {
     }
   };
 
-  /* ================= ADMIN UPDATE ================= */
+  /* ================= ADMIN ================= */
+
   const handleUpdateBook = async (formData) => {
     try {
       await Books.updateBook(book.id, formData);
@@ -139,12 +146,48 @@ export default function SingleBook() {
     }
   };
 
+  const handleAddBook = async (formData) => {
+    try {
+      await Books.addBook(formData);
+      navigate("/book");
+    } catch {
+      setError("שגיאה בהוספת ספר");
+    }
+  };
+
   /* ================= LOADING ================= */
-  if (loading || !book) {
+  if (loading) {
     return <div className="loading-container" />;
   }
 
-  /* ================= JSX ================= */
+  /* ================= ADD NEW BOOK ================= */
+  if (isNew && isAdmin) {
+    return (
+      <div className="single-book-container">
+        <button className="back-button" onClick={() => navigate("/book")}>
+          ← חזרה
+        </button>
+
+        <div className="single-book">
+          <div className="book-details">
+            <h1 className="book-title">➕ הוספת ספר חדש</h1>
+
+            <BookForm
+              categories={categories}
+              ageGroups={ageGroups}
+              onSubmit={handleAddBook}
+            />
+
+            {error && <p className="borrow-error">{error}</p>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ================= VIEW / EDIT BOOK ================= */
+  if (!book) return null;
+
   return (
     <div className="single-book-container">
       <button className="back-button" onClick={() => navigate("/book")}>
@@ -157,7 +200,6 @@ export default function SingleBook() {
         </div>
 
         <div className="book-details">
-          {/* ===== EDIT MODE (ADMIN ONLY) ===== */}
           {isAdmin && isEditMode ? (
             <>
               <BookForm
@@ -179,7 +221,9 @@ export default function SingleBook() {
               <h1 className="book-title">{book.title}</h1>
               <p className="book-author">{book.author}</p>
 
-              {book.summary && <p className="book-summary">{book.summary}</p>}
+              {book.summary && (
+                <p className="book-summary">{book.summary}</p>
+              )}
 
               <div className="book-info-grid">
                 <div className="info-item">
@@ -207,7 +251,6 @@ export default function SingleBook() {
                 </div>
               </div>
 
-              {/* ===== ACTIONS ===== */}
               {isAdmin ? (
                 <button
                   className="edit-toggle-button"

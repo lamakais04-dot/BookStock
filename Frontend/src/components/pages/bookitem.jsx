@@ -33,8 +33,8 @@ function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) {
   );
 }
 
-// Modal Component for Success
-function SuccessModal({ show, onClose }) {
+// Modal Component for Success (Delete/Borrow/Favorite)
+function SuccessModal({ show, onClose, type, bookTitle }) {
   useEffect(() => {
     if (show) {
       const timer = setTimeout(onClose, 2500);
@@ -44,12 +44,63 @@ function SuccessModal({ show, onClose }) {
 
   if (!show) return null;
 
+  const getModalContent = () => {
+    switch (type) {
+      case "delete":
+        return {
+          icon: "✅",
+          title: "נמחק בהצלחה!",
+          message: "הספר נמחק מהמערכת בהצלחה",
+          iconClass: "success"
+        };
+      case "borrow":
+        return {
+          icon: "📚",
+          title: "הושאל בהצלחה!",
+          message: `הספר "${bookTitle}" נוסף להשאלות שלך`,
+          iconClass: "borrow"
+        };
+      case "return":
+        return {
+          icon: "✨",
+          title: "הוחזר בהצלחה!",
+          message: `הספר "${bookTitle}" הוחזר למערכת`,
+          iconClass: "return"
+        };
+      case "favorite-add":
+        return {
+          icon: "❤️",
+          title: "נוסף למועדפים!",
+          message: `הספר "${bookTitle}" נוסף למועדפים שלך`,
+          iconClass: "favorite"
+        };
+      case "favorite-remove":
+        return {
+          icon: "💔",
+          title: "הוסר מהמועדפים",
+          message: `הספר "${bookTitle}" הוסר מהמועדפים שלך`,
+          iconClass: "unfavorite"
+        };
+      default:
+        return {
+          icon: "✅",
+          title: "הצליח!",
+          message: "הפעולה בוצעה בהצלחה",
+          iconClass: "success"
+        };
+    }
+  };
+
+  const content = getModalContent();
+
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-icon success">✅</div>
-        <h2 className="modal-title">נמחק בהצלחה!</h2>
-        <p className="modal-message">הספר נמחק מהמערכת בהצלחה</p>
+      <div className="modal-content modal-success">
+        <div className={`modal-icon ${content.iconClass}`}>
+          {content.icon}
+        </div>
+        <h2 className="modal-title">{content.title}</h2>
+        <p className="modal-message">{content.message}</p>
       </div>
     </div>
   );
@@ -66,10 +117,14 @@ export default function BookItem({
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+  
+  // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successModal, setSuccessModal] = useState({
+    show: false,
+    type: null
+  });
 
   const isBorrowedByMe = Boolean(user?.borrowedBooks?.includes(book.id));
 
@@ -97,14 +152,13 @@ export default function BookItem({
   }, [book.id, user, isAdmin, mode]);
 
   useEffect(() => {
-    if (msg || error) {
+    if (error) {
       const t = setTimeout(() => {
-        setMsg("");
         setError("");
       }, 3000);
       return () => clearTimeout(t);
     }
-  }, [msg, error]);
+  }, [error]);
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
@@ -115,7 +169,7 @@ export default function BookItem({
     try {
       await Books.deleteBook(book.id);
       setShowDeleteModal(false);
-      setShowSuccessModal(true);
+      setSuccessModal({ show: true, type: "delete" });
       setTimeout(() => {
         setBooks(prev => prev.filter(b => b.id !== book.id));
       }, 2500);
@@ -137,11 +191,15 @@ export default function BookItem({
       if (isFavorite) {
         await Favorites.remove(book.id);
         setIsFavorite(false);
+        setSuccessModal({ show: true, type: "favorite-remove" });
       } else {
         await Favorites.add(book.id);
         setIsFavorite(true);
+        setSuccessModal({ show: true, type: "favorite-add" });
       }
-    } catch {}
+    } catch {
+      setError("שגיאה בעדכון מועדפים");
+    }
   };
 
   const handleBorrow = async () => {
@@ -160,7 +218,7 @@ export default function BookItem({
           b.id === book.id ? { ...b, quantity: b.quantity - 1 } : b
         )
       );
-      setMsg(res.message);
+      setSuccessModal({ show: true, type: "borrow" });
     } catch {
       setError("לא ניתן להשאיל את הספר");
     } finally {
@@ -190,7 +248,7 @@ export default function BookItem({
         );
       }
 
-      setMsg(res.message);
+      setSuccessModal({ show: true, type: "return" });
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
@@ -214,8 +272,10 @@ export default function BookItem({
       />
 
       <SuccessModal
-        show={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
+        show={successModal.show}
+        onClose={() => setSuccessModal({ show: false, type: null })}
+        type={successModal.type}
+        bookTitle={book.title}
       />
 
       <div className="book-card">
@@ -291,7 +351,6 @@ export default function BookItem({
           </div>
         )}
 
-        {msg && <p className="borrow-success">{msg}</p>}
         {error && <p className="borrow-error">{error}</p>}
       </div>
     </>
