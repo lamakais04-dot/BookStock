@@ -1,4 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, Form, Depends, Query, BackgroundTasks
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File,
+    Form,
+    Depends,
+    Query,
+    BackgroundTasks,
+)
 from utils.auth_helper import get_user
 from utils.admin_helper import get_admin_user
 from services.bookService import (
@@ -12,11 +20,17 @@ from services.bookService import (
 from schemas.books import BookCreate, BookUpdate
 from socketio_app import sio
 
-router = APIRouter()
+# ❗❗❗ אין prefix כאן
+router = APIRouter(tags=["Book"])
 
-@router.post("/", dependencies=[Depends(get_admin_user)])
+
+# =========================
+# CREATE BOOK (ADMIN)
+# =========================
+@router.post("/")
 async def add_book(
     background_tasks: BackgroundTasks,
+    admin=Depends(get_admin_user),
     title: str = Form(...),
     summary: str = Form(...),
     author: str = Form(...),
@@ -35,15 +49,30 @@ async def add_book(
         categoryid=categoryid,
         agesid=agesid,
     )
+
     new_book = create_book(data, image)
-    # notify all clients that books list changed
-    background_tasks.add_task(sio.emit, "books_changed", {"reason": "created", "id": new_book.id})
+
+    background_tasks.add_task(
+        sio.emit,
+        "books_changed",
+        {
+            "reason": "created",
+            "bookId": new_book.id,
+            "userId": admin.id,
+        },
+    )
+
     return new_book
 
-@router.put("/{book_id}", dependencies=[Depends(get_admin_user)])
+
+# =========================
+# UPDATE BOOK (ADMIN)
+# =========================
+@router.put("/{book_id}")
 async def edit_book(
     book_id: int,
     background_tasks: BackgroundTasks,
+    admin=Depends(get_admin_user),
     title: str | None = Form(None),
     summary: str | None = Form(None),
     author: str | None = Form(None),
@@ -62,31 +91,74 @@ async def edit_book(
         categoryid=categoryid,
         agesid=agesid,
     )
+
     updated = update_book(book_id, data, image)
-    background_tasks.add_task(sio.emit, "books_changed", {"reason": "updated", "id": book_id})
+
+    background_tasks.add_task(
+        sio.emit,
+        "books_changed",
+        {
+            "reason": "updated",
+            "bookId": book_id
+        },
+    )
+
     return updated
 
-@router.delete("/{book_id}", dependencies=[Depends(get_admin_user)])
-async def remove_book(book_id: int, background_tasks: BackgroundTasks):
+
+# =========================
+# DELETE BOOK (ADMIN)
+# =========================
+@router.delete("/{book_id}")
+async def remove_book(
+    book_id: int,
+    background_tasks: BackgroundTasks,
+    admin=Depends(get_admin_user),
+):
     result = delete_book(book_id)
-    background_tasks.add_task(sio.emit, "books_changed", {"reason": "deleted", "id": book_id})
+
+    background_tasks.add_task(
+        sio.emit,
+        "books_changed",
+        {
+            "reason": "deleted",
+            "bookId": book_id,
+            "userId": admin.id,
+        },
+    )
+
     return result
 
+
+# =========================
+# LIST BOOKS
+# =========================
 @router.get("/")
 def list_books(
     page: int = Query(1, ge=1),
-    limit: int = Query(8, ge=1, le=50),
-    category_id: int | None = None,
-    age_group_id: int | None = None,
-    search: str | None = None,
+    limit: int = Query(10, ge=1, le=50),
+    category_id: int | None = Query(None),
+    age_group_id: int | None = Query(None),
+    search: str | None = Query(None),
     user=Depends(get_user),
 ):
     return get_books(page, limit, category_id, age_group_id, search)
 
+
+# =========================
+# RANDOM BOOKS
+# =========================
 @router.get("/random/limit")
-def random_books(limit: int = 10, user=Depends(get_user)):
+def random_books(
+    limit: int = Query(10, ge=1, le=50),
+    user=Depends(get_user),
+):
     return get_random_books(limit)
 
+
+# =========================
+# SINGLE BOOK
+# =========================
 @router.get("/{book_id}")
 def single_book(book_id: int, user=Depends(get_user)):
     return get_book_by_id(book_id)

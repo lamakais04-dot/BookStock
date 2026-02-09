@@ -1,3 +1,4 @@
+// SingleBook.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import Books from "../services/books";
@@ -17,6 +18,7 @@ export default function SingleBook() {
   const { user, setUser, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const isEditMode = searchParams.get("edit") === "true";
+  const isNew = id === "new";
 
   /* ================= STATE ================= */
   const [loading, setLoading] = useState(true);
@@ -27,21 +29,26 @@ export default function SingleBook() {
   const [error, setError] = useState("");
   const [book, setBook] = useState(null);
 
-  const isBorrowedByMe = Boolean(user?.borrowedBooks?.includes(Number(id)));
+  const isBorrowedByMe = !isNew && Boolean(user?.borrowedBooks?.includes(Number(id)));
 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function loadData() {
       try {
-        const [cats, ages, bookData] = await Promise.all([
+        const [cats, ages] = await Promise.all([
           Filters.getCategories(),
           Filters.getAgeGroups(),
-          Books.getBookById(id),
         ]);
 
         setCategories(cats);
         setAgeGroups(ages);
-        setBook(bookData);
+
+        if (!isNew) {
+          const bookData = await Books.getBookById(id);
+          setBook(bookData);
+        } else {
+          setBook(null);
+        }
       } catch (err) {
         console.error(err);
         setError("שגיאה בטעינת הספר");
@@ -51,21 +58,21 @@ export default function SingleBook() {
     }
 
     loadData();
-  }, [id]);
+  }, [id, isNew]);
 
   /* ================= FAVORITES ================= */
   useEffect(() => {
-    if (!user || isAdmin) return;
+    if (!user || isAdmin || isNew) return;
 
     async function loadFavs() {
       try {
         const favs = await Favorites.getFavorites();
-        setIsFavorite(favs.some(f => f.bookid === Number(id)));
+        setIsFavorite(favs.some((f) => f.bookid === Number(id)));
       } catch {}
     }
 
     loadFavs();
-  }, [id, user, isAdmin]);
+  }, [id, user, isAdmin, isNew]);
 
   /* ================= ACTIONS ================= */
 
@@ -77,13 +84,13 @@ export default function SingleBook() {
     try {
       const res = await Library.borrowBook(book.id);
 
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
 
-      setBook(prev => ({ ...prev, quantity: prev.quantity - 1 }));
+      setBook((prev) => ({ ...prev, quantity: prev.quantity - 1 }));
     } catch {
       setError("לא ניתן להשאיל את הספר");
     } finally {
@@ -96,13 +103,13 @@ export default function SingleBook() {
     try {
       const res = await Library.returnBook(book.id);
 
-      setUser(prev => ({
+      setUser((prev) => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
 
-      setBook(prev => ({ ...prev, quantity: prev.quantity + 1 }));
+      setBook((prev) => ({ ...prev, quantity: prev.quantity + 1 }));
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
@@ -127,7 +134,7 @@ export default function SingleBook() {
     }
   };
 
-  /* ================= ADMIN UPDATE ================= */
+  /* ================= ADMIN CREATE / UPDATE ================= */
   const handleUpdateBook = async (formData) => {
     try {
       await Books.updateBook(book.id, formData);
@@ -139,8 +146,20 @@ export default function SingleBook() {
     }
   };
 
+  const handleCreateBook = async (formData) => {
+    try {
+      await Books.addBook(formData);
+      navigate("/book");
+    } catch {
+      setError("שגיאה ביצירת הספר");
+    }
+  };
+
   /* ================= LOADING ================= */
-  if (loading || !book) {
+  if (loading) {
+    return <div className="loading-container" />;
+  }
+  if (!isNew && !book) {
     return <div className="loading-container" />;
   }
 
@@ -153,26 +172,34 @@ export default function SingleBook() {
 
       <div className="single-book">
         <div className="book-image">
-          <img src={book.image || "/placeholder.png"} alt={book.title} />
+          {!isNew && (
+            <img src={book.image || "/placeholder.png"} alt={book.title} />
+          )}
         </div>
 
         <div className="book-details">
-          {/* ===== EDIT MODE (ADMIN ONLY) ===== */}
-          {isAdmin && isEditMode ? (
+          {/* ===== CREATE / EDIT MODE (ADMIN ONLY) ===== */}
+          {isAdmin && (isNew || isEditMode) ? (
             <>
+              <h1 className="book-title">
+                {isNew ? "הוסף ספר חדש" : "עריכת ספר"}
+              </h1>
+
               <BookForm
-                initialData={book}
+                initialData={isNew ? {} : book}
                 categories={categories}
                 ageGroups={ageGroups}
-                onSubmit={handleUpdateBook}
+                onSubmit={isNew ? handleCreateBook : handleUpdateBook}
               />
 
-              <button
-                className="cancel-button"
-                onClick={() => setSearchParams({})}
-              >
-                ביטול עריכה
-              </button>
+              {!isNew && (
+                <button
+                  className="cancel-button"
+                  onClick={() => setSearchParams({})}
+                >
+                  ביטול עריכה
+                </button>
+              )}
             </>
           ) : (
             <>
@@ -185,14 +212,16 @@ export default function SingleBook() {
                 <div className="info-item">
                   <div className="info-label">קטגוריה</div>
                   <div className="info-value">
-                    {categories.find(c => c.id === book.categoryid)?.name || "-"}
+                    {categories.find((c) => c.id === book.categoryid)?.name ||
+                      "-"}
                   </div>
                 </div>
 
                 <div className="info-item">
                   <div className="info-label">טווח גילאים</div>
                   <div className="info-value">
-                    {ageGroups.find(a => a.id === book.agesid)?.description || "-"}
+                    {ageGroups.find((a) => a.id === book.agesid)
+                      ?.description || "-"}
                   </div>
                 </div>
 
