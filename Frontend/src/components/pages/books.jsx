@@ -3,7 +3,8 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  useRef
+  useRef,
+  useMemo,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
@@ -39,34 +40,33 @@ export default function AllBooks() {
 
   const booksPerPage = 10;
   const location = useLocation();
-  const search =
-    new URLSearchParams(location.search).get("search") || "";
 
-  /* 🔒 שומר סדר יציב של ספרים */
+  const search = useMemo(() => {
+    return new URLSearchParams(location.search).get("search") || "";
+  }, [location.search]);
+
+  // Keep initial order of fetched books stable
   const orderRef = useRef([]);
 
-  /* ================= LOAD BOOKS ================= */
   const loadBooks = useCallback(
-    async (withSpinner = true) => {
+    async (page, catId, ageId, searchTerm, withSpinner = true) => {
       if (withSpinner) setLoading(true);
 
       try {
         const data = await Books.getBooks(
-          currentPage,
+          page,
           booksPerPage,
-          categoryId,
-          ageGroupId,
-          search
+          catId,
+          ageId,
+          searchTerm
         );
 
         const fetchedBooks = data?.books || [];
 
-        // שמירת סדר בפעם הראשונה בלבד
         if (orderRef.current.length === 0) {
           orderRef.current = fetchedBooks.map((b) => b.id);
         }
 
-        // החזרת הספרים לפי הסדר המקורי
         const orderedBooks = [...fetchedBooks].sort(
           (a, b) =>
             orderRef.current.indexOf(a.id) -
@@ -85,25 +85,10 @@ export default function AllBooks() {
         if (withSpinner) setLoading(false);
       }
     },
-    [currentPage, categoryId, ageGroupId, search]
+    []
   );
 
-  /* ================= INITIAL / FILTER LOAD ================= */
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      loadBooks(true);
-    }, 400);
-
-    return () => clearTimeout(delay);
-  }, [loadBooks]);
-
-  /* איפוס עמוד בשינוי סינון */
-  useEffect(() => {
-    setCurrentPage(1);
-    orderRef.current = []; // סדר חדש לסינון חדש
-  }, [categoryId, ageGroupId, search]);
-
-  /* ================= LOAD FILTERS ================= */
+  /* =============== LOAD FILTER OPTIONS =============== */
   useEffect(() => {
     async function loadFilters() {
       try {
@@ -118,26 +103,97 @@ export default function AllBooks() {
     loadFilters();
   }, []);
 
-  /* ================= SOCKET UPDATES ================= */
+  /* =============== FETCH ON PAGE / FILTER / SEARCH CHANGE =============== */
+
+  // When filters/search change, reset to page 1 and clear order
+  useEffect(() => {
+    orderRef.current = [];
+    setCurrentPage(1);
+  }, [categoryId, ageGroupId, search]);
+
+  // Whenever page / filters / search change -> fetch
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      loadBooks(currentPage, categoryId, ageGroupId, search, true);
+    }, 400); // debounce for search/filter
+
+    return () => clearTimeout(delay);
+  }, [currentPage, categoryId, ageGroupId, search, loadBooks]);
+
+  /* =============== LOCAL UPDATERS (CURRENT USER) =============== */
+  const handleLocalBorrow = useCallback((bookId) => {
+    setBooks((prev) =>
+      prev.map((b) =>
+        b.id === bookId
+          ? { ...b, quantity: Math.max(0, b.quantity - 1) }
+          : b
+      )
+    );
+    setBorrowedBooksCount((c) => c + 1);
+  }, []);
+
+  const handleLocalReturn = useCallback((bookId) => {
+    setBooks((prev) =>
+      prev.map((b) =>
+        b.id === bookId ? { ...b, quantity: b.quantity + 1 } : b
+      )
+    );
+    setBorrowedBooksCount((c) => Math.max(0, c - 1));
+  }, []);
+
+  /* =============== SOCKET UPDATES (OTHER USERS) =============== */
   useEffect(() => {
     function handleBooksChanged(payload) {
-      console.log(payload)
-      if (payload?.userId === user?.id) return;
+      // ignore current user
+      if (!payload?.userId || payload.userId === user?.id) return;
 
-      loadBooks(false);
+      setBooks((prev) => {
+        if (!payload?.reason) return prev;
+
+        switch (payload.reason) {
+          case "borrowed":
+            return prev.map((b) =>
+              b.id === payload.id
+                ? { ...b, quantity: Math.max(0, b.quantity - 1) }
+                : b
+            );
+
+          case "returned":
+            return prev.map((b) =>
+              b.id === payload.id
+                ? { ...b, quantity: b.quantity + 1 }
+                : b
+            );
+
+          case "updated":
+            return prev.map((b) =>
+              b.id === payload.book.id ? { ...b, ...payload.book } : b
+            );
+
+          case "created":
+            return payload.book ? [payload.book, ...prev] : prev;
+
+          case "deleted":
+            return prev.filter((b) => b.id !== payload.bookId);
+
+          default:
+            return prev;
+        }
+      });
+
+      // stats are handled via fresh fetch, not via socket increments
     }
 
     socket.on("books_changed", handleBooksChanged);
     return () => socket.off("books_changed", handleBooksChanged);
-  }, [loadBooks, user?.id]);
+  }, [user?.id]);
 
-  const availableBooksCount =
-    totalBooksCount - borrowedBooksCount;
+  const availableBooksCount = totalBooksCount - borrowedBooksCount;
 
-  /* ================= JSX ================= */
+  /* =============== JSX =============== */
   return (
     <>
-      {/* ===== STATS ===== */}
+      {/* STATS */}
       <div className="inventory-stats">
         <div className="stat-card stat-total">
           <div className="stat-icon">📚</div>
@@ -150,12 +206,8 @@ export default function AllBooks() {
         <div className="stat-card stat-borrowed">
           <div className="stat-icon">📖</div>
           <div className="stat-content">
-            <div className="stat-number">
-              {borrowedBooksCount}
-            </div>
-            <div className="stat-label">
-              ספרים מושאלים
-            </div>
+            <div className="stat-number">{borrowedBooksCount}</div>
+            <div className="stat-label">ספרים מושאלים</div>
           </div>
         </div>
 
@@ -165,14 +217,12 @@ export default function AllBooks() {
             <div className="stat-number">
               {availableBooksCount}
             </div>
-            <div className="stat-label">
-              ספרים זמינים
-            </div>
+            <div className="stat-label">ספרים זמינים</div>
           </div>
         </div>
       </div>
 
-      {/* ===== ADD BOOK ===== */}
+      {/* ADD BOOK */}
       {isAdmin && (
         <div className="add-book-wrapper">
           <button
@@ -184,25 +234,26 @@ export default function AllBooks() {
         </div>
       )}
 
-      {/* ===== AGE FILTER ===== */}
+      {/* AGE FILTER */}
       <div className="age-filter">
         {ageGroups.map((age) => (
           <button
             key={age.id}
-            className={`age-btn ${ageGroupId === age.id ? "active" : ""
-              }`}
-            onClick={() =>
-              setAgeGroupId(
-                ageGroupId === age.id ? null : age.id
-              )
-            }
+            className={`age-btn ${
+              ageGroupId === age.id ? "active" : ""
+            }`}
+            onClick={() => {
+              const next = ageGroupId === age.id ? null : age.id;
+              orderRef.current = [];
+              setAgeGroupId(next);
+            }}
           >
             ★ {age.description}
           </button>
         ))}
       </div>
 
-      {/* ===== CLEAR FILTERS ===== */}
+      {/* CLEAR FILTERS */}
       {(categoryId || ageGroupId || search) && (
         <div className="clear-filters-wrapper">
           <button
@@ -210,6 +261,7 @@ export default function AllBooks() {
             onClick={() => {
               setCategoryId(null);
               setAgeGroupId(null);
+              orderRef.current = [];
               setCurrentPage(1);
             }}
           >
@@ -218,7 +270,7 @@ export default function AllBooks() {
         </div>
       )}
 
-      {/* ===== BOOKS GRID ===== */}
+      {/* BOOKS GRID */}
       <div className="books-grid">
         {loading ? (
           <div className="books-loading">
@@ -236,21 +288,23 @@ export default function AllBooks() {
             <BookItem
               key={book.id}
               book={book}
-              setBooks={setBooks}
               isAdmin={isAdmin}
+              onLocalBorrow={handleLocalBorrow}
+              onLocalReturn={handleLocalReturn}
             />
           ))
         )}
       </div>
 
-      {/* ===== PAGINATION ===== */}
+      {/* PAGINATION */}
       {!loading && totalPages > 1 && (
         <div className="pagination">
           <button
             disabled={currentPage === 1}
-            onClick={() =>
-              setCurrentPage((p) => p - 1)
-            }
+            onClick={() => {
+              orderRef.current = [];
+              setCurrentPage((p) => p - 1);
+            }}
           >
             הקודם
           </button>
@@ -258,10 +312,11 @@ export default function AllBooks() {
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
-              className={
-                currentPage === i + 1 ? "active" : ""
-              }
-              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => {
+                orderRef.current = [];
+                setCurrentPage(i + 1);
+              }}
             >
               {i + 1}
             </button>
@@ -269,16 +324,17 @@ export default function AllBooks() {
 
           <button
             disabled={currentPage === totalPages}
-            onClick={() =>
-              setCurrentPage((p) => p + 1)
-            }
+            onClick={() => {
+              orderRef.current = [];
+              setCurrentPage((p) => p + 1);
+            }}
           >
             הבא
           </button>
         </div>
       )}
 
-      {/* ===== CATEGORY MENU ===== */}
+      {/* CATEGORY MENU */}
       <div className="category-menu">
         <button
           className="menu-btn"
@@ -301,9 +357,10 @@ export default function AllBooks() {
                   categoryId === cat.id ? "active" : ""
                 }
                 onClick={() => {
-                  setCategoryId(
-                    cat.id === categoryId ? null : cat.id
-                  );
+                  const next =
+                    cat.id === categoryId ? null : cat.id;
+                  orderRef.current = [];
+                  setCategoryId(next);
                   setIsFilterOpen(false);
                 }}
               >

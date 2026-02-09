@@ -9,6 +9,8 @@ from fastapi import (
 )
 from utils.auth_helper import get_user
 from utils.admin_helper import get_admin_user
+from fastapi.encoders import jsonable_encoder
+
 from services.bookService import (
     get_books,
     get_random_books,
@@ -29,7 +31,6 @@ router = APIRouter(tags=["Book"])
 # =========================
 @router.post("/")
 async def add_book(
-    background_tasks: BackgroundTasks,
     admin=Depends(get_admin_user),
     title: str = Form(...),
     summary: str = Form(...),
@@ -52,17 +53,17 @@ async def add_book(
 
     new_book = create_book(data, image)
 
-    background_tasks.add_task(
-        sio.emit,
+    await sio.emit(
         "books_changed",
-        {
+        jsonable_encoder({
             "reason": "created",
-            "bookId": new_book.id,
-            "userId": admin.id,
-        },
+            "book": new_book,   # 👈 send full book
+            "userId": admin["id"],
+        }),
     )
 
     return new_book
+
 
 
 # =========================
@@ -71,7 +72,6 @@ async def add_book(
 @router.put("/{book_id}")
 async def edit_book(
     book_id: int,
-    background_tasks: BackgroundTasks,
     admin=Depends(get_admin_user),
     title: str | None = Form(None),
     summary: str | None = Form(None),
@@ -94,16 +94,17 @@ async def edit_book(
 
     updated = update_book(book_id, data, image)
 
-    background_tasks.add_task(
-        sio.emit,
+    await sio.emit(
         "books_changed",
-        {
+        jsonable_encoder({
             "reason": "updated",
-            "bookId": book_id
-        },
+            "book": updated,
+            "userId": admin["id"]
+        }),
     )
 
     return updated
+
 
 
 # =========================
@@ -112,13 +113,11 @@ async def edit_book(
 @router.delete("/{book_id}")
 async def remove_book(
     book_id: int,
-    background_tasks: BackgroundTasks,
     admin=Depends(get_admin_user),
 ):
     result = delete_book(book_id)
 
-    background_tasks.add_task(
-        sio.emit,
+    await sio.emit(
         "books_changed",
         {
             "reason": "deleted",
@@ -128,6 +127,7 @@ async def remove_book(
     )
 
     return result
+
 
 
 # =========================

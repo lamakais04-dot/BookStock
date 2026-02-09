@@ -1,4 +1,3 @@
-# services/adminService.py
 from typing import List, Optional
 from datetime import datetime
 
@@ -13,6 +12,49 @@ from models.borrow_history import BorrowHistory
 
 from schemas.admin_users import AdminUserRow, BorrowRow
 from schemas.admin_activity import ActivityRow
+
+
+# =========================
+# NEW: build single activity row for socket events
+# =========================
+def build_activity_row_for_event(
+    borrow_history_id: int,
+    action: str,  # "BORROW" or "RETURN"
+) -> ActivityRow:
+    """
+    Returns a single ActivityRow (date, action, user, book) for a given BorrowHistory row.
+    Used by borrow/return routes to emit full data to sockets.
+    """
+    with Session(engine) as session:
+        stmt = (
+            select(BorrowHistory, Users, books)
+            .join(Users, Users.id == BorrowHistory.user_id)
+            .join(books, books.id == BorrowHistory.book_id)
+            .where(BorrowHistory.id == borrow_history_id)
+        )
+        row = session.exec(stmt).first()
+        if not row:
+            raise HTTPException(status_code=404, detail="Borrow history not found")
+
+        h, u, b = row
+
+        if action == "BORROW":
+            d = h.borrowed_at
+        else:  # "RETURN"
+            d = h.returned_at
+
+        if d is None:
+            raise HTTPException(status_code=400, detail="Activity date is missing")
+
+        return ActivityRow(
+            date=d,              # full datetime, frontend will format
+            action=action,
+            user_id=u.id,
+            firstname=u.firstname,
+            lastname=u.lastname,
+            book_id=b.id,
+            title=b.title,
+        )
 
 
 # =========================
@@ -53,7 +95,6 @@ def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
         for uid in total_borrows:
             total_borrows_map[uid] = total_borrows_map.get(uid, 0) + 1
 
-        # 🔥🔥🔥 כאן היה הבאג – is_blocked לא הוחזר
         return [
             AdminUserRow(
                 id=u.id,
@@ -61,9 +102,7 @@ def admin_get_users_service(q: str = "") -> List[AdminUserRow]:
                 lastname=u.lastname,
                 email=u.email,
                 role=u.role,
-
-                is_blocked=u.is_blocked,  # ✅ חובה
-
+                is_blocked=u.is_blocked,
                 borrowed_now_count=borrowed_now_map.get(u.id, 0),
                 total_borrows=total_borrows_map.get(u.id, 0),
             )
@@ -130,10 +169,10 @@ def admin_activity_service(
             # BORROW
             if action in ("ALL", "BORROW"):
                 d = h.borrowed_at
-                if (not date_from or d >= date_from) and (not date_to or d <= date_to):
+                if d and (not date_from or d >= date_from) and (not date_to or d <= date_to):
                     events.append(
                         ActivityRow(
-                            date=d,
+                            date=d,          # full datetime
                             action="BORROW",
                             user_id=u.id,
                             firstname=u.firstname,
@@ -146,10 +185,10 @@ def admin_activity_service(
             # RETURN
             if h.returned_at and action in ("ALL", "RETURN"):
                 d = h.returned_at
-                if (not date_from or d >= date_from) and (not date_to or d <= date_to):
+                if d and (not date_from or d >= date_from) and (not date_to or d <= date_to):
                     events.append(
                         ActivityRow(
-                            date=d,
+                            date=d,          # full datetime
                             action="RETURN",
                             user_id=u.id,
                             firstname=u.firstname,

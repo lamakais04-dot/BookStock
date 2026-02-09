@@ -40,12 +40,15 @@ export default function Profile() {
     loadData();
   }, [loadBorrowedBooks]);
 
-  /* Live updates when this user borrows/returns in another tab */
+  /* Live updates when this user borrows/returns in another tab / by admin */
   useEffect(() => {
     function handleBorrowReturnChanged(data) {
-      if (!user || data?.user_id !== user.id) return;
+      // if event belongs to current user – do nothing (local UI already updated)
+      if (!user || data?.user_id === user.id) return;
+
+      // only reload when some other user/admin changed this user's loans
       loadBorrowedBooks();
-      fetchUser(); // refresh canBorrow / borrowedBooks in context
+      fetchUser();
     }
 
     socket.on("borrow_return_changed", handleBorrowReturnChanged);
@@ -95,7 +98,9 @@ export default function Profile() {
 
       <div className="floating-books">
         {[...Array(30)].map((_, i) => (
-          <div key={i} className={`floating-book fb-${i + 1}`}>📚</div>
+          <div key={i} className={`floating-book fb-${i + 1}`}>
+            📚
+          </div>
         ))}
       </div>
 
@@ -214,7 +219,7 @@ export default function Profile() {
                 onClick={async () => {
                   if (isBlocked) {
                     setErrorMsg(
-                      "החשבון שלך חסום — לא ניתן לשמור שינויים",
+                      "החשבון שלך חסום — לא ניתן לשמור שינויים"
                     );
                     return;
                   }
@@ -233,7 +238,7 @@ export default function Profile() {
                 onClick={() => {
                   if (isBlocked) {
                     setErrorMsg(
-                      "החשבון שלך חסום — לא ניתן לערוך פרטים",
+                      "החשבון שלך חסום — לא ניתן לערוך פרטים"
                     );
                     return;
                   }

@@ -60,6 +60,7 @@ def login(
 ):
     # If already logged in, block login
     if user:
+        print("user exists")
         raise HTTPException(status_code=400, detail="Already logged in")
     return login_user(login_req, response)
 
