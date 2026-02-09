@@ -84,7 +84,7 @@
     position: absolute;
     top: 40px;
     left: 50px;
-    z-index: 2;
+    z-index: 1000;
     
     display: inline-flex;
     align-items: center;

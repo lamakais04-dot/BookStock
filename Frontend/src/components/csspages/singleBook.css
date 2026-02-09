@@ -1,6 +1,6 @@
 /* ===============================
-   SINGLE BOOK PAGE - IMPROVED
-   עיצוב מודרני ומלוטש
+   SINGLE BOOK PAGE - עיצוב רך ומודרני
+   מעוגל, צבעוני ועקבי עם העיצוב הכללי
 ================================ */
 
 :root {
@@ -150,16 +150,30 @@
   max-width: 1300px;
   margin: 0 auto;
   background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
+  border-radius: 32px;
+  padding: 50px;
   box-shadow: var(--shadow-xl);
-  border: 1px solid rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(139, 69, 19, 0.08);
   display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 40px;
+  grid-template-columns: 420px 1fr;
+  gap: 50px;
   animation: fadeInUp 0.6s ease-out;
   position: relative;
   z-index: 1;
+}
+
+/* כאשר יש רק book-details (מצב עריכה או הוספה) */
+.single-book:has(.book-details:only-child) {
+  grid-template-columns: 1fr;
+  max-width: 900px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.single-book:has(.book-details:only-child) .book-details {
+  width: 100%;
+  max-width: 800px;
 }
 
 @keyframes fadeInUp {
@@ -173,95 +187,29 @@
   }
 }
 
-/* ספרים מעוטרים בפינות */
-.single-book::before {
-  content: '📖';
-  position: absolute;
-  top: -25px;
-  right: -25px;
-  font-size: 50px;
-  filter: drop-shadow(0 4px 12px rgba(139, 69, 19, 0.3));
-  animation: bookRotate 4s ease-in-out infinite;
-  z-index: 2;
-}
-
-.single-book::after {
-  content: '📚';
-  position: absolute;
-  bottom: -25px;
-  left: -25px;
-  font-size: 50px;
-  filter: drop-shadow(0 4px 12px rgba(139, 69, 19, 0.3));
-  animation: bookRotate 4s ease-in-out infinite reverse;
-  z-index: 2;
-}
-
-@keyframes bookRotate {
-  0%, 100% {
-    transform: rotate(-5deg) scale(1);
-  }
-  50% {
-    transform: rotate(5deg) scale(1.05);
-  }
-}
-
 /* ===============================
    IMAGE
 ================================ */
 .book-image {
   width: 100%;
   aspect-ratio: 3/4;
-  border-radius: 16px;
+  border-radius: 24px;
   background: linear-gradient(135deg, #fef9f3, #fff);
   box-shadow: var(--shadow-lg);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 16px;
+  padding: 20px;
   border: 2px solid rgba(139, 69, 19, 0.1);
   transition: all 0.3s ease;
   position: relative;
 }
 
-/* אפקט כוכבים על hover */
-.book-image::before {
-  content: '✨';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 30px;
-  opacity: 0;
-  transform: scale(0) rotate(0deg);
-  transition: all 0.4s ease;
-  z-index: 10;
-}
-
-.book-image::after {
-  content: '✨';
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  font-size: 30px;
-  opacity: 0;
-  transform: scale(0) rotate(0deg);
-  transition: all 0.4s ease;
-  z-index: 10;
-}
-
-.book-image:hover::before {
-  opacity: 1;
-  transform: scale(1) rotate(20deg);
-}
-
-.book-image:hover::after {
-  opacity: 1;
-  transform: scale(1) rotate(-20deg);
-}
-
 .book-image:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 48px rgba(139, 69, 19, 0.3);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 24px 56px rgba(139, 69, 19, 0.25);
+  border-color: var(--accent);
 }
 
 .book-image img {
@@ -269,9 +217,12 @@
   max-height: 100%;
   object-fit: contain;
   display: block;
-  border-radius: 12px;
-  position: relative;
-  z-index: 1;
+  border-radius: 16px;
+  transition: transform 0.3s ease;
+}
+
+.book-image:hover img {
+  transform: scale(1.05);
 }
 
 /* ===============================
@@ -280,38 +231,44 @@
 .book-details {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* ===============================
-   TITLE - נקי ללא אימוג'י
+   TITLE - כותרת מרכזית
 ================================ */
 .book-title {
-  font-size: 42px;
-  font-weight: 800;
+  font-size: 48px;
+  font-weight: 900;
   background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0;
   line-height: 1.2;
+  text-align: center;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--bg-secondary);
 }
 
 /* ===============================
-   AUTHOR - עיצוב כמו info-item
+   AUTHOR
 ================================ */
 .book-author {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text-primary);
   background: linear-gradient(135deg, var(--bg-secondary), #fff);
-  padding: 18px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
+  padding: 16px 28px;
+  border-radius: 50px;
+  border: 2px solid var(--border);
   box-shadow: var(--shadow-sm);
   width: fit-content;
-  margin: 0;
+  margin: 0 auto;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .book-author:hover {
@@ -321,24 +278,25 @@
 }
 
 /* ===============================
-   SUMMARY - ללא אימוג'י ספר
+   SUMMARY
 ================================ */
 .book-summary {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.8;
   color: var(--text-primary);
   background: var(--bg-secondary);
-  padding: 20px;
-  border-radius: 16px;
-  border-right: 4px solid var(--primary);
+  padding: 24px 28px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
   box-shadow: var(--shadow-sm);
-  position: relative;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .book-summary:hover {
   box-shadow: var(--shadow-md);
-  transform: translateX(-4px);
+  transform: translateY(-2px);
+  border-color: var(--accent);
 }
 
 /* ===============================
@@ -347,16 +305,17 @@
 .book-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 
 .info-item {
   background: linear-gradient(135deg, var(--bg-secondary), #fff);
-  padding: 18px 20px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
+  padding: 20px 24px;
+  border-radius: 18px;
+  border: 2px solid var(--border);
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .info-item:hover {
@@ -366,35 +325,35 @@
 }
 
 .info-label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-weight: 700;
+  margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .info-value {
-  font-size: 20px;
+  font-size: 26px;
   color: var(--text-primary);
-  font-weight: 800;
+  font-weight: 900;
 }
 
 /* ===============================
-   ACTIONS - כפתורים משופרים
+   ACTIONS - כפתורים
 ================================ */
 .book-actions {
   display: flex;
-  gap: 14px;
-  margin-top: 24px;
+  gap: 16px;
+  margin-top: 28px;
 }
 
 .book-actions button {
   flex: 1;
   padding: 18px 32px;
   font-size: 17px;
-  font-weight: 700;
-  border-radius: 16px;
+  font-weight: 800;
+  border-radius: 50px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -403,9 +362,23 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   font-family: inherit;
+  box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+}
+
+.book-actions button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0);
+  border-radius: 50%;
+  transition: transform 0.5s ease;
+}
+
+.book-actions button:hover::before {
+  transform: scale(2);
 }
 
 /* כפתור השאלה */
@@ -416,35 +389,38 @@
 
 .book-actions button:first-child:hover:not(:disabled) {
   background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(46, 204, 113, 0.4);
 }
 
 .book-actions button:first-child:disabled {
   background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
+}
+
+.book-actions button:first-child:disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-md);
 }
 
 /* כפתור מועדפים */
 .book-actions button:last-child {
-  background: white;
+  background: linear-gradient(135deg, #fff, var(--bg-secondary));
   color: var(--primary);
   border: 2px solid var(--primary);
-  box-shadow: var(--shadow-sm);
 }
 
 .book-actions button:last-child:hover {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: white;
-  border-color: transparent;
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
-/* אפקט לחיצה */
+/* לחיצה */
 .book-actions button:active:not(:disabled) {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-2px) scale(0.98);
 }
 
 /* ===============================
@@ -454,8 +430,8 @@
   width: 100%;
   padding: 18px 32px;
   font-size: 17px;
-  font-weight: 700;
-  border-radius: 16px;
+  font-weight: 800;
+  border-radius: 50px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -464,7 +440,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
   font-family: inherit;
-  margin-top: 24px;
+  margin-top: 28px;
   background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
   color: white;
   box-shadow: var(--shadow-md);
@@ -472,27 +448,27 @@
 
 .edit-toggle-button:hover {
   background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(243, 156, 18, 0.4);
 }
 
 .edit-toggle-button:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-2px) scale(0.98);
 }
 
-/* כפתור ביטול עריכה */
+/* כפתור ביטול */
 .cancel-button {
   width: 100%;
   padding: 18px 32px;
   font-size: 17px;
-  font-weight: 700;
-  border-radius: 16px;
+  font-weight: 800;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid var(--danger);
   font-family: inherit;
   margin-top: 16px;
-  background: white;
+  background: linear-gradient(135deg, #fff, #fee2e2);
   color: var(--danger);
   box-shadow: var(--shadow-sm);
 }
@@ -500,27 +476,28 @@
 .cancel-button:hover {
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   color: white;
-  border-color: transparent;
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
 .cancel-button:active {
-  transform: translateY(-1px) scale(0.98);
+  transform: translateY(-2px) scale(0.98);
 }
 
 /* ===============================
-   SUCCESS/ERROR MESSAGES
+   MESSAGES
 ================================ */
 .borrow-success,
-.borrow-error {
-  padding: 16px 20px;
-  border-radius: 14px;
+.borrow-error,
+.blocked-on-page-message {
+  padding: 16px 24px;
+  border-radius: 16px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
   animation: slideIn 0.3s ease;
-  margin-top: 16px;
+  margin-top: 20px;
+  border: 2px solid;
 }
 
 @keyframes slideIn {
@@ -537,17 +514,18 @@
 .borrow-success {
   background: linear-gradient(135deg, #d1fae5, #a7f3d0);
   color: #065f46;
-  border: 2px solid var(--success);
+  border-color: var(--success);
 }
 
-.borrow-error {
+.borrow-error,
+.blocked-on-page-message {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   color: #991b1b;
-  border: 2px solid var(--danger);
+  border-color: var(--danger);
 }
 
 /* ===============================
-   MODAL - SUCCESS/ERROR MESSAGES
+   MODAL
 ================================ */
 .modal-overlay {
   position: fixed;
@@ -572,8 +550,8 @@
 
 .modal-content {
   background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
+  border-radius: 32px;
+  padding: 50px;
   max-width: 500px;
   width: 90%;
   box-shadow: var(--shadow-xl);
@@ -594,8 +572,8 @@
 }
 
 .modal-icon {
-  font-size: 80px;
-  margin-bottom: 20px;
+  font-size: 100px;
+  margin-bottom: 24px;
   animation: iconPop 0.5s ease;
   display: block;
 }
@@ -613,8 +591,8 @@
 }
 
 .modal-title {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 32px;
+  font-weight: 900;
   color: var(--text-primary);
   margin-bottom: 12px;
   background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
@@ -627,13 +605,13 @@
   font-size: 17px;
   color: var(--text-secondary);
   line-height: 1.6;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .modal-close-button {
-  padding: 14px 32px;
-  font-size: 15px;
-  font-weight: 700;
+  padding: 16px 40px;
+  font-size: 16px;
+  font-weight: 800;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -645,7 +623,7 @@
 }
 
 .modal-close-button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -658,8 +636,8 @@
 ================================ */
 @media (max-width: 1200px) {
   .single-book {
-    grid-template-columns: 350px 1fr;
-    gap: 32px;
+    grid-template-columns: 380px 1fr;
+    gap: 40px;
   }
 }
 
@@ -674,28 +652,23 @@
   }
 
   .single-book {
-    padding: 32px;
+    padding: 40px;
   }
 }
 
 @media (max-width: 900px) {
   .single-book {
     grid-template-columns: 1fr;
-    align-items: center;
+    padding: 36px;
   }
 
   .book-image {
-    max-width: 380px;
+    max-width: 420px;
     margin: 0 auto;
   }
 
   .book-title {
-    font-size: 36px;
-    text-align: center;
-  }
-
-  .book-author {
-    margin: 0 auto;
+    font-size: 40px;
   }
 
   .book-actions {
@@ -716,7 +689,8 @@
   }
 
   .single-book {
-    padding: 28px;
+    padding: 32px;
+    border-radius: 24px;
   }
 
   /* הסתרת הספרים המרחפים במובייל */
@@ -724,56 +698,60 @@
     display: none;
   }
 
-  .single-book::before,
-  .single-book::after {
-    font-size: 35px;
+  .book-title {
+    font-size: 36px;
+  }
+
+  .book-author {
+    font-size: 18px;
+  }
+
+  .book-summary {
+    font-size: 16px;
+  }
+
+  .book-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    padding: 36px;
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .single-book {
+    padding: 24px;
   }
 
   .book-title {
     font-size: 32px;
   }
 
-  .book-info-grid {
-    grid-template-columns: 1fr;
+  .info-value {
+    font-size: 22px;
   }
 }
 
-/* ריווח בין כרטיסי מידע */
-.book-info-grid {
-  gap: 16px;
+/* ===============================
+   NEW BOOK MODE - מצב הוספת ספר חדש
+================================ */
+
+/* כאשר אין תמונה - רק טופס */
+.single-book > .book-details:first-child:last-child {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-/* ריווח בין כפתורים */
-.book-actions {
+.single-book:has(.book-details:only-child) {
   display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  grid-template-columns: none;
 }
 
-/* ריווח בין שורות טופס בעריכה */
-.edit-form-local input,
-.edit-form-local textarea,
-.edit-form-local select {
-  margin-bottom: 12px;
-}
-
-/* ריווח בין בלוקים בטופס */
-.edit-form-local .form-row {
-  gap: 12px;
-}
-.blocked-on-page-message {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #ef9a9a;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.single-book .book-details:only-child {
+  width: 100%;
+  max-width: 900px;
 }

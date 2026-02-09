@@ -29,7 +29,9 @@ export default function SingleBook() {
   const [error, setError] = useState("");
   const [book, setBook] = useState(null);
 
-  const isBorrowedByMe = !isNew && Boolean(user?.borrowedBooks?.includes(Number(id)));
+  const isBorrowedByMe = Boolean(
+    user?.borrowedBooks?.includes(Number(id))
+  );
 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
@@ -46,12 +48,10 @@ export default function SingleBook() {
         if (!isNew) {
           const bookData = await Books.getBookById(id);
           setBook(bookData);
-        } else {
-          setBook(null);
         }
       } catch (err) {
         console.error(err);
-        setError("שגיאה בטעינת הספר");
+        setError("שגיאה בטעינת הנתונים");
       } finally {
         setLoading(false);
       }
@@ -134,7 +134,8 @@ export default function SingleBook() {
     }
   };
 
-  /* ================= ADMIN CREATE / UPDATE ================= */
+  /* ================= ADMIN ================= */
+
   const handleUpdateBook = async (formData) => {
     try {
       await Books.updateBook(book.id, formData);
@@ -146,12 +147,12 @@ export default function SingleBook() {
     }
   };
 
-  const handleCreateBook = async (formData) => {
+  const handleAddBook = async (formData) => {
     try {
       await Books.addBook(formData);
       navigate("/book");
     } catch {
-      setError("שגיאה ביצירת הספר");
+      setError("שגיאה בהוספת ספר");
     }
   };
 
@@ -159,11 +160,35 @@ export default function SingleBook() {
   if (loading) {
     return <div className="loading-container" />;
   }
-  if (!isNew && !book) {
-    return <div className="loading-container" />;
+
+  /* ================= ADD NEW BOOK ================= */
+  if (isNew && isAdmin) {
+    return (
+      <div className="single-book-container">
+        <button className="back-button" onClick={() => navigate("/book")}>
+          ← חזרה
+        </button>
+
+        <div className="single-book">
+          <div className="book-details">
+            <h1 className="book-title">➕ הוספת ספר חדש</h1>
+
+            <BookForm
+              categories={categories}
+              ageGroups={ageGroups}
+              onSubmit={handleAddBook}
+            />
+
+            {error && <p className="borrow-error">{error}</p>}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  /* ================= JSX ================= */
+  /* ================= VIEW / EDIT BOOK ================= */
+  if (!book) return null;
+
   return (
     <div className="single-book-container">
       <button className="back-button" onClick={() => navigate("/book")}>
@@ -178,8 +203,7 @@ export default function SingleBook() {
         </div>
 
         <div className="book-details">
-          {/* ===== CREATE / EDIT MODE (ADMIN ONLY) ===== */}
-          {isAdmin && (isNew || isEditMode) ? (
+          {isAdmin && isEditMode ? (
             <>
               <h1 className="book-title">
                 {isNew ? "הוסף ספר חדש" : "עריכת ספר"}
@@ -206,7 +230,9 @@ export default function SingleBook() {
               <h1 className="book-title">{book.title}</h1>
               <p className="book-author">{book.author}</p>
 
-              {book.summary && <p className="book-summary">{book.summary}</p>}
+              {book.summary && (
+                <p className="book-summary">{book.summary}</p>
+              )}
 
               <div className="book-info-grid">
                 <div className="info-item">
@@ -236,7 +262,6 @@ export default function SingleBook() {
                 </div>
               </div>
 
-              {/* ===== ACTIONS ===== */}
               {isAdmin ? (
                 <button
                   className="edit-toggle-button"

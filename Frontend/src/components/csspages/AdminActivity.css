@@ -4,12 +4,11 @@
 .admin-activity-page {
     min-height: 100vh;
     background: linear-gradient(180deg, #fef6e7 0%, #fff9ed 50%, #fef3e2 100%);
-    padding: 120px 20px 60px;
+    padding: 120px 40px 60px;
     direction: rtl;
     position: relative;
 }
 
-/* רקע עם ספרים מרחפים */
 .admin-activity-page::before {
     content: '';
     position: fixed;
@@ -25,79 +24,10 @@
    CONTAINER
 ================================ */
 .admin-activity-container {
-    max-width: 95%;
+    max-width: 1400px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
-}
-
-/* ===============================
-   BACK BUTTON
-================================ */
-.back-button {
-  position: fixed;
-  top: 120px;
-
-  left: 24px;        /* שמאל אמיתי */
-  right: auto;       /* 🔴 חובה – מבטל RTL */
-
-  direction: ltr;    /* 🔴 מונע היפוך חצים/טקסט */
-
-  padding: 0.6rem 1.4rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #fef3e2 0%, #fdefd5 100%);
-  color: #8b4513;
-  border: 2px solid #8b4513;
-  border-radius: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  box-shadow: 0 3px 10px rgba(139, 69, 19, 0.14);
-  transition: all 0.3s ease;
-  z-index: 1000;
-}
-
-
-.back-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    transition: left 0.5s;
-}
-
-.back-button:hover::before {
-    left: 100%;
-}
-
-.back-button:hover {
-    background: linear-gradient(135deg, #8b4513, #a05a2c);
-    color: #fff;
-    transform: translateY(-3px) translateX(-5px);
-    box-shadow: 0 10px 28px rgba(139, 69, 19, 0.3);
-}
-
-.back-button:active {
-    transform: translateY(-1px) translateX(-3px);
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
-}
-
-.back-arrow {
-    font-size: 20px;
-    transition: transform 0.3s ease;
-}
-
-.back-button:hover .back-arrow {
-    transform: translateX(-5px);
-}
-
-.back-text {
-    font-weight: 700;
 }
 
 /* ===============================
@@ -108,7 +38,7 @@
     padding: 40px 50px;
     border-radius: 28px;
     box-shadow: 0 20px 60px rgba(139, 69, 19, 0.35);
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     color: white;
     text-align: center;
     position: relative;
@@ -124,6 +54,7 @@
     height: 200%;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     animation: rotate-glow 20s linear infinite;
+    pointer-events: none;
 }
 
 @keyframes rotate-glow {
@@ -133,10 +64,48 @@
 
 .admin-activity-header h1 {
     font-size: 36px;
-    margin: 0;
+    font-weight: 800;
+    margin: 0 0 12px 0;
     position: relative;
-    z-index: 1;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.header-subtitle {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.95;
+    position: relative;
+    z-index: 2;
+    font-weight: 500;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    position: absolute;
+    top: 22px;
+    left: 28px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.18);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn:active {
+    transform: translateX(-2px);
 }
 
 /* ===============================
@@ -147,21 +116,37 @@
     padding: 32px 40px;
     border-radius: 24px;
     box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     border: 2px solid rgba(139, 69, 19, 0.1);
 }
 
 .filters-row {
     display: flex;
-    gap: 20px;
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
     flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #5d3a1a;
+    display: block;
 }
 
 /* SELECT */
 .admin-activity-filters select {
     padding: 14px 20px;
-    padding-left: 40px; /* מקום לחץ */
+    padding-right: 40px;
     font-size: 16px;
     font-weight: 600;
     color: #5d3a1a;
@@ -174,14 +159,12 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
     
-    min-width: 160px;
+    width: 100%;
     
-    /* הסרת החץ הדיפולטיבי */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     
-    /* חץ מותאם אישית */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b4513' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: left 16px center;
@@ -198,88 +181,85 @@
     border-color: #a05a2c;
 }
 
-/* INPUT */
-.admin-activity-filters input {
-    padding: 14px 20px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #5d3a1a;
-    
-    background: linear-gradient(135deg, #fff, #fdf8f0);
-    border: 2px solid #d4a574;
-    border-radius: 16px;
-    
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
-    
-    width: 280px;
+/* EXPORT BUTTONS */
+.export-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.admin-activity-filters input::placeholder {
-    color: #a0826d;
-}
-
-.admin-activity-filters input:focus {
-    outline: none;
-    border-color: #8b4513;
-    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.2);
-    transform: translateY(-2px);
-}
-
-/* BUTTONS */
-.admin-activity-filters button {
-    padding: 14px 28px;
+.export-btn {
+    padding: 14px 24px;
     font-size: 15px;
     font-weight: 700;
-    color: #5d3a1a;
-    
-    background: linear-gradient(135deg, #fff, #fdf8f0);
-    border: 2px solid #8b4513;
     border-radius: 16px;
-    
     cursor: pointer;
+    border: 2px solid;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 6px 16px rgba(139, 69, 19, 0.15);
-    
     position: relative;
     overflow: hidden;
+    white-space: nowrap;
 }
 
-.admin-activity-filters button::before {
+.export-btn::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: left 0.5s;
 }
 
-.admin-activity-filters button:hover::before {
+.export-btn:hover::before {
     left: 100%;
 }
 
-.admin-activity-filters button:hover {
-    background: linear-gradient(135deg, #8b4513, #a05a2c);
-    color: #fff;
+.export-btn.excel {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    border-color: #66bb6a;
+    color: #2e7d32;
+    box-shadow: 0 6px 16px rgba(102, 187, 106, 0.25);
+}
+
+.export-btn.excel:hover {
+    background: linear-gradient(135deg, #66bb6a, #4caf50);
+    color: white;
     transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(139, 69, 19, 0.3);
+    box-shadow: 0 10px 28px rgba(102, 187, 106, 0.4);
 }
 
-.admin-activity-filters button:active {
+.export-btn.pdf {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border-color: #ef5350;
+    color: #c62828;
+    box-shadow: 0 6px 16px rgba(239, 83, 80, 0.25);
+}
+
+.export-btn.pdf:hover {
+    background: linear-gradient(135deg, #ef5350, #e53935);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(239, 83, 80, 0.4);
+}
+
+.export-btn.print {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-color: #64b5f6;
+    color: #1565c0;
+    box-shadow: 0 6px 16px rgba(100, 181, 246, 0.25);
+}
+
+.export-btn.print:hover {
+    background: linear-gradient(135deg, #64b5f6, #42a5f5);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(100, 181, 246, 0.4);
+}
+
+.export-btn:active {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
-}
-
-/* ===============================
-   DIVIDER
-================================ */
-.admin-activity-divider {
-    border: none;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #d4a574, transparent);
-    margin: 40px 0;
 }
 
 /* ===============================
@@ -288,21 +268,54 @@
 .admin-activity-loading {
     text-align: center;
     padding: 80px 20px;
-    font-size: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(139, 69, 19, 0.1);
+    border-top-color: #8b4513;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.admin-activity-loading p {
+    font-size: 20px;
     font-weight: 600;
     color: #8b4513;
+    margin: 0;
 }
 
-.admin-activity-loading::after {
-    content: '...';
-    display: inline-block;
-    animation: dots 1.5s steps(3, end) infinite;
+/* ===============================
+   EMPTY STATE
+================================ */
+.admin-activity-empty {
+    text-align: center;
+    padding: 80px 40px;
+    color: #8b6f47;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
+    border: 2px solid rgba(139, 69, 19, 0.1);
 }
 
-@keyframes dots {
-    0%, 20% { content: '.'; }
-    40% { content: '..'; }
-    60%, 100% { content: '...'; }
+.admin-activity-empty-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.admin-activity-empty-text {
+    font-size: 20px;
+    font-weight: 600;
 }
 
 /* ===============================
@@ -311,15 +324,29 @@
 .admin-activity-table-wrapper {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 24px;
-    padding: 20px;
     box-shadow: 0 12px 40px rgba(139, 69, 19, 0.15);
     overflow: hidden;
     border: 2px solid rgba(139, 69, 19, 0.1);
 }
 
+.table-header-info {
+    padding: 20px 28px;
+    background: linear-gradient(135deg, #fef9f3, #fef6e7);
+    border-bottom: 2px solid rgba(139, 69, 19, 0.1);
+}
+
+.total-count {
+    font-size: 16px;
+    font-weight: 700;
+    color: #5d3a1a;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .admin-activity-table-scroll {
     overflow-x: auto;
-    border-radius: 16px;
+    padding: 20px;
 }
 
 /* Custom scrollbar */
@@ -345,23 +372,25 @@
    TABLE
 ================================ */
 .admin-activity-table {
+    width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 15px;
+    min-width: 800px;
 }
 
 /* THEAD */
 .admin-activity-table thead {
     background: linear-gradient(135deg, #8b4513, #a05a2c);
-    color: white;
 }
 
 .admin-activity-table th {
-    padding: 14px 12px;
+    padding: 18px 20px;
     font-size: 15px;
     font-weight: 700;
     text-align: right;
-    border-bottom: 3px solid #d4a574;
+    color: white;
+    border-bottom: 3px solid #7a3d0f;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     white-space: nowrap;
 }
@@ -391,11 +420,15 @@
 }
 
 .admin-activity-table td {
-    padding: 12px 12px;
-    border-bottom: 1px solid #f0e5d8;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.08);
     color: #5d3a1a;
     font-weight: 500;
     vertical-align: middle;
+}
+
+.admin-activity-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .admin-activity-table tbody tr:last-child td:first-child {
@@ -406,54 +439,84 @@
     border-bottom-left-radius: 12px;
 }
 
-/* טקסט תאריך */
-.admin-activity-table td:first-child {
+/* DATE CELL */
+.date-cell {
     font-size: 14px;
     color: #8b6f47;
     font-weight: 600;
+    white-space: nowrap;
 }
 
-/* אייקוני פעולה */
+/* ACTION BADGE */
 .activity-action {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 16px;
+    padding: 8px 18px;
     border-radius: 20px;
     font-weight: 700;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 .activity-action.borrow {
     background: linear-gradient(135deg, #e3f2fd, #bbdefb);
     color: #1565c0;
     border: 2px solid #64b5f6;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
 }
 
 .activity-action.return {
     background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
     color: #2e7d32;
     border: 2px solid #66bb6a;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
 }
 
-/* ===============================
-   EMPTY STATE
-================================ */
-.admin-activity-empty {
-    text-align: center;
-    padding: 80px 40px;
+/* USER CELL */
+.user-cell {
+    text-align: right;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #5d3a1a;
+}
+
+.user-id {
+    font-size: 13px;
     color: #8b6f47;
+    font-weight: 500;
 }
 
-.admin-activity-empty-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    opacity: 0.3;
+/* BOOK CELL */
+.book-cell {
+    text-align: right;
 }
 
-.admin-activity-empty-text {
-    font-size: 20px;
-    font-weight: 600;
+.book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.book-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #5d3a1a;
+}
+
+.book-id {
+    font-size: 13px;
+    color: #8b6f47;
+    font-weight: 500;
 }
 
 /* ===============================
@@ -465,9 +528,10 @@
         padding: 20px;
     }
     
-    .back-button,
+    .back-btn,
     .admin-activity-filters,
-    .admin-activity-header::before {
+    .admin-activity-header::before,
+    .table-header-info {
         display: none;
     }
     
@@ -492,8 +556,8 @@
    RESPONSIVE
 ================================ */
 @media (max-width: 1024px) {
-    .admin-activity-page {
-        padding: 100px 30px 40px;
+    .admin-activity-container {
+        max-width: 100%;
     }
     
     .admin-activity-header {
@@ -511,21 +575,27 @@
 
 @media (max-width: 768px) {
     .admin-activity-page {
-        padding: 90px 20px 30px;
+        padding: 100px 20px 40px;
     }
     
-    .back-button {
-        padding: 10px 20px;
-        font-size: 15px;
+    .back-btn {
+        top: 16px;
+        left: 16px;
+        padding: 8px 16px;
+        font-size: 14px;
     }
     
     .admin-activity-header {
-        padding: 24px 28px;
+        padding: 30px 25px;
         border-radius: 20px;
     }
     
     .admin-activity-header h1 {
         font-size: 26px;
+    }
+    
+    .header-subtitle {
+        font-size: 14px;
     }
     
     .admin-activity-filters {
@@ -537,41 +607,46 @@
         align-items: stretch;
     }
     
-    .admin-activity-filters select,
-    .admin-activity-filters input,
-    .admin-activity-filters button {
+    .filter-group {
         width: 100%;
     }
     
-    .admin-activity-table-wrapper {
-        padding: 20px;
+    .export-buttons {
+        width: 100%;
+        justify-content: stretch;
+    }
+    
+    .export-btn {
+        flex: 1;
+    }
+    
+    .table-header-info {
+        padding: 16px 20px;
+    }
+    
+    .admin-activity-table-scroll {
+        padding: 16px;
     }
     
     .admin-activity-table th,
     .admin-activity-table td {
-        padding: 12px 14px;
+        padding: 14px 16px;
         font-size: 14px;
     }
     
     .activity-action {
         font-size: 13px;
-        padding: 5px 12px;
+        padding: 6px 14px;
     }
 }
 
 @media (max-width: 480px) {
     .admin-activity-page {
-        padding: 80px 16px 24px;
-    }
-    
-    .back-button {
-        padding: 8px 16px;
-        font-size: 14px;
-        gap: 6px;
+        padding: 90px 16px 30px;
     }
     
     .admin-activity-header {
-        padding: 20px 24px;
+        padding: 24px 20px;
     }
     
     .admin-activity-header h1 {
@@ -582,13 +657,22 @@
         padding: 16px 20px;
     }
     
-    .admin-activity-table th,
-    .admin-activity-table td {
-        padding: 10px 12px;
-        font-size: 13px;
+    .export-buttons {
+        flex-direction: column;
+        gap: 10px;
     }
     
-    .admin-activity-table th {
-        font-size: 14px;
+    .export-btn {
+        width: 100%;
+    }
+    
+    .admin-activity-table {
+        min-width: 700px;
+    }
+    
+    .admin-activity-table th,
+    .admin-activity-table td {
+        padding: 12px 14px;
+        font-size: 13px;
     }
 }
