@@ -29,10 +29,21 @@ const HomePage = () => {
     loadRandomBooks();
   }, [loadRandomBooks]);
 
-  // live refresh when books change (admin edits, borrow/return)
+  // OPTIONAL: live refresh when catalog changes (NOT on borrow/return)
   useEffect(() => {
-    function handleBooksChanged() {
-      loadRandomBooks();
+    function handleBooksChanged(payload) {
+      // ignore events from current user
+      if (payload?.userId && payload.userId === user?.id) return;
+
+      // Only reload when books are created/updated/deleted.
+      if (
+        payload?.reason === "created" ||
+        payload?.reason === "updated" ||
+        payload?.reason === "deleted"
+      ) {
+        loadRandomBooks();
+      }
+      // BORROWED / RETURNED are ignored so UI stays local and no “reload”
     }
 
     socket.on("books_changed", handleBooksChanged);
@@ -40,7 +51,7 @@ const HomePage = () => {
     return () => {
       socket.off("books_changed", handleBooksChanged);
     };
-  }, [loadRandomBooks]);
+  }, [loadRandomBooks, user?.id]);
 
   const handleSearchClick = () => {
     navigate("/book");

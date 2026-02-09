@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 from fastapi import HTTPException
 from sqlalchemy import update
 from datetime import datetime
+from fastapi.encoders import jsonable_encoder
 
 from db import engine
 from models.library import Library
@@ -16,7 +17,6 @@ def can_borrow(user_id: int) -> bool:
     """
     Returns True if the user can borrow another book (less than 2 borrowed).
     """
-
     with Session(engine) as session:
         library = session.exec(
             select(Library).where(Library.userid == user_id)
@@ -85,6 +85,7 @@ def borrow_book(user_id: int, book_id: int):
         session.add(history)
 
         session.commit()
+        session.refresh(history)  # <-- ensure id is loaded
 
         borrowed_books = [
             b for b in [library.book1id, library.book2id] if b is not None
@@ -94,6 +95,8 @@ def borrow_book(user_id: int, book_id: int):
             "message": "📚 הספר הושאל בהצלחה",
             "borrowedBooks": borrowed_books,
             "canBorrow": len(borrowed_books) < 2,
+            # NEW: id for admin activity socket
+            "borrow_history_id": history.id,
         }
 
 
@@ -146,6 +149,8 @@ def get_user_borrowed_books(user_id: int):
 # Return book
 # =========================
 def return_book(user_id: int, book_id: int):
+    print("user id in return book",user_id)
+    print("book id in return book",book_id)
     with Session(engine) as session:
         # check book
         book = session.exec(
@@ -195,6 +200,7 @@ def return_book(user_id: int, book_id: int):
         history.returned_at = datetime.utcnow()
 
         session.commit()
+        session.refresh(history)  # <-- ensure id & returned_at updated
 
         borrowed_books = [
             b for b in [library.book1id, library.book2id] if b is not None
@@ -209,4 +215,6 @@ def return_book(user_id: int, book_id: int):
             "borrowedBooks": borrowed_books,
             "canBorrow": len(borrowed_books) < 2,
             "newQuantity": new_qty,
+            # NEW: id for admin activity socket
+            "borrow_history_id": history.id,
         }

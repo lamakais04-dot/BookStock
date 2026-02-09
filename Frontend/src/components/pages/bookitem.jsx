@@ -12,7 +12,10 @@ function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-icon confirm">⚠️</div>
         <h2 className="modal-title">אישור מחיקה</h2>
         <p className="modal-message">
@@ -21,10 +24,16 @@ function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) {
           <strong>פעולה זו לא ניתנת לביטול!</strong>
         </p>
         <div className="modal-buttons">
-          <button className="modal-btn modal-btn-danger" onClick={onConfirm}>
+          <button
+            className="modal-btn modal-btn-danger"
+            onClick={onConfirm}
+          >
             כן, מחק
           </button>
-          <button className="modal-btn modal-btn-secondary" onClick={onClose}>
+          <button
+            className="modal-btn modal-btn-secondary"
+            onClick={onClose}
+          >
             ביטול
           </button>
         </div>
@@ -60,6 +69,8 @@ export default function BookItem({
   setBooks,
   isAdmin = false,
   mode = "all",
+  onLocalBorrow,
+  onLocalReturn,
 }) {
   const navigate = useNavigate();
   const { user, setUser, isBlocked } = useAuth();
@@ -71,12 +82,16 @@ export default function BookItem({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const isBorrowedByMe = Boolean(user?.borrowedBooks?.includes(book.id));
+  const isBorrowedByMe = Boolean(
+    user?.borrowedBooks?.includes(book.id)
+  );
 
   const handleClick = () => navigate(`/book/${book.id}`);
 
-  /* ===== BLOCK GUARD (MUST BE FIRST) ===== */
-  const blockActionIfBlocked = (text = "החשבון שלך חסום — לא ניתן לבצע פעולה זו") => {
+  /* BLOCK GUARD */
+  const blockActionIfBlocked = (
+    text = "החשבון שלך חסום — לא ניתן לבצע פעולה זו"
+  ) => {
     if (isBlocked) {
       setError(text);
       return true;
@@ -84,18 +99,22 @@ export default function BookItem({
     return false;
   };
 
+  // load favorites once
   useEffect(() => {
     if (!user || isAdmin || mode === "profile") return;
     async function loadFavorites() {
       try {
         const favs = await Favorites.getFavorites();
-        const ids = favs.map(f => f.bookid);
+        const ids = favs.map((f) => f.bookid);
         setIsFavorite(ids.includes(book.id));
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
     loadFavorites();
   }, [book.id, user, isAdmin, mode]);
 
+  // auto-clear msg / error
   useEffect(() => {
     if (msg || error) {
       const t = setTimeout(() => {
@@ -117,7 +136,7 @@ export default function BookItem({
       setShowDeleteModal(false);
       setShowSuccessModal(true);
       setTimeout(() => {
-        setBooks(prev => prev.filter(b => b.id !== book.id));
+        setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
       }, 2500);
     } catch {
       setError("שגיאה במחיקת הספר");
@@ -126,7 +145,12 @@ export default function BookItem({
   };
 
   const handleLike = async () => {
-    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן לשנות מועדפים")) return;
+    if (
+      blockActionIfBlocked(
+        "החשבון שלך חסום — לא ניתן לשנות מועדפים"
+      )
+    )
+      return;
 
     if (!user) {
       setError("יש להתחבר כדי להוסיף למועדפים");
@@ -141,25 +165,48 @@ export default function BookItem({
         await Favorites.add(book.id);
         setIsFavorite(true);
       }
-    } catch {}
+    } catch {
+      // optional error
+    }
   };
 
   const handleBorrow = async () => {
-    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן להשאיל ספרים")) return;
+    if (
+      blockActionIfBlocked(
+        "החשבון שלך חסום — לא ניתן להשאיל ספרים"
+      )
+    )
+      return;
+
+    if (!user) {
+      setError("יש להתחבר כדי להשאיל ספרים");
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await Library.borrowBook(book.id);
-      setUser(prev => ({
+
+      setUser((prev) => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
-      setBooks?.(prev =>
-        prev.map(b =>
-          b.id === book.id ? { ...b, quantity: b.quantity - 1 } : b
-        )
-      );
+
+      // local update for this list:
+      if (onLocalBorrow) {
+        onLocalBorrow(book.id); // AllBooks updates list + counters
+      } else {
+        // fallback: local update in this list only
+        setBooks?.((prev) =>
+          prev.map((b) =>
+            b.id === book.id
+              ? { ...b, quantity: Math.max(0, b.quantity - 1) }
+              : b
+          )
+        );
+      }
+
       setMsg(res.message);
     } catch {
       setError("לא ניתן להשאיל את הספר");
@@ -169,23 +216,40 @@ export default function BookItem({
   };
 
   const handleReturn = async () => {
-    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן להחזיר ספרים")) return;
+    if (
+      blockActionIfBlocked(
+        "החשבון שלך חסום — לא ניתן להחזיר ספרים"
+      )
+    )
+      return;
+
+    if (!user) {
+      setError("יש להתחבר כדי להחזיר ספרים");
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await Library.returnBook(book.id);
-      setUser(prev => ({
+
+      setUser((prev) => ({
         ...prev,
         borrowedBooks: res.borrowedBooks,
         canBorrow: res.canBorrow,
       }));
 
       if (mode === "profile") {
-        setBooks?.(prev => prev.filter(b => b.id !== book.id));
+        // in profile view we remove the card
+        setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+      } else if (onLocalReturn) {
+        onLocalReturn(book.id); // AllBooks updates list + counters
       } else {
-        setBooks?.(prev =>
-          prev.map(b =>
-            b.id === book.id ? { ...b, quantity: b.quantity + 1 } : b
+        // fallback update
+        setBooks?.((prev) =>
+          prev.map((b) =>
+            b.id === book.id
+              ? { ...b, quantity: b.quantity + 1 }
+              : b
           )
         );
       }
@@ -223,7 +287,9 @@ export default function BookItem({
           <img src={book.image} alt={book.title} />
         </div>
 
-        <h3 className="book-title" onClick={handleClick}>{book.title}</h3>
+        <h3 className="book-title" onClick={handleClick}>
+          {book.title}
+        </h3>
         <p className="book-meta">{book.pages} עמודים</p>
         <p className="book-meta">{book.quantity} ספרים זמינים</p>
 
@@ -238,7 +304,10 @@ export default function BookItem({
             >
               ✏️ ערוך
             </button>
-            <button className="delete-btn" onClick={handleDeleteClick}>
+            <button
+              className="delete-btn"
+              onClick={handleDeleteClick}
+            >
               🗑 מחק
             </button>
           </div>
@@ -281,7 +350,9 @@ export default function BookItem({
                 )}
 
                 <span
-                  className={`heart ${isFavorite ? "active" : ""}`}
+                  className={`heart ${
+                    isFavorite ? "active" : ""
+                  }`}
                   onClick={handleLike}
                 >
                   {isFavorite ? "❤️" : "♡"}

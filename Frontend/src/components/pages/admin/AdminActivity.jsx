@@ -32,23 +32,56 @@ export default function AdminActivity() {
     load();
   }, [load]);
 
-  // live updates when borrow/return happens
+  // live updates when borrow/return happens - append row without load()
   useEffect(() => {
     function handleBorrowReturnChanged(data) {
-    console.log("borrow_return_changed event:", data);  // <‑‑ log here
-        if (data){
-            console.log("data",data)
-            load();
-        }
-    
-  }
+      console.log("borrow_return_changed event:", data);
+
+      // expect: { type: "BORROW" | "RETURN", row: ActivityRow }
+      if (!data || !data.row) {
+        return;
+      }
+
+      const newRow = data.row;
+
+      // respect current filter: if action is BORROW/RETURN, ignore others
+      if (action !== "ALL" && newRow.action !== action) {
+        return;
+      }
+
+      // respect user filter if set
+      if (userId && Number(userId) !== newRow.user_id) {
+        return;
+      }
+
+      setRows((prev) => {
+        // avoid duplicates if same row already exists
+        const exists = prev.some(
+          (r) =>
+            r.user_id === newRow.user_id &&
+            r.book_id === newRow.book_id &&
+            r.action === newRow.action &&
+            r.date === newRow.date
+        );
+        if (exists) return prev;
+
+        const updated = [newRow, ...prev];
+
+        // keep only latest 200, sorted by date desc
+        updated.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        return updated.slice(0, 200);
+      });
+    }
 
     socket.on("borrow_return_changed", handleBorrowReturnChanged);
 
     return () => {
       socket.off("borrow_return_changed", handleBorrowReturnChanged);
     };
-  }, [load]);
+  }, [action, userId]);
 
   const handleExcel = async () => {
     const blob = await AdminService.exportActivityExcel({
