@@ -62,7 +62,7 @@ async def returnb(book_id: int, background_tasks: BackgroundTasks, user=Depends(
     background_tasks.add_task(
         sio.emit,
         "books_changed",
-        {"reason": "returned", "id": book_id},
+        {"reason": "returned", "id": book_id, "userId" : user["id"]},
     )
     background_tasks.add_task(
         sio.emit,

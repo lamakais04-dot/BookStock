@@ -1,5 +1,10 @@
 // pages/books.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
@@ -14,13 +19,17 @@ import "../csspages/pagination.css";
 export default function AllBooks() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
+
   const [categoryId, setCategoryId] = useState(null);
   const [ageGroupId, setAgeGroupId] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
 
@@ -30,42 +39,71 @@ export default function AllBooks() {
 
   const booksPerPage = 10;
   const location = useLocation();
-  const search = new URLSearchParams(location.search).get("search") || "";
+  const search =
+    new URLSearchParams(location.search).get("search") || "";
 
-  const loadBooks = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await Books.getBooks(
-        currentPage,
-        booksPerPage,
-        categoryId,
-        ageGroupId,
-        search
-      );
-      setBooks(data?.books || []);
-      setTotalPages(data?.totalPages || 1);
-      setTotalBooksCount(data?.totalBooks || 0);
-      setBorrowedBooksCount(data?.borrowedBooks || 0);
-    } catch (err) {
-      console.error(err);
-      setBooks([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, categoryId, ageGroupId, search]);
+  /* 🔒 שומר סדר יציב של ספרים */
+  const orderRef = useRef([]);
 
+  /* ================= LOAD BOOKS ================= */
+  const loadBooks = useCallback(
+    async (withSpinner = true) => {
+      if (withSpinner) setLoading(true);
+
+      try {
+        const data = await Books.getBooks(
+          currentPage,
+          booksPerPage,
+          categoryId,
+          ageGroupId,
+          search
+        );
+
+        const fetchedBooks = data?.books || [];
+
+        // שמירת סדר בפעם הראשונה בלבד
+        if (orderRef.current.length === 0) {
+          orderRef.current = fetchedBooks.map((b) => b.id);
+        }
+
+        // החזרת הספרים לפי הסדר המקורי
+        const orderedBooks = [...fetchedBooks].sort(
+          (a, b) =>
+            orderRef.current.indexOf(a.id) -
+            orderRef.current.indexOf(b.id)
+        );
+
+        setBooks(orderedBooks);
+        setTotalPages(data?.totalPages || 1);
+        setTotalBooksCount(data?.totalBooks || 0);
+        setBorrowedBooksCount(data?.borrowedBooks || 0);
+      } catch (err) {
+        console.error(err);
+        setBooks([]);
+        setTotalPages(1);
+      } finally {
+        if (withSpinner) setLoading(false);
+      }
+    },
+    [currentPage, categoryId, ageGroupId, search]
+  );
+
+  /* ================= INITIAL / FILTER LOAD ================= */
   useEffect(() => {
     const delay = setTimeout(() => {
-      loadBooks();
+      loadBooks(true);
     }, 400);
+
     return () => clearTimeout(delay);
   }, [loadBooks]);
 
+  /* איפוס עמוד בשינוי סינון */
   useEffect(() => {
     setCurrentPage(1);
+    orderRef.current = []; // סדר חדש לסינון חדש
   }, [categoryId, ageGroupId, search]);
 
+  /* ================= LOAD FILTERS ================= */
   useEffect(() => {
     async function loadFilters() {
       try {
@@ -80,24 +118,26 @@ export default function AllBooks() {
     loadFilters();
   }, []);
 
-  // live updates when books change anywhere
+  /* ================= SOCKET UPDATES ================= */
   useEffect(() => {
-    function handleBooksChanged() {
-      loadBooks();
+    function handleBooksChanged(payload) {
+      console.log(payload)
+      if (payload?.userId === user?.id) return;
+
+      loadBooks(false);
     }
 
     socket.on("books_changed", handleBooksChanged);
+    return () => socket.off("books_changed", handleBooksChanged);
+  }, [loadBooks, user?.id]);
 
-    return () => {
-      socket.off("books_changed", handleBooksChanged);
-    };
-  }, [loadBooks]);
+  const availableBooksCount =
+    totalBooksCount - borrowedBooksCount;
 
-  const availableBooksCount = totalBooksCount - borrowedBooksCount;
-
+  /* ================= JSX ================= */
   return (
     <>
-      {/* Inventory Stats Section */}
+      {/* ===== STATS ===== */}
       <div className="inventory-stats">
         <div className="stat-card stat-total">
           <div className="stat-icon">📚</div>
@@ -106,51 +146,63 @@ export default function AllBooks() {
             <div className="stat-label">סה"כ ספרים</div>
           </div>
         </div>
-        
+
         <div className="stat-card stat-borrowed">
           <div className="stat-icon">📖</div>
           <div className="stat-content">
-            <div className="stat-number">{borrowedBooksCount}</div>
-            <div className="stat-label">ספרים מושאלים</div>
+            <div className="stat-number">
+              {borrowedBooksCount}
+            </div>
+            <div className="stat-label">
+              ספרים מושאלים
+            </div>
           </div>
         </div>
-        
+
         <div className="stat-card stat-available">
           <div className="stat-icon">✨</div>
           <div className="stat-content">
-            <div className="stat-number">{availableBooksCount}</div>
-            <div className="stat-label">ספרים זמינים</div>
+            <div className="stat-number">
+              {availableBooksCount}
+            </div>
+            <div className="stat-label">
+              ספרים זמינים
+            </div>
           </div>
         </div>
       </div>
 
+      {/* ===== ADD BOOK ===== */}
       {isAdmin && (
         <div className="add-book-wrapper">
           <button
             className="add-book-btn"
             onClick={() => navigate("/book/new")}
           >
-            <span className="icon">➕</span>
-            הוסף ספר חדש
+            ➕ הוסף ספר חדש
           </button>
         </div>
       )}
 
+      {/* ===== AGE FILTER ===== */}
       <div className="age-filter">
         {ageGroups.map((age) => (
           <button
             key={age.id}
-            className={`age-btn ${ageGroupId === age.id ? "active" : ""}`}
+            className={`age-btn ${ageGroupId === age.id ? "active" : ""
+              }`}
             onClick={() =>
-              setAgeGroupId(ageGroupId === age.id ? null : age.id)
+              setAgeGroupId(
+                ageGroupId === age.id ? null : age.id
+              )
             }
           >
-            <span className="star">★</span>
-            {age.description}
+            ★ {age.description}
           </button>
         ))}
       </div>
 
+      {/* ===== CLEAR FILTERS ===== */}
       {(categoryId || ageGroupId || search) && (
         <div className="clear-filters-wrapper">
           <button
@@ -166,17 +218,18 @@ export default function AllBooks() {
         </div>
       )}
 
+      {/* ===== BOOKS GRID ===== */}
       <div className="books-grid">
         {loading ? (
           <div className="books-loading">
-            <div className="loading-spinner"></div>
+            <div className="loading-spinner" />
             <p>טוען ספרים...</p>
           </div>
         ) : books.length === 0 ? (
           <div className="books-empty">
             <div className="books-empty-icon">📚</div>
             <h2>לא נמצאו ספרים</h2>
-            <p>נסה לשנות את הסינון או את מילות החיפוש</p>
+            <p>נסה לשנות את הסינון או החיפוש</p>
           </div>
         ) : (
           books.map((book) => (
@@ -190,32 +243,42 @@ export default function AllBooks() {
         )}
       </div>
 
+      {/* ===== PAGINATION ===== */}
       {!loading && totalPages > 1 && (
         <div className="pagination">
           <button
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
+            onClick={() =>
+              setCurrentPage((p) => p - 1)
+            }
           >
             הקודם
           </button>
+
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
-              className={currentPage === i + 1 ? "active" : ""}
+              className={
+                currentPage === i + 1 ? "active" : ""
+              }
               onClick={() => setCurrentPage(i + 1)}
             >
               {i + 1}
             </button>
           ))}
+
           <button
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
+            onClick={() =>
+              setCurrentPage((p) => p + 1)
+            }
           >
             הבא
           </button>
         </div>
       )}
 
+      {/* ===== CATEGORY MENU ===== */}
       <div className="category-menu">
         <button
           className="menu-btn"
@@ -234,14 +297,17 @@ export default function AllBooks() {
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                className={categoryId === cat.id ? "active" : ""}
+                className={
+                  categoryId === cat.id ? "active" : ""
+                }
                 onClick={() => {
-                  setCategoryId(cat.id === categoryId ? null : cat.id);
+                  setCategoryId(
+                    cat.id === categoryId ? null : cat.id
+                  );
                   setIsFilterOpen(false);
                 }}
               >
-                <span className="star">★</span>
-                {cat.name}
+                ★ {cat.name}
               </button>
             ))}
           </div>
