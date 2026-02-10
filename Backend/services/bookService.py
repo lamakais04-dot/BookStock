@@ -94,9 +94,11 @@ def create_book(data: BookCreate, image_file: UploadFile | None):
         if exists:
             raise HTTPException(400, "כבר קיים ספר עם שם זה")
 
+        payload = data.model_dump()
+        payload["title"] = normalized_title
+
         new_book = books(
-            **data.model_dump(),
-            title=normalized_title,
+            **payload,
             image=image_url,
         )
 
