@@ -131,31 +131,26 @@ def upload_image_to_s3(image_file: UploadFile, folder: str) -> str:
 
     ext = image_file.filename.split(".")[-1]
     key = f"public/{folder}/{uuid.uuid4()}.{ext}"
+    content_type = image_file.content_type or "application/octet-stream"
+    file_bytes = image_file.file.read()
 
-    extra_args = {
-        "ContentType": image_file.content_type or "application/octet-stream",
+    put_args = {
+        "Bucket": os.getenv("AWS_BUCKET_NAME"),
+        "Key": key,
+        "Body": file_bytes,
+        "ContentType": content_type,
         "ACL": "public-read",
     }
 
     try:
-        s3_client.upload_fileobj(
-            image_file.file,
-            os.getenv("AWS_BUCKET_NAME"),
-            key,
-            ExtraArgs=extra_args,
-        )
+        s3_client.put_object(**put_args)
     except ClientError as e:
         # Buckets with Object Ownership = Bucket owner enforced do not allow ACLs.
         # In that case upload without ACL and rely on bucket policy for public access.
         if e.response.get("Error", {}).get("Code") != "AccessControlListNotSupported":
             raise
-        image_file.file.seek(0)
-        s3_client.upload_fileobj(
-            image_file.file,
-            os.getenv("AWS_BUCKET_NAME"),
-            key,
-            ExtraArgs={"ContentType": image_file.content_type or "application/octet-stream"},
-        )
+        put_args.pop("ACL", None)
+        s3_client.put_object(**put_args)
 
     return (
         f"https://{os.getenv('AWS_BUCKET_NAME')}"
