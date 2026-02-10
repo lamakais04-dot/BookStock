@@ -42,6 +42,61 @@
   border: 2px solid rgba(139, 69, 19, 0.1);
 }
 
+.book-form-shell {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.book-form.edit-mode {
+  background: linear-gradient(135deg, #fffaf4 0%, #fff5e9 100%);
+  border-color: rgba(139, 69, 19, 0.22);
+}
+
+.book-form.edit-mode .form-title::before {
+  content: '✏️ ';
+}
+
+.book-form.edit-mode .form-subtitle {
+  color: #8b6f47;
+}
+
+.book-form.edit-mode input[name="title"],
+.book-form.edit-mode input[name="author"],
+.book-form.edit-mode input[name="pages"],
+.book-form.edit-mode input[name="quantity"],
+.book-form.edit-mode textarea,
+.book-form.edit-mode select {
+  border-color: #e8dcc8;
+  background: linear-gradient(135deg, #ffffff 0%, #fffaf4 100%);
+}
+
+.book-form.edit-mode input:focus,
+.book-form.edit-mode textarea:focus,
+.book-form.edit-mode select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(139, 69, 19, 0.12);
+}
+
+.book-form.edit-mode button[type="submit"] {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  box-shadow:
+    var(--shadow-md),
+    0 0 20px rgba(139, 69, 19, 0.25);
+}
+
+.book-form.edit-mode button[type="submit"]:hover {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 28px rgba(160, 82, 45, 0.35);
+}
+
 @keyframes formFadeIn {
   from {
     opacity: 0;
@@ -497,3 +552,122 @@
 .book-form > *:nth-child(6) { animation-delay: 0.35s; }
 .book-form > *:nth-child(7) { animation-delay: 0.4s; }
 .book-form > *:nth-child(8) { animation-delay: 0.45s; }
+/* ===============================
+   POLISHED APP-ALIGNED FORM STYLE (override)
+================================ */
+.book-form {
+  max-width: 760px;
+  border-radius: 22px;
+  border: 1.5px solid #e8dcc8;
+  background: linear-gradient(180deg, #fffdf9 0%, #fff8ee 100%);
+  box-shadow: 0 12px 34px rgba(93, 58, 26, 0.12);
+}
+
+.book-form .form-title {
+  font-size: 34px;
+  color: #8b4513;
+  -webkit-text-fill-color: initial;
+  background: none;
+}
+
+.book-form .form-title::before {
+  content: "📚 ";
+}
+
+.book-form.edit-mode .form-title::before {
+  content: "✏️ ";
+}
+
+.book-form .form-subtitle {
+  margin-top: 6px;
+  margin-bottom: 14px;
+  color: #8b6f47;
+  font-size: 15px;
+}
+
+.book-form input[type="text"],
+.book-form input[type="number"],
+.book-form textarea,
+.book-form select {
+  border: 1.5px solid #dfd0bd;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: none;
+  padding: 14px 18px;
+}
+
+.book-form textarea {
+  min-height: 110px;
+}
+
+.book-form input:hover,
+.book-form textarea:hover,
+.book-form select:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.book-form input:focus,
+.book-form textarea:focus,
+.book-form select:focus {
+  border-color: #a05a2c;
+  box-shadow: 0 0 0 3px rgba(160, 90, 44, 0.15);
+  transform: none;
+}
+
+.book-form button[type="submit"] {
+  border-radius: 14px;
+  padding: 14px 22px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #8b4513 0%, #a05a2c 100%);
+  box-shadow: 0 8px 20px rgba(139, 69, 19, 0.28);
+}
+
+.book-form button[type="submit"]::before {
+  content: "";
+  margin: 0;
+}
+
+.book-form button[type="submit"]:hover {
+  background: linear-gradient(135deg, #9a4f1a 0%, #b56a36 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(139, 69, 19, 0.3);
+}
+
+.book-form button[type="submit"]::after {
+  display: none;
+}
+
+.book-form.edit-mode button[type="submit"] {
+  background: linear-gradient(135deg, #8b4513 0%, #b46834 100%);
+}
+
+
+.book-form-errors {
+  background: #fff4f1;
+  border: 1.5px solid #e8a89c;
+  border-radius: 14px;
+  padding: 10px 14px;
+  color: #8f2d1f;
+}
+
+.book-form-errors ul {
+  margin: 0;
+  padding-right: 18px;
+  direction: rtl;
+}
+
+.book-form-errors li {
+  margin: 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.book-form-image-hint {
+  display: block;
+  margin-top: -8px;
+  color: #8b6f47;
+  font-size: 13px;
+  text-align: right;
+}

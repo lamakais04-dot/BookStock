@@ -1,6 +1,6 @@
 // SingleBook.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import Favorites from "../services/favorites";
@@ -13,12 +13,13 @@ import "../csspages/BookForm.css";
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { user, setUser, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const isEditMode = searchParams.get("edit") === "true";
-  const isNew = id === "new";
+  const isNew = !id || location.pathname === "/book/new";
 
   /* ================= STATE ================= */
   const [loading, setLoading] = useState(true);
@@ -68,7 +69,9 @@ export default function SingleBook() {
       try {
         const favs = await Favorites.getFavorites();
         setIsFavorite(favs.some((f) => f.bookid === Number(id)));
-      } catch {}
+      } catch (err) {
+        console.error("Failed to load favorites", err);
+      }
     }
 
     loadFavs();
@@ -99,6 +102,8 @@ export default function SingleBook() {
   };
 
   const handleReturn = async () => {
+    if (isBlocked) return setError("החשבון שלך חסום");
+
     setActionLoading(true);
     try {
       const res = await Library.returnBook(book.id);
@@ -137,6 +142,11 @@ export default function SingleBook() {
   /* ================= ADMIN ================= */
 
   const handleUpdateBook = async (formData) => {
+    if (isBlocked) {
+      setError("החשבון שלך חסום — לא ניתן לערוך ספרים");
+      return;
+    }
+
     try {
       await Books.updateBook(book.id, formData);
       const updatedBook = await Books.getBookById(book.id);
@@ -148,11 +158,17 @@ export default function SingleBook() {
   };
 
   const handleAddBook = async (formData) => {
+    if (isBlocked) {
+      setError("החשבון שלך חסום — לא ניתן להוסיף ספרים");
+      return;
+    }
+
     try {
       await Books.addBook(formData);
       navigate("/book");
-    } catch {
-      setError("שגיאה בהוספת ספר");
+    } catch (err) {
+      const serverMsg = err?.response?.data?.detail;
+      setError(serverMsg || "שגיאה בהוספת ספר");
     }
   };
 
@@ -177,6 +193,10 @@ export default function SingleBook() {
               categories={categories}
               ageGroups={ageGroups}
               onSubmit={handleAddBook}
+              mode="create"
+              title="הוספת ספר חדש"
+              readOnly={isBlocked}
+              readOnlyMessage="החשבון שלך חסום — לא ניתן להוסיף ספרים"
             />
 
             {error && <p className="borrow-error">{error}</p>}
@@ -213,7 +233,20 @@ export default function SingleBook() {
                 initialData={isNew ? {} : book}
                 categories={categories}
                 ageGroups={ageGroups}
-                onSubmit={isNew ? handleCreateBook : handleUpdateBook}
+                onSubmit={isNew ? handleAddBook : handleUpdateBook}
+                mode={isNew ? "create" : "edit"}
+                title={isNew ? "הוספת ספר חדש" : "עריכת ספר"}
+                subtitle={
+                  isNew
+                    ? "מלא את כל הפרטים להוספת הספר לספרייה"
+                    : "עדכן את פרטי הספר ושמור שינויים"
+                }
+                readOnly={isBlocked}
+                readOnlyMessage={
+                  isNew
+                    ? "החשבון שלך חסום — לא ניתן להוסיף ספרים"
+                    : "החשבון שלך חסום — לא ניתן לערוך ספרים"
+                }
               />
 
               {!isNew && (
@@ -264,24 +297,39 @@ export default function SingleBook() {
 
               {isAdmin ? (
                 <button
+                  type="button"
                   className="edit-toggle-button"
-                  onClick={() => setSearchParams({ edit: "true" })}
+                  onClick={() => {
+                    if (isBlocked) {
+                      setError("החשבון שלך חסום — לא ניתן לערוך ספרים");
+                      return;
+                    }
+                    setSearchParams({ edit: "true" });
+                  }}
                 >
                   ✏️ עריכת ספר
                 </button>
               ) : (
                 <div className="book-actions">
                   {isBorrowedByMe ? (
-                    <button onClick={handleReturn} disabled={actionLoading}>
+                    <button
+                      type="button"
+                      onClick={handleReturn}
+                      disabled={actionLoading}
+                    >
                       החזר ספר
                     </button>
                   ) : (
-                    <button onClick={handleBorrow} disabled={actionLoading}>
+                    <button
+                      type="button"
+                      onClick={handleBorrow}
+                      disabled={actionLoading}
+                    >
                       השאל ספר
                     </button>
                   )}
 
-                  <button onClick={handleFavorite}>
+                  <button type="button" onClick={handleFavorite}>
                     {isFavorite ? "❤️ במועדפים" : "♡ הוסף למועדפים"}
                   </button>
                 </div>
