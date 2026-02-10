@@ -193,7 +193,7 @@ export default function AllBooks() {
   /* =============== JSX =============== */
   return (
     <>
-      {/* STATS */}
+      {/* STATS
       <div className="inventory-stats">
         <div className="stat-card stat-total">
           <div className="stat-icon">📚</div>
@@ -220,7 +220,7 @@ export default function AllBooks() {
             <div className="stat-label">ספרים זמינים</div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ADD BOOK */}
       {isAdmin && (
