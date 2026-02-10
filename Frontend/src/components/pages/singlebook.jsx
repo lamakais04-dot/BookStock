@@ -181,6 +181,7 @@ export default function SingleBook() {
               categories={categories}
               ageGroups={ageGroups}
               onSubmit={handleAddBook}
+              mode="create"
             />
 
             {error && <p className="borrow-error">{error}</p>}
