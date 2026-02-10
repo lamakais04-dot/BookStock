@@ -182,6 +182,7 @@ export default function SingleBook() {
               ageGroups={ageGroups}
               onSubmit={handleAddBook}
               mode="create"
+              title="הוספת ספר חדש"
             />
 
             {error && <p className="borrow-error">{error}</p>}
@@ -219,6 +220,13 @@ export default function SingleBook() {
                 categories={categories}
                 ageGroups={ageGroups}
                 onSubmit={isNew ? handleAddBook : handleUpdateBook}
+                mode={isNew ? "create" : "edit"}
+                title={isNew ? "הוספת ספר חדש" : "עריכת ספר"}
+                subtitle={
+                  isNew
+                    ? "מלא את כל הפרטים להוספת הספר לספרייה"
+                    : "עדכן את פרטי הספר ושמור שינויים"
+                }
               />
 
               {!isNew && (
