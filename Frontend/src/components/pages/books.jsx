@@ -159,6 +159,7 @@ export default function AllBooks() {
 
         switch (payload.reason) {
           case "borrowed":
+            setBorrowedBooksCount((c) => c + 1);
             return prev.map((b) =>
               b.id === payload.id
                 ? { ...b, quantity: Math.max(0, b.quantity - 1) }
@@ -166,6 +167,7 @@ export default function AllBooks() {
             );
 
           case "returned":
+            setBorrowedBooksCount((c) => Math.max(0, c - 1));
             return prev.map((b) =>
               b.id === payload.id
                 ? { ...b, quantity: b.quantity + 1 }
@@ -188,7 +190,7 @@ export default function AllBooks() {
         }
       });
 
-      // stats are handled via fresh fetch, not via socket increments
+      // keep counters in sync for borrow/return live events
     }
 
     socket.on("books_changed", handleBooksChanged);
