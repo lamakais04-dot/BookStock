@@ -33,8 +33,9 @@ export default function AllBooks() {
 
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
+  const [blockedError, setBlockedError] = useState("");
 
-  const { user } = useAuth();
+  const { user, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
 
@@ -141,17 +142,25 @@ export default function AllBooks() {
     setBorrowedBooksCount((c) => Math.max(0, c - 1));
   }, []);
 
+  const handleLocalDelete = useCallback((deletedBook) => {
+    setBooks((prev) => prev.filter((b) => b.id !== deletedBook.id));
+    setTotalBooksCount((c) =>
+      Math.max(0, c - (Number(deletedBook.quantity) || 0))
+    );
+  }, []);
+
   /* =============== SOCKET UPDATES (OTHER USERS) =============== */
   useEffect(() => {
     function handleBooksChanged(payload) {
       // ignore current user
-      if (!payload?.userId || payload.userId === user?.id) return;
+      if (!payload?.userId || String(payload.userId) === String(user?.id)) return;
 
       setBooks((prev) => {
         if (!payload?.reason) return prev;
 
         switch (payload.reason) {
           case "borrowed":
+            setBorrowedBooksCount((c) => c + 1);
             return prev.map((b) =>
               b.id === payload.id
                 ? { ...b, quantity: Math.max(0, b.quantity - 1) }
@@ -159,6 +168,7 @@ export default function AllBooks() {
             );
 
           case "returned":
+            setBorrowedBooksCount((c) => Math.max(0, c - 1));
             return prev.map((b) =>
               b.id === payload.id
                 ? { ...b, quantity: b.quantity + 1 }
@@ -181,7 +191,7 @@ export default function AllBooks() {
         }
       });
 
-      // stats are handled via fresh fetch, not via socket increments
+      // keep counters in sync for borrow/return live events
     }
 
     socket.on("books_changed", handleBooksChanged);
@@ -189,6 +199,12 @@ export default function AllBooks() {
   }, [user?.id]);
 
   const availableBooksCount = totalBooksCount - borrowedBooksCount;
+
+  useEffect(() => {
+    if (!blockedError) return;
+    const t = setTimeout(() => setBlockedError(""), 2500);
+    return () => clearTimeout(t);
+  }, [blockedError]);
 
   /* =============== JSX =============== */
   return (
@@ -227,11 +243,21 @@ export default function AllBooks() {
         <div className="add-book-wrapper">
           <button
             className="add-book-btn"
-            onClick={() => navigate("/book/new")}
+            onClick={() => {
+              if (isBlocked) {
+                setBlockedError("החשבון שלך חסום — לא ניתן להוסיף או לערוך ספרים");
+                return;
+              }
+              navigate("/book/new");
+            }}
           >
             ➕ הוסף ספר חדש
           </button>
         </div>
+      )}
+
+      {blockedError && (
+        <div className="books-blocked-error">{blockedError}</div>
       )}
 
       {/* AGE FILTER */}
@@ -288,9 +314,11 @@ export default function AllBooks() {
             <BookItem
               key={book.id}
               book={book}
+              setBooks={setBooks}
               isAdmin={isAdmin}
               onLocalBorrow={handleLocalBorrow}
               onLocalReturn={handleLocalReturn}
+              onLocalDelete={handleLocalDelete}
             />
           ))
         )}
