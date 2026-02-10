@@ -122,6 +122,7 @@ export default function BookItem({
   mode = "all",
   onLocalBorrow,
   onLocalReturn,
+  onLocalDelete,
 }) {
   const navigate = useNavigate();
   const { user, setUser, isBlocked } = useAuth();
@@ -129,6 +130,7 @@ export default function BookItem({
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [blockedModalMessage, setBlockedModalMessage] = useState("");
   
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -149,6 +151,7 @@ export default function BookItem({
   ) => {
     if (isBlocked) {
       setError(text);
+      setBlockedModalMessage(text);
       return true;
     }
     return false;
@@ -179,8 +182,18 @@ export default function BookItem({
     }
   }, [error]);
 
+  useEffect(() => {
+    const hasModalOpen = showDeleteModal || successModal.show;
+    document.body.classList.toggle("book-modal-open", hasModalOpen);
+
+    return () => {
+      document.body.classList.remove("book-modal-open");
+    };
+  }, [showDeleteModal, successModal.show]);
+
   const handleDeleteClick = (e) => {
     e.stopPropagation();
+    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן למחוק ספרים")) return;
     setShowDeleteModal(true);
   };
 
@@ -188,10 +201,11 @@ export default function BookItem({
     try {
       await Books.deleteBook(book.id);
       setShowDeleteModal(false);
-      setSuccessModal({ show: true, type: "delete" });
-      setTimeout(() => {
+      if (onLocalDelete) {
+        onLocalDelete(book);
+      } else {
         setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
-      }, 2500);
+      }
     } catch {
       setError("שגיאה במחיקת הספר");
       setShowDeleteModal(false);
@@ -263,7 +277,7 @@ export default function BookItem({
         );
       }
 
-      setMsg(res.message);
+      setSuccessModal({ show: true, type: "borrow" });
     } catch {
       setError("לא ניתן להשאיל את הספר");
     } finally {
@@ -294,9 +308,13 @@ export default function BookItem({
         canBorrow: res.canBorrow,
       }));
 
+      setSuccessModal({ show: true, type: "return" });
+
       if (mode === "profile") {
-        // in profile view we remove the card
-        setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+        // in profile view, keep card visible for modal feedback then remove it
+        setTimeout(() => {
+          setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+        }, 1200);
       } else if (onLocalReturn) {
         onLocalReturn(book.id); // AllBooks updates list + counters
       } else {
@@ -309,8 +327,6 @@ export default function BookItem({
           )
         );
       }
-
-      setSuccessModal({ show: true, type: "return" });
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
@@ -340,6 +356,17 @@ export default function BookItem({
         bookTitle={book.title}
       />
 
+      {blockedModalMessage && (
+        <div className="modal-overlay" onClick={() => setBlockedModalMessage("")}>
+          <div className="modal-content modal-success" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon confirm">🚫</div>
+            <h2 className="modal-title">פעולה חסומה</h2>
+            <p className="modal-message">{blockedModalMessage}</p>
+            <button type="button" className="modal-btn modal-btn-secondary" onClick={() => setBlockedModalMessage("")}>הבנתי</button>
+          </div>
+        </div>
+      )}
+
       <div className="book-card">
         <div className="book-image" onClick={handleClick}>
           <img src={book.image} alt={book.title} />
@@ -354,15 +381,18 @@ export default function BookItem({
         {isAdmin ? (
           <div className="admin-actions">
             <button
+              type="button"
               className="edit-btn"
               onClick={(e) => {
                 e.stopPropagation();
+                if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן לערוך ספרים")) return;
                 navigate(`/book/${book.id}?edit=true`);
               }}
             >
               ✏️ ערוך
             </button>
             <button
+              type="button"
               className="delete-btn"
               onClick={handleDeleteClick}
             >
@@ -373,6 +403,7 @@ export default function BookItem({
           <div className="book-actions">
             {mode === "profile" ? (
               <button
+                type="button"
                 className="return-btn"
                 onClick={handleReturn}
                 disabled={loading}
@@ -383,6 +414,7 @@ export default function BookItem({
               <>
                 {isBorrowedByMe ? (
                   <button
+                    type="button"
                     className="return-btn"
                     onClick={handleReturn}
                     disabled={loading}
@@ -391,6 +423,7 @@ export default function BookItem({
                   </button>
                 ) : (
                   <button
+                    type="button"
                     className="borrow-btn"
                     onClick={handleBorrow}
                     disabled={borrowDisabled}

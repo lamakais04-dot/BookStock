@@ -8,9 +8,9 @@ import { socket } from "../../services/socket";
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
-  const [message, setMessage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({ userId: null, isBlocked: false, userName: "" });
+  const [resultModal, setResultModal] = useState({ show: false, text: "", success: true });
   const navigate = useNavigate();
 
   /* ================= LOAD USERS ================= */
@@ -61,16 +61,13 @@ export default function AdminUsers() {
         )
       );
 
-      setMessage(
-        res.is_blocked
-          ? "🚫 המשתמש נחסם בהצלחה"
-          : "✅ החסימה בוטלה בהצלחה"
-      );
-
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err) {
-      setMessage("❌ שגיאה בעדכון סטטוס המשתמש");
-      setTimeout(() => setMessage(null), 3000);
+      const resultText = res.is_blocked
+        ? "🚫 המשתמש נחסם בהצלחה"
+        : "✅ החסימה בוטלה בהצלחה";
+      setResultModal({ show: true, text: resultText, success: true });
+    } catch {
+      const resultText = "❌ שגיאה בעדכון סטטוס המשתמש";
+      setResultModal({ show: true, text: resultText, success: false });
     }
 
     closeModal();
@@ -99,9 +96,6 @@ export default function AdminUsers() {
             חסימה, שחרור ומעקב אחרי משתמשים
           </p>
         </div>
-
-        {/* MESSAGE */}
-        {message && <div className="admin-message">{message}</div>}
 
         {/* SEARCH */}
         <div className="admin-users-search-wrapper">
@@ -221,6 +215,27 @@ export default function AdminUsers() {
                 onClick={confirmToggleBlock}
               >
                 {modalData.isBlocked ? "✅ בטל חסימה" : "🚫 חסום משתמש"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resultModal.show && (
+        <div
+          className="modal-overlay"
+          onClick={() => setResultModal((prev) => ({ ...prev, show: false }))}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">{resultModal.success ? "✅" : "⚠️"}</div>
+            <h2 className="modal-title">{resultModal.success ? "עודכן בהצלחה" : "שגיאה"}</h2>
+            <p className="modal-text">{resultModal.text}</p>
+            <div className="modal-buttons">
+              <button
+                className="modal-btn confirm"
+                onClick={() => setResultModal((prev) => ({ ...prev, show: false }))}
+              >
+                סגור
               </button>
             </div>
           </div>

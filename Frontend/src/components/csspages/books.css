@@ -798,3 +798,16 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   font-size: 14px;
 }
+
+
+.books-blocked-error {
+  max-width: 680px;
+  margin: -10px auto 18px;
+  background: #fdecea;
+  border: 1.5px solid #e74c3c;
+  color: #922b21;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+}
