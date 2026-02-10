@@ -1,10 +1,8 @@
-// SingleBook.jsx
+// pages/SingleBook.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
-import Favorites from "../services/favorites";
-import Library from "../services/library";
 import { useAuth } from "../context/AuthContext";
 import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
@@ -16,23 +14,18 @@ export default function SingleBook() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { user, setUser, isBlocked } = useAuth();
+  const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const isNew = id === "new";
   const isEditMode = searchParams.get("edit") === "true";
   const isNew = !id || location.pathname === "/book/new";
 
-  /* ================= STATE ================= */
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [error, setError] = useState("");
   const [book, setBook] = useState(null);
-
-  const isBorrowedByMe = Boolean(
-    user?.borrowedBooks?.includes(Number(id))
-  );
+  const [error, setError] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
@@ -46,9 +39,10 @@ export default function SingleBook() {
         setCategories(cats);
         setAgeGroups(ages);
 
+        // ❗❗❗ רק אם זה לא new
         if (!isNew) {
-          const bookData = await Books.getBookById(id);
-          setBook(bookData);
+          const data = await Books.getBookById(id);
+          setBook(data);
         }
       } catch (err) {
         console.error(err);
@@ -161,9 +155,7 @@ export default function SingleBook() {
   };
 
   /* ================= LOADING ================= */
-  if (loading) {
-    return <div className="loading-container" />;
-  }
+  if (loading) return <div className="loading-container" />;
 
   /* ================= ADD NEW BOOK ================= */
   if (isNew && isAdmin) {
@@ -175,7 +167,7 @@ export default function SingleBook() {
 
         <div className="single-book">
           <div className="book-details">
-            <h1 className="book-title">➕ הוספת ספר חדש</h1>
+            <p className="section-subtitle">מידע על הספר</p>
 
             <BookForm
               categories={categories}
@@ -192,9 +184,10 @@ export default function SingleBook() {
     );
   }
 
-  /* ================= VIEW / EDIT BOOK ================= */
+  /* ================= SAFETY ================= */
   if (!book) return null;
 
+  /* ================= VIEW / EDIT ================= */
   return (
     <div className="single-book-container">
       <button className="back-button" onClick={() => navigate("/book")}>
@@ -203,20 +196,16 @@ export default function SingleBook() {
 
       <div className="single-book">
         <div className="book-image">
-          {!isNew && (
-            <img src={book.image || "/placeholder.png"} alt={book.title} />
-          )}
+          <img src={book.image || "/placeholder.png"} alt={book.title} />
         </div>
 
         <div className="book-details">
           {isAdmin && isEditMode ? (
             <>
-              <h1 className="book-title">
-                {isNew ? "הוסף ספר חדש" : "עריכת ספר"}
-              </h1>
+              <p className="section-subtitle">עריכת פרטי הספר</p>
 
               <BookForm
-                initialData={isNew ? {} : book}
+                initialData={book}
                 categories={categories}
                 ageGroups={ageGroups}
                 onSubmit={isNew ? handleAddBook : handleUpdateBook}
@@ -229,38 +218,30 @@ export default function SingleBook() {
                 }
               />
 
-              {!isNew && (
-                <button
-                  className="cancel-button"
-                  onClick={() => setSearchParams({})}
-                >
-                  ביטול עריכה
-                </button>
-              )}
+              <button
+                className="cancel-button"
+                onClick={() => setSearchParams({})}
+              >
+                ביטול
+              </button>
             </>
           ) : (
             <>
               <h1 className="book-title">{book.title}</h1>
               <p className="book-author">{book.author}</p>
 
-              {book.summary && (
-                <p className="book-summary">{book.summary}</p>
-              )}
-
               <div className="book-info-grid">
                 <div className="info-item">
                   <div className="info-label">קטגוריה</div>
                   <div className="info-value">
-                    {categories.find((c) => c.id === book.categoryid)?.name ||
-                      "-"}
+                    {categories.find((c) => c.id === book.categoryid)?.name}
                   </div>
                 </div>
 
                 <div className="info-item">
-                  <div className="info-label">טווח גילאים</div>
+                  <div className="info-label">קבוצת גיל</div>
                   <div className="info-value">
-                    {ageGroups.find((a) => a.id === book.agesid)
-                      ?.description || "-"}
+                    {ageGroups.find((a) => a.id === book.agesid)?.description}
                   </div>
                 </div>
 
@@ -270,20 +251,20 @@ export default function SingleBook() {
                 </div>
 
                 <div className="info-item">
-                  <div className="info-label">כמות זמינה</div>
+                  <div className="info-label">כמות</div>
                   <div className="info-value">{book.quantity}</div>
                 </div>
               </div>
 
-              {isAdmin ? (
+              {isAdmin? (
                 <button
                   type="button"
                   className="edit-toggle-button"
                   onClick={() => setSearchParams({ edit: "true" })}
                 >
-                  ✏️ עריכת ספר
+                  ✏️ עריכה
                 </button>
-              ) : (
+              )  :(
                 <div className="book-actions">
                   {isBorrowedByMe ? (
                     <button
@@ -314,6 +295,25 @@ export default function SingleBook() {
           {error && <p className="borrow-error">{error}</p>}
         </div>
       </div>
+
+      {/* SUCCESS MODAL */}
+      {showSuccessModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowSuccessModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">✅</div>
+            <h2 className="modal-title">הספר עודכן בהצלחה</h2>
+            <button
+              className="modal-btn confirm"
+              onClick={() => setShowSuccessModal(false)}
+            >
+              סגור
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
