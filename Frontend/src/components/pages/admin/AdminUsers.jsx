@@ -8,7 +8,6 @@ import { socket } from "../../services/socket";
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
-  const [message, setMessage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({ userId: null, isBlocked: false, userName: "" });
   const [resultModal, setResultModal] = useState({ show: false, text: "", success: true });
@@ -56,15 +55,10 @@ export default function AdminUsers() {
       const resultText = res.is_blocked
         ? "🚫 המשתמש נחסם בהצלחה"
         : "✅ החסימה בוטלה בהצלחה";
-      setMessage(resultText);
       setResultModal({ show: true, text: resultText, success: true });
-
-      setTimeout(() => setMessage(null), 3000);
     } catch {
       const resultText = "❌ שגיאה בעדכון סטטוס המשתמש";
-      setMessage(resultText);
       setResultModal({ show: true, text: resultText, success: false });
-      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -91,9 +85,6 @@ export default function AdminUsers() {
             חסימה, שחרור ומעקב אחרי משתמשים
           </p>
         </div>
-
-        {/* MESSAGE */}
-        {message && <div className="admin-message">{message}</div>}
 
         {/* SEARCH */}
         <div className="admin-users-search-wrapper">
