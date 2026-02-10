@@ -6,7 +6,7 @@ import logo from "../../../../BookstockLogo.png";
 import LoginClass from "../../services/login";
 
 export default function Navbar() {
-  const { user, loading, setUser } = useAuth();
+  const { user, loading, setUser, fetchUser } = useAuth();
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
@@ -25,12 +25,18 @@ export default function Navbar() {
 
   if (loading) return null;
 
-  const handleLogout = () => {
-    setUser(null);
-    LoginClass.handleLogout();
-    navigate("/login");
-    window.location.reload();
-    
+  const handleLogout = async () => {
+    try {
+      await LoginClass.handleLogout();
+    } catch (err) {
+      console.error("Logout request failed, clearing local session", err);
+    } finally {
+      setOpenProfileMenu(false);
+      setSearch("");
+      setUser(null);
+      await fetchUser({ silent: true });
+      navigate("/login", { replace: true });
+    }
   };
 
   const handleSearchChange = (value) => {
