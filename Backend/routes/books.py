@@ -39,7 +39,7 @@ async def add_book(
     pages: int = Form(...),
     categoryid: int = Form(...),
     agesid: int = Form(...),
-    image: UploadFile = File(...),
+    image: UploadFile | None = File(None),
 ):
     data = BookCreate(
         title=title,

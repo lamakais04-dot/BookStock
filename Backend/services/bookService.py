@@ -79,8 +79,8 @@ def get_book_by_id(book_id: int):
         return book
 
 
-def create_book(data: BookCreate, image_file: UploadFile):
-    image_url = upload_image_to_s3(image_file, "books")
+def create_book(data: BookCreate, image_file: UploadFile | None):
+    image_url = upload_image_to_s3(image_file, "books") if image_file else None
 
     new_book = books(
         **data.model_dump(),
