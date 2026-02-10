@@ -16,7 +16,6 @@ export default function SingleBook() {
 
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  const isNew = id === "new";
   const isEditMode = searchParams.get("edit") === "true";
   const isNew = !id || location.pathname === "/book/new";
 

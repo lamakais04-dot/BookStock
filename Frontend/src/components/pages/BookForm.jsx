@@ -26,6 +26,8 @@ export default function BookForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState([]);
+  const MAX_IMAGE_MB = 5;
+  const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,9 +41,39 @@ export default function BookForm({
   };
 
   const handleFileChange = (e) => {
+    const file = e.target.files?.[0] || null;
+
+    if (!file) {
+      setForm((prev) => ({ ...prev, imageFile: null }));
+      return;
+    }
+
+    const nextErrors = [];
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      nextErrors.push("קובץ תמונה חייב להיות מסוג JPG / PNG / WEBP");
+    }
+
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      nextErrors.push("גודל התמונה חייב להיות עד 5MB");
+    }
+
+    if (nextErrors.length > 0) {
+      setValidationErrors((prev) => [...new Set([...prev, ...nextErrors])]);
+      e.target.value = "";
+      return;
+    }
+
+    setValidationErrors((prev) =>
+      prev.filter(
+        (msg) =>
+          msg !== "קובץ תמונה חייב להיות מסוג JPG / PNG / WEBP" &&
+          msg !== "גודל התמונה חייב להיות עד 5MB"
+      )
+    );
+
     setForm((prev) => ({
       ...prev,
-      imageFile: e.target.files?.[0] || null,
+      imageFile: file,
     }));
   };
 
@@ -235,10 +267,14 @@ export default function BookForm({
 
         <input
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
           disabled={isSubmitting}
         />
+
+        <small className="book-form-image-hint">
+          העלאת תמונה אופציונלית (JPG/PNG/WEBP, עד 5MB)
+        </small>
 
         {form.imageFile && <p>{form.imageFile.name}</p>}
 

@@ -662,3 +662,12 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+
+.book-form-image-hint {
+  display: block;
+  margin-top: -8px;
+  color: #8b6f47;
+  font-size: 13px;
+  text-align: right;
+}
