@@ -36,12 +36,31 @@ export default function AdminUsers() {
     };
   }, [load]);
 
-  /* ================= BLOCK / UNBLOCK ================= */
-  const toggleBlock = async (userId, isBlocked) => {
-    if (!isBlocked) {
-      const ok = window.confirm("האם את בטוחה שברצונך לחסום משתמש זה?");
-      if (!ok) return;
-    }
+  /* ================= OPEN MODAL ================= */
+  const openModal = (userId, isBlocked, userName) => {
+    setModalData({ userId, isBlocked, userName });
+    setShowModal(true);
+  };
+
+  const handleBlockActionClick = (e, userItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(
+      userItem.id,
+      userItem.is_blocked,
+      `${userItem.firstname} ${userItem.lastname}`
+    );
+  };
+
+  /* ================= CLOSE MODAL ================= */
+  const closeModal = () => {
+    setShowModal(false);
+    setModalData({ userId: null, isBlocked: false, userName: "" });
+  };
+
+  /* ================= CONFIRM BLOCK / UNBLOCK ================= */
+  const confirmToggleBlock = async () => {
+    const { userId } = modalData;
 
     try {
       const res = await Admin.toggleUserBlock(userId);
@@ -149,6 +168,7 @@ export default function AdminUsers() {
                   <td>
                     <div className="user-actions">
                       <button
+                        type="button"
                         className="user-action-btn view"
                         onClick={() => navigate(`/admin/users/${u.id}`)}
                       >
@@ -156,10 +176,11 @@ export default function AdminUsers() {
                       </button>
 
                       <button
+                        type="button"
                         className={`user-action-btn ${
                           u.is_blocked ? "unblock" : "block"
                         }`}
-                        onClick={() => toggleBlock(u.id, u.is_blocked)}
+                        onClick={(e) => handleBlockActionClick(e, u)}
                       >
                         {u.is_blocked ? "✅ ביטול חסימה" : "🚫 חסום"}
                       </button>
@@ -194,12 +215,14 @@ export default function AdminUsers() {
 
             <div className="modal-buttons">
               <button 
+                type="button"
                 className="modal-btn cancel"
                 onClick={closeModal}
               >
                 ביטול
               </button>
               <button 
+                type="button"
                 className={`modal-btn confirm ${modalData.isBlocked ? "unblock" : "block"}`}
                 onClick={confirmToggleBlock}
               >
@@ -221,6 +244,7 @@ export default function AdminUsers() {
             <p className="modal-text">{resultModal.text}</p>
             <div className="modal-buttons">
               <button
+                type="button"
                 className="modal-btn confirm"
                 onClick={() => setResultModal((prev) => ({ ...prev, show: false }))}
               >
