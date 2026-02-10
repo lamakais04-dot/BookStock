@@ -79,8 +79,6 @@ export default function AdminUsers() {
       const resultText = "❌ שגיאה בעדכון סטטוס המשתמש";
       setResultModal({ show: true, text: resultText, success: false });
     }
-
-    closeModal();
   };
 
   const getInitials = (first, last) =>
@@ -96,7 +94,7 @@ export default function AdminUsers() {
         <div className="admin-users-header">
           <button
             className="back-btn"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/profile#admin")}
           >
             ← חזור
           </button>

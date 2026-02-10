@@ -9,7 +9,7 @@ import React, {
 import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
-import BookItem from "./BookItem";
+import BookItem from "./bookitem";
 import { useAuth } from "../context/AuthContext";
 import { socket } from "../services/socket";
 
@@ -209,7 +209,6 @@ export default function AllBooks() {
   /* =============== JSX =============== */
   return (
     <>
-      {/* STATS */}
       <div className="inventory-stats">
         <div className="stat-card stat-total">
           <div className="stat-icon">📚</div>
