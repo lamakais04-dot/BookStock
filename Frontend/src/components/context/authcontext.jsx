@@ -50,7 +50,10 @@ export function AuthProvider({ children }) {
         fetchUser,
         loading,
         isAdmin: user?.role === "admin",
-        isBlocked: user?.is_blocked === true,
+        isBlocked:
+          user?.is_blocked === true ||
+          user?.is_blocked === 1 ||
+          user?.is_blocked === "1",
       }}
     >
       {children}
