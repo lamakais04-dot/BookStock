@@ -68,7 +68,9 @@ export default function SingleBook() {
       try {
         const favs = await Favorites.getFavorites();
         setIsFavorite(favs.some((f) => f.bookid === Number(id)));
-      } catch {}
+      } catch (err) {
+        console.error("Failed to load favorites", err);
+      }
     }
 
     loadFavs();
@@ -151,8 +153,9 @@ export default function SingleBook() {
     try {
       await Books.addBook(formData);
       navigate("/book");
-    } catch {
-      setError("שגיאה בהוספת ספר");
+    } catch (err) {
+      const serverMsg = err?.response?.data?.detail;
+      setError(serverMsg || "שגיאה בהוספת ספר");
     }
   };
 
@@ -213,7 +216,7 @@ export default function SingleBook() {
                 initialData={isNew ? {} : book}
                 categories={categories}
                 ageGroups={ageGroups}
-                onSubmit={isNew ? handleCreateBook : handleUpdateBook}
+                onSubmit={isNew ? handleAddBook : handleUpdateBook}
               />
 
               {!isNew && (
