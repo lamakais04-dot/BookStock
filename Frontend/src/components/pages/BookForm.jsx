@@ -25,12 +25,17 @@ export default function BookForm({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState([]);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
+    if (validationErrors.length) {
+      setValidationErrors([]);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -40,14 +45,62 @@ export default function BookForm({
     }));
   };
 
+  const validateForm = () => {
+    const errors = [];
+
+    if (!form.title.trim()) {
+      errors.push("שם מוצר חובה");
+    }
+
+    if (!form.categoryid) {
+      errors.push("קטגוריה חובה");
+    }
+
+    const qty = Number(form.quantity);
+    if (!Number.isInteger(qty) || qty < 0) {
+      errors.push("כמות חייבת להיות מספר תקין ולא שלילי");
+    }
+
+    if (!form.author.trim()) {
+      errors.push("שם מחבר חובה");
+    }
+
+    if (!form.summary.trim()) {
+      errors.push("תקציר חובה");
+    }
+
+    const pages = Number(form.pages);
+    if (!Number.isInteger(pages) || pages <= 0) {
+      errors.push("מספר עמודים חייב להיות חיובי");
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = validateForm();
+    setValidationErrors(errors);
+    if (errors.length > 0) return;
+
     setIsSubmitting(true);
 
     try {
-      await onSubmit(form);
+      await onSubmit({
+        ...form,
+        title: form.title.trim(),
+        author: form.author.trim(),
+        summary: form.summary.trim(),
+      });
     } catch (err) {
       console.error("Form submit error:", err);
+      const serverDetail = err?.response?.data?.detail;
+      if (typeof serverDetail === "string") {
+        setValidationErrors((prev) =>
+          prev.includes(serverDetail) ? prev : [...prev, serverDetail]
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -73,6 +126,16 @@ export default function BookForm({
                 : "מלא את כל הפרטים להוספת הספר לספרייה")}
           </p>
         </div>
+
+        {validationErrors.length > 0 && (
+          <div className="book-form-errors" role="alert" aria-live="polite">
+            <ul>
+              {validationErrors.map((err) => (
+                <li key={err}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="book-input-wrap">
           <input
