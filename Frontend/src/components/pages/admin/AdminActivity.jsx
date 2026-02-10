@@ -32,56 +32,23 @@ export default function AdminActivity() {
     load();
   }, [load]);
 
-  // live updates when borrow/return happens - append row without load()
+  // live updates when borrow/return happens
   useEffect(() => {
     function handleBorrowReturnChanged(data) {
-      console.log("borrow_return_changed event:", data);
-
-      // expect: { type: "BORROW" | "RETURN", row: ActivityRow }
-      if (!data || !data.row) {
-        return;
-      }
-
-      const newRow = data.row;
-
-      // respect current filter: if action is BORROW/RETURN, ignore others
-      if (action !== "ALL" && newRow.action !== action) {
-        return;
-      }
-
-      // respect user filter if set
-      if (userId && Number(userId) !== newRow.user_id) {
-        return;
-      }
-
-      setRows((prev) => {
-        // avoid duplicates if same row already exists
-        const exists = prev.some(
-          (r) =>
-            r.user_id === newRow.user_id &&
-            r.book_id === newRow.book_id &&
-            r.action === newRow.action &&
-            r.date === newRow.date
-        );
-        if (exists) return prev;
-
-        const updated = [newRow, ...prev];
-
-        // keep only latest 200, sorted by date desc
-        updated.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-
-        return updated.slice(0, 200);
-      });
-    }
+    console.log("borrow_return_changed event:", data);  // <‑‑ log here
+        if (data){
+            console.log("data",data)
+            load();
+        }
+    
+  }
 
     socket.on("borrow_return_changed", handleBorrowReturnChanged);
 
     return () => {
       socket.off("borrow_return_changed", handleBorrowReturnChanged);
     };
-  }, [action, userId]);
+  }, [load]);
 
   const handleExcel = async () => {
     const blob = await AdminService.exportActivityExcel({
@@ -112,42 +79,29 @@ export default function AdminActivity() {
             ← חזור
           </button>
 
-          <h1>🕘 פעילות אחרונה</h1>
-          <p className="header-subtitle">מעקב אחרי השאלות והחזרות</p>
+          <h1>🕘 פעילות אחרונה (השאלה / החזרה)</h1>
         </div>
 
         {/* FILTERS */}
         <div className="admin-activity-filters">
           <div className="filters-row">
-            <div className="filter-group">
-              <label className="filter-label">🔍 סינון לפי פעולה</label>
-              <select value={action} onChange={(e) => setAction(e.target.value)}>
-                <option value="ALL">הכל</option>
-                <option value="BORROW">השאלות</option>
-                <option value="RETURN">החזרות</option>
-              </select>
-            </div>
+            <select value={action} onChange={(e) => setAction(e.target.value)}>
+              <option value="ALL">הכל</option>
+              <option value="BORROW">השאלות</option>
+              <option value="RETURN">החזרות</option>
+            </select>
 
-            <div className="export-buttons">
-              <button className="export-btn excel" onClick={handleExcel}>
-                📤 ייצא Excel
-              </button>
-              <button className="export-btn pdf" onClick={handlePdf}>
-                📄 ייצא PDF
-              </button>
-              <button className="export-btn print" onClick={handlePrint}>
-                🖨️ הדפסה
-              </button>
-            </div>
+            <button onClick={handleExcel}>📤 Export Excel</button>
+            <button onClick={handlePdf}>📄 Export PDF</button>
+            <button onClick={handlePrint}>🖨️ Print</button>
           </div>
         </div>
 
+        <hr className="admin-activity-divider" />
+
         {/* LOADING / TABLE */}
         {loading ? (
-          <div className="admin-activity-loading">
-            <div className="spinner"></div>
-            <p>טוען נתונים...</p>
-          </div>
+          <div className="admin-activity-loading">טוען</div>
         ) : rows.length === 0 ? (
           <div className="admin-activity-empty">
             <div className="admin-activity-empty-icon">📋</div>
@@ -155,30 +109,24 @@ export default function AdminActivity() {
           </div>
         ) : (
           <div className="admin-activity-table-wrapper">
-            <div className="table-header-info">
-              <span className="total-count">📊 סה"כ {rows.length} פעולות</span>
-            </div>
-            
             <div className="admin-activity-table-scroll">
               <table className="admin-activity-table">
                 <thead>
                   <tr>
-                    <th>📅 תאריך</th>
-                    <th>⚡ פעולה</th>
-                    <th>👤 משתמש</th>
-                    <th>📚 ספר</th>
+                    <th>תאריך</th>
+                    <th>פעולה</th>
+                    <th>משתמש</th>
+                    <th>ספר</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r, i) => (
                     <tr key={i}>
-                      <td className="date-cell">
+                      <td>
                         {new Date(r.date).toLocaleString("he-IL", {
                           day: "2-digit",
                           month: "2-digit",
                           year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
                         })}
                       </td>
                       <td>
@@ -190,19 +138,17 @@ export default function AdminActivity() {
                           {r.action === "BORROW" ? "📚 השאלה" : "✅ החזרה"}
                         </span>
                       </td>
-                      <td className="user-cell">
-                        <div className="user-info">
-                          <span className="user-name">
-                            {r.firstname} {r.lastname}
-                          </span>
-                          <span className="user-id">#{r.user_id}</span>
-                        </div>
+                      <td>
+                        {r.firstname} {r.lastname}
+                        <span style={{ color: "#8b6f47", fontSize: "13px" }}>
+                          (#{r.user_id})
+                        </span>
                       </td>
-                      <td className="book-cell">
-                        <div className="book-info">
-                          <span className="book-title">{r.title}</span>
-                          <span className="book-id">#{r.book_id}</span>
-                        </div>
+                      <td>
+                        {r.title}
+                        <span style={{ color: "#8b6f47", fontSize: "13px" }}>
+                          (#{r.book_id})
+                        </span>
                       </td>
                     </tr>
                   ))}
