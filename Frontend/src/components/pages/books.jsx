@@ -193,7 +193,6 @@ export default function AllBooks() {
   /* =============== JSX =============== */
   return (
     <>
-      {/* STATS */}
       <div className="inventory-stats">
         <div className="stat-card stat-total">
           <div className="stat-icon">📚</div>
