@@ -145,7 +145,7 @@ export default function AllBooks() {
   useEffect(() => {
     function handleBooksChanged(payload) {
       // ignore current user
-      if (!payload?.userId || payload.userId === user?.id) return;
+      if (!payload?.userId || String(payload.userId) === String(user?.id)) return;
 
       setBooks((prev) => {
         if (!payload?.reason) return prev;

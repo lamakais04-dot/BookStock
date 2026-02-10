@@ -263,7 +263,7 @@ export default function BookItem({
         );
       }
 
-      setMsg(res.message);
+      setSuccessModal({ show: true, type: "borrow" });
     } catch {
       setError("לא ניתן להשאיל את הספר");
     } finally {
@@ -354,6 +354,7 @@ export default function BookItem({
         {isAdmin ? (
           <div className="admin-actions">
             <button
+              type="button"
               className="edit-btn"
               onClick={(e) => {
                 e.stopPropagation();
@@ -363,6 +364,7 @@ export default function BookItem({
               ✏️ ערוך
             </button>
             <button
+              type="button"
               className="delete-btn"
               onClick={handleDeleteClick}
             >
@@ -373,6 +375,7 @@ export default function BookItem({
           <div className="book-actions">
             {mode === "profile" ? (
               <button
+                type="button"
                 className="return-btn"
                 onClick={handleReturn}
                 disabled={loading}
@@ -383,6 +386,7 @@ export default function BookItem({
               <>
                 {isBorrowedByMe ? (
                   <button
+                    type="button"
                     className="return-btn"
                     onClick={handleReturn}
                     disabled={loading}
@@ -391,6 +395,7 @@ export default function BookItem({
                   </button>
                 ) : (
                   <button
+                    type="button"
                     className="borrow-btn"
                     onClick={handleBorrow}
                     disabled={borrowDisabled}
