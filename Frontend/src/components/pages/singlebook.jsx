@@ -25,6 +25,9 @@ export default function SingleBook() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [error, setError] = useState("");
+  const [blockedModalMessage, setBlockedModalMessage] = useState("");
   const [book, setBook] = useState(null);
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -77,7 +80,10 @@ export default function SingleBook() {
 
   const handleBorrow = async () => {
     if (!user) return setError("יש להתחבר כדי להשאיל ספר");
-    if (isBlocked) return setError("החשבון שלך חסום");
+    if (isBlocked) {
+      setBlockedModalMessage("החשבון שלך חסום — לא ניתן להשאיל ספרים");
+      return;
+    }
 
     setActionLoading(true);
     try {
@@ -98,7 +104,10 @@ export default function SingleBook() {
   };
 
   const handleReturn = async () => {
-    if (isBlocked) return setError("החשבון שלך חסום");
+    if (isBlocked) {
+      setBlockedModalMessage("החשבון שלך חסום — לא ניתן להחזיר ספרים");
+      return;
+    }
 
     setActionLoading(true);
     try {
@@ -120,7 +129,10 @@ export default function SingleBook() {
 
   const handleFavorite = async () => {
     if (!user) return setError("יש להתחבר כדי להוסיף למועדפים");
-    if (isBlocked) return setError("החשבון שלך חסום");
+    if (isBlocked) {
+      setBlockedModalMessage("החשבון שלך חסום — לא ניתן לעדכן מועדפים");
+      return;
+    }
 
     try {
       if (isFavorite) {
@@ -139,7 +151,7 @@ export default function SingleBook() {
 
   const handleUpdateBook = async (formData) => {
     if (isBlocked) {
-      setError("החשבון שלך חסום — לא ניתן לערוך ספרים");
+      setBlockedModalMessage("החשבון שלך חסום — לא ניתן לערוך ספרים");
       return;
     }
 
@@ -155,7 +167,7 @@ export default function SingleBook() {
 
   const handleAddBook = async (formData) => {
     if (isBlocked) {
-      setError("החשבון שלך חסום — לא ניתן להוסיף ספרים");
+      setBlockedModalMessage("החשבון שלך חסום — לא ניתן להוסיף ספרים");
       return;
     }
 
@@ -284,7 +296,7 @@ export default function SingleBook() {
                   className="edit-toggle-button"
                   onClick={() => {
                     if (isBlocked) {
-                      setError("החשבון שלך חסום — לא ניתן לערוך ספרים");
+                      setBlockedModalMessage("החשבון שלך חסום — לא ניתן לערוך ספרים");
                       return;
                     }
                     setSearchParams({ edit: "true" });
@@ -324,20 +336,19 @@ export default function SingleBook() {
         </div>
       </div>
 
-      {/* SUCCESS MODAL */}
-      {showSuccessModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowSuccessModal(false)}
+      {blockedModalMessage && (
+        <div className="modal-overlay" onClick={() => setBlockedModalMessage("")}
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon">✅</div>
-            <h2 className="modal-title">הספר עודכן בהצלחה</h2>
+            <div className="modal-icon">🚫</div>
+            <h2 className="modal-title">פעולה חסומה</h2>
+            <p className="modal-message">{blockedModalMessage}</p>
             <button
-              className="modal-btn confirm"
-              onClick={() => setShowSuccessModal(false)}
+              type="button"
+              className="modal-close-button"
+              onClick={() => setBlockedModalMessage("")}
             >
-              סגור
+              הבנתי
             </button>
           </div>
         </div>
