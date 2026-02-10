@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Favorites from "../services/favorites";
 import Books from "../services/books";
-import BookItem from "./BookItem";
+import BookItem from "./bookitem";
 import "../csspages/favorites.css";
 import { useAuth } from "../context/AuthContext";
 import { socket } from "../services/socket";
