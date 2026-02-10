@@ -141,6 +141,13 @@ export default function AllBooks() {
     setBorrowedBooksCount((c) => Math.max(0, c - 1));
   }, []);
 
+  const handleLocalDelete = useCallback((deletedBook) => {
+    setBooks((prev) => prev.filter((b) => b.id !== deletedBook.id));
+    setTotalBooksCount((c) =>
+      Math.max(0, c - (Number(deletedBook.quantity) || 0))
+    );
+  }, []);
+
   /* =============== SOCKET UPDATES (OTHER USERS) =============== */
   useEffect(() => {
     function handleBooksChanged(payload) {
@@ -287,9 +294,11 @@ export default function AllBooks() {
             <BookItem
               key={book.id}
               book={book}
+              setBooks={setBooks}
               isAdmin={isAdmin}
               onLocalBorrow={handleLocalBorrow}
               onLocalReturn={handleLocalReturn}
+              onLocalDelete={handleLocalDelete}
             />
           ))
         )}

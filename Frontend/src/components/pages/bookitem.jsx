@@ -122,6 +122,7 @@ export default function BookItem({
   mode = "all",
   onLocalBorrow,
   onLocalReturn,
+  onLocalDelete,
 }) {
   const navigate = useNavigate();
   const { user, setUser, isBlocked } = useAuth();
@@ -188,10 +189,11 @@ export default function BookItem({
     try {
       await Books.deleteBook(book.id);
       setShowDeleteModal(false);
-      setSuccessModal({ show: true, type: "delete" });
-      setTimeout(() => {
+      if (onLocalDelete) {
+        onLocalDelete(book);
+      } else {
         setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
-      }, 2500);
+      }
     } catch {
       setError("שגיאה במחיקת הספר");
       setShowDeleteModal(false);
