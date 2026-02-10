@@ -7,8 +7,11 @@ export default function BookForm({
   ageGroups = [],
   onSubmit,
   mode = "create", // create | edit
+  title,
+  subtitle,
 }) {
-  const isEditMode = mode === "edit";
+  const isEditMode =
+    mode === "edit" || Boolean(initialData?.id);
 
   const [form, setForm] = useState({
     title: initialData.title || "",
@@ -58,12 +61,16 @@ export default function BookForm({
       >
         <div className="form-header">
           <h2 className="form-title">
-            {isEditMode ? "עריכת ספר" : "הוספת ספר חדש"}
+            {title ||
+              (isEditMode
+                ? "עריכת ספר"
+                : "הוספת ספר חדש")}
           </h2>
           <p className="form-subtitle">
-            {isEditMode
-              ? "עדכן את פרטי הספר ושמור שינויים"
-              : "מלא את כל הפרטים להוספת הספר לספרייה"}
+            {subtitle ||
+              (isEditMode
+                ? "עדכן את פרטי הספר ושמור שינויים"
+                : "מלא את כל הפרטים להוספת הספר לספרייה")}
           </p>
         </div>
 
