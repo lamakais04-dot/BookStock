@@ -264,6 +264,7 @@ export default function SingleBook() {
 
               {isAdmin ? (
                 <button
+                  type="button"
                   className="edit-toggle-button"
                   onClick={() => setSearchParams({ edit: "true" })}
                 >
@@ -272,16 +273,24 @@ export default function SingleBook() {
               ) : (
                 <div className="book-actions">
                   {isBorrowedByMe ? (
-                    <button onClick={handleReturn} disabled={actionLoading}>
+                    <button
+                      type="button"
+                      onClick={handleReturn}
+                      disabled={actionLoading}
+                    >
                       החזר ספר
                     </button>
                   ) : (
-                    <button onClick={handleBorrow} disabled={actionLoading}>
+                    <button
+                      type="button"
+                      onClick={handleBorrow}
+                      disabled={actionLoading}
+                    >
                       השאל ספר
                     </button>
                   )}
 
-                  <button onClick={handleFavorite}>
+                  <button type="button" onClick={handleFavorite}>
                     {isFavorite ? "❤️ במועדפים" : "♡ הוסף למועדפים"}
                   </button>
                 </div>
