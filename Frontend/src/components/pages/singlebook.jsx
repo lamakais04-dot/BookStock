@@ -219,7 +219,6 @@ export default function SingleBook() {
                 categories={categories}
                 ageGroups={ageGroups}
                 onSubmit={isNew ? handleAddBook : handleUpdateBook}
-                mode={isNew ? "create" : "edit"}
               />
 
               {!isNew && (
