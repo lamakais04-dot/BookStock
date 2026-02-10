@@ -9,6 +9,8 @@ export default function BookForm({
   mode = "create", // create | edit
   title,
   subtitle,
+  readOnly = false,
+  readOnlyMessage = "החשבון שלך חסום — לא ניתן לבצע פעולה זו",
 }) {
   const isEditMode =
     mode === "edit" || Boolean(initialData?.id);
@@ -112,6 +114,11 @@ export default function BookForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (readOnly) {
+      setValidationErrors([readOnlyMessage]);
+      return;
+    }
+
     const errors = validateForm();
     setValidationErrors(errors);
     if (errors.length > 0) return;
@@ -177,7 +184,7 @@ export default function BookForm({
             value={form.title}
             onChange={handleChange}
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           />
         </div>
 
@@ -189,7 +196,7 @@ export default function BookForm({
             onChange={handleChange}
             rows={4}
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           />
         </div>
 
@@ -201,7 +208,7 @@ export default function BookForm({
             value={form.author}
             onChange={handleChange}
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           />
         </div>
 
@@ -214,7 +221,7 @@ export default function BookForm({
             onChange={handleChange}
             min="1"
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           />
         </div>
 
@@ -227,7 +234,7 @@ export default function BookForm({
             onChange={handleChange}
             min="0"
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           />
         </div>
 
@@ -237,7 +244,7 @@ export default function BookForm({
             value={form.categoryid}
             onChange={handleChange}
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           >
             <option value="">בחר קטגוריה</option>
             {categories.map((cat) => (
@@ -254,7 +261,7 @@ export default function BookForm({
             value={form.agesid}
             onChange={handleChange}
             required
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnly}
           >
             <option value="">בחר קבוצת גיל</option>
             {ageGroups.map((age) => (
@@ -269,7 +276,7 @@ export default function BookForm({
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
-          disabled={isSubmitting}
+          disabled={isSubmitting || readOnly}
         />
 
         <small className="book-form-image-hint">
@@ -278,7 +285,7 @@ export default function BookForm({
 
         {form.imageFile && <p>{form.imageFile.name}</p>}
 
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" disabled={isSubmitting || readOnly}>
           {isSubmitting
             ? "שומר..."
             : isEditMode
