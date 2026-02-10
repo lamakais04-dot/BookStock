@@ -27,6 +27,7 @@ router = APIRouter()
 
 # ---------- helper: user or None ----------
 
+
 def get_user_or_none(access_token: str | None = Cookie(default=None)):
     # reuse existing get_user, but turn 401 into None
     if access_token is None:
@@ -40,6 +41,7 @@ def get_user_or_none(access_token: str | None = Cookie(default=None)):
 
 
 # ---------- AUTH ----------
+
 
 @router.post("/signup", status_code=201)
 def sign_up(
@@ -67,11 +69,17 @@ def login(
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie(key="access_token", path="/")
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        samesite="none",
+        secure=True,
+    )
     return {"message": "Logged out successfully"}
 
 
 # ---------- USER ----------
+
 
 @router.get("/me")
 def me(user=Depends(get_user)):
@@ -100,6 +108,7 @@ async def upload_image(
 
 
 # ---------- BOOK ----------
+
 
 @router.get("/{book_id}")
 def get_book_by_id_route(book_id: int, user=Depends(get_user)):
