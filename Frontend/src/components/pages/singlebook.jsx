@@ -68,7 +68,9 @@ export default function SingleBook() {
       try {
         const favs = await Favorites.getFavorites();
         setIsFavorite(favs.some((f) => f.bookid === Number(id)));
-      } catch {}
+      } catch (err) {
+        console.error("Failed to load favorites", err);
+      }
     }
 
     loadFavs();
@@ -151,8 +153,9 @@ export default function SingleBook() {
     try {
       await Books.addBook(formData);
       navigate("/book");
-    } catch {
-      setError("שגיאה בהוספת ספר");
+    } catch (err) {
+      const serverMsg = err?.response?.data?.detail;
+      setError(serverMsg || "שגיאה בהוספת ספר");
     }
   };
 
@@ -213,7 +216,7 @@ export default function SingleBook() {
                 initialData={isNew ? {} : book}
                 categories={categories}
                 ageGroups={ageGroups}
-                onSubmit={isNew ? handleCreateBook : handleUpdateBook}
+                onSubmit={isNew ? handleAddBook : handleUpdateBook}
               />
 
               {!isNew && (
@@ -264,6 +267,7 @@ export default function SingleBook() {
 
               {isAdmin ? (
                 <button
+                  type="button"
                   className="edit-toggle-button"
                   onClick={() => setSearchParams({ edit: "true" })}
                 >
@@ -272,16 +276,24 @@ export default function SingleBook() {
               ) : (
                 <div className="book-actions">
                   {isBorrowedByMe ? (
-                    <button onClick={handleReturn} disabled={actionLoading}>
+                    <button
+                      type="button"
+                      onClick={handleReturn}
+                      disabled={actionLoading}
+                    >
                       החזר ספר
                     </button>
                   ) : (
-                    <button onClick={handleBorrow} disabled={actionLoading}>
+                    <button
+                      type="button"
+                      onClick={handleBorrow}
+                      disabled={actionLoading}
+                    >
                       השאל ספר
                     </button>
                   )}
 
-                  <button onClick={handleFavorite}>
+                  <button type="button" onClick={handleFavorite}>
                     {isFavorite ? "❤️ במועדפים" : "♡ הוסף למועדפים"}
                   </button>
                 </div>
