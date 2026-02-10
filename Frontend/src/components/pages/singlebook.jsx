@@ -14,9 +14,11 @@ export default function SingleBook() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+   const { isBlocked, setUser } = useAuth();  
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  const isNew = id === "new";
   const isEditMode = searchParams.get("edit") === "true";
   const isNew = !id || location.pathname === "/book/new";
 
