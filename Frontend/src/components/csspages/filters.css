@@ -216,3 +216,11 @@
     margin: 20px 0;
   }
 }
+
+
+/* Hide floating filters when a book modal is open */
+body.book-modal-open .category-menu,
+body.book-modal-open .age-filter,
+body.book-modal-open .category-list {
+  display: none !important;
+}

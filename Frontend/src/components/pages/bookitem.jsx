@@ -180,6 +180,15 @@ export default function BookItem({
     }
   }, [error]);
 
+  useEffect(() => {
+    const hasModalOpen = showDeleteModal || successModal.show;
+    document.body.classList.toggle("book-modal-open", hasModalOpen);
+
+    return () => {
+      document.body.classList.remove("book-modal-open");
+    };
+  }, [showDeleteModal, successModal.show]);
+
   const handleDeleteClick = (e) => {
     e.stopPropagation();
     setShowDeleteModal(true);
