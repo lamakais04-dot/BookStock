@@ -40,23 +40,22 @@ export default function Profile() {
     loadData();
   }, [loadBorrowedBooks]);
 
-  /* Live updates when this user borrows/returns in another tab / by admin */
+  /* Live updates when this user borrows/returns in another tab */
   useEffect(() => {
-    function handleBorrowReturnChanged(data) {
-      // if event belongs to current user – do nothing (local UI already updated)
-      if (!user || data?.user_id === user.id) return;
+    function handleBooksChanged(payload) {
+      if (!user?.id || !payload?.userId) return;
+      if (String(payload.userId) !== String(user.id)) return;
 
-      // only reload when some other user/admin changed this user's loans
       loadBorrowedBooks();
-      fetchUser();
+      fetchUser({ silent: true });
     }
 
-    socket.on("borrow_return_changed", handleBorrowReturnChanged);
+    socket.on("books_changed", handleBooksChanged);
 
     return () => {
-      socket.off("borrow_return_changed", handleBorrowReturnChanged);
+      socket.off("books_changed", handleBooksChanged);
     };
-  }, [user, loadBorrowedBooks, fetchUser]);
+  }, [user?.id, loadBorrowedBooks, fetchUser]);
 
   /* ===== Auto clear error ===== */
   useEffect(() => {
