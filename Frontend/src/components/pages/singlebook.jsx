@@ -98,6 +98,8 @@ export default function SingleBook() {
   };
 
   const handleReturn = async () => {
+    if (isBlocked) return setError("החשבון שלך חסום");
+
     setActionLoading(true);
     try {
       const res = await Library.returnBook(book.id);
@@ -136,6 +138,11 @@ export default function SingleBook() {
   /* ================= ADMIN ================= */
 
   const handleUpdateBook = async (formData) => {
+    if (isBlocked) {
+      setError("החשבון שלך חסום — לא ניתן לערוך ספרים");
+      return;
+    }
+
     try {
       await Books.updateBook(book.id, formData);
       const updatedBook = await Books.getBookById(book.id);
@@ -147,6 +154,11 @@ export default function SingleBook() {
   };
 
   const handleAddBook = async (formData) => {
+    if (isBlocked) {
+      setError("החשבון שלך חסום — לא ניתן להוסיף ספרים");
+      return;
+    }
+
     try {
       await Books.addBook(formData);
       navigate("/book");
@@ -177,6 +189,8 @@ export default function SingleBook() {
               onSubmit={handleAddBook}
               mode="create"
               title="הוספת ספר חדש"
+              readOnly={isBlocked}
+              readOnlyMessage="החשבון שלך חסום — לא ניתן להוסיף ספרים"
             />
 
             {error && <p className="borrow-error">{error}</p>}
@@ -217,6 +231,12 @@ export default function SingleBook() {
                   isNew
                     ? "מלא את כל הפרטים להוספת הספר לספרייה"
                     : "עדכן את פרטי הספר ושמור שינויים"
+                }
+                readOnly={isBlocked}
+                readOnlyMessage={
+                  isNew
+                    ? "החשבון שלך חסום — לא ניתן להוסיף ספרים"
+                    : "החשבון שלך חסום — לא ניתן לערוך ספרים"
                 }
               />
 
@@ -262,7 +282,13 @@ export default function SingleBook() {
                 <button
                   type="button"
                   className="edit-toggle-button"
-                  onClick={() => setSearchParams({ edit: "true" })}
+                  onClick={() => {
+                    if (isBlocked) {
+                      setError("החשבון שלך חסום — לא ניתן לערוך ספרים");
+                      return;
+                    }
+                    setSearchParams({ edit: "true" });
+                  }}
                 >
                   ✏️ עריכה
                 </button>

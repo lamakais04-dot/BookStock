@@ -191,6 +191,7 @@ export default function BookItem({
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
+    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן למחוק ספרים")) return;
     setShowDeleteModal(true);
   };
 
@@ -371,6 +372,7 @@ export default function BookItem({
               className="edit-btn"
               onClick={(e) => {
                 e.stopPropagation();
+                if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן לערוך ספרים")) return;
                 navigate(`/book/${book.id}?edit=true`);
               }}
             >
