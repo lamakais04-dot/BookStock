@@ -641,3 +641,24 @@
 .book-form.edit-mode button[type="submit"] {
   background: linear-gradient(135deg, #8b4513 0%, #b46834 100%);
 }
+
+
+.book-form-errors {
+  background: #fff4f1;
+  border: 1.5px solid #e8a89c;
+  border-radius: 14px;
+  padding: 10px 14px;
+  color: #8f2d1f;
+}
+
+.book-form-errors ul {
+  margin: 0;
+  padding-right: 18px;
+  direction: rtl;
+}
+
+.book-form-errors li {
+  margin: 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
