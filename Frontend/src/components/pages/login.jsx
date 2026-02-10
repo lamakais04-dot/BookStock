@@ -12,6 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ✅ Same password validation like Signup:
   // min 8 chars, starts with uppercase letter, at least 1 special char
@@ -44,6 +45,7 @@ export default function Login() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
+      setIsSubmitting(true);
       await LoginClass.handleSubmit(email, password);
       await fetchUser();
 
@@ -53,11 +55,13 @@ export default function Login() {
       setErrors({});
 
       setTimeout(() => {
-        navigate("/");
-      }, 2000);
+        navigate("/", { replace: true });
+      }, 1400);
     } catch {
       setErrors({ general: "אימייל או סיסמה שגויים" });
       setShowSuccess(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -74,7 +78,7 @@ export default function Login() {
         {errors.general && <div className="login-alert error">❌ {errors.general}</div>}
 
         {showSuccess && (
-          <div className="login-alert success">✔ התחברת בהצלחה! מועבר לאתר...</div>
+          <div className="login-alert success">✔ התחברת בהצלחה! את/ה מועבר/ת לאפליקציה...</div>
         )}
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -127,8 +131,8 @@ export default function Login() {
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
-          <button className="login-button" type="submit">
-            התחבר
+          <button className="login-button" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "מתחבר..." : "התחבר"}
           </button>
         </form>
 
