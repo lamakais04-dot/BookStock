@@ -4,7 +4,7 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import { useAuth } from "../context/AuthContext";
-import BookForm from "../components/BookForm";
+import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
 import "../csspages/BookForm.css";
 
@@ -169,7 +169,7 @@ export default function SingleBook() {
                 </div>
               </div>
 
-              {isAdmin && (
+              {isAdmin? (
                 <button
                   type="button"
                   className="edit-toggle-button"
@@ -177,7 +177,7 @@ export default function SingleBook() {
                 >
                   ✏️ עריכה
                 </button>
-              ) : (
+              )  :(
                 <div className="book-actions">
                   {isBorrowedByMe ? (
                     <button
