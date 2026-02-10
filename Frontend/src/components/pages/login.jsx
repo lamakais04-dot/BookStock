@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import LoginClass from "../services/login.js";
-import { useAuth } from "../context/AuthContext.jsx";
 import "../csspages/login.css";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const { fetchUser } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +43,6 @@ export default function Login() {
     try {
       setIsSubmitting(true);
       await LoginClass.handleSubmit(email, password);
-      await fetchUser();
 
       setShowSuccess(true);
       setEmail("");
@@ -55,7 +50,7 @@ export default function Login() {
       setErrors({});
 
       setTimeout(() => {
-        navigate("/", { replace: true });
+        window.location.href = "/";
       }, 1400);
     } catch {
       setErrors({ general: "אימייל או סיסמה שגויים" });
@@ -78,7 +73,7 @@ export default function Login() {
         {errors.general && <div className="login-alert error">❌ {errors.general}</div>}
 
         {showSuccess && (
-          <div className="login-alert success">✔ התחברת בהצלחה! את/ה מועבר/ת לאפליקציה...</div>
+          <div className="login-alert success">✔ התחברת בהצלחה! מעביר/ה אותך לאפליקציה...</div>
         )}
 
         <form className="login-form" onSubmit={handleSubmit}>
