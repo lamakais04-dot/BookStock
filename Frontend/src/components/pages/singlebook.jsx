@@ -1,6 +1,6 @@
 // SingleBook.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
 import Favorites from "../services/favorites";
@@ -13,12 +13,13 @@ import "../csspages/BookForm.css";
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { user, setUser, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const isEditMode = searchParams.get("edit") === "true";
-  const isNew = id === "new";
+  const isNew = !id || location.pathname === "/book/new";
 
   /* ================= STATE ================= */
   const [loading, setLoading] = useState(true);
