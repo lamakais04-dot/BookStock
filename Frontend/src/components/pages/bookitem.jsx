@@ -122,6 +122,7 @@ export default function BookItem({
   mode = "all",
   onLocalBorrow,
   onLocalReturn,
+  onLocalDelete,
 }) {
   const navigate = useNavigate();
   const { user, setUser, isBlocked } = useAuth();
@@ -179,6 +180,15 @@ export default function BookItem({
     }
   }, [error]);
 
+  useEffect(() => {
+    const hasModalOpen = showDeleteModal || successModal.show;
+    document.body.classList.toggle("book-modal-open", hasModalOpen);
+
+    return () => {
+      document.body.classList.remove("book-modal-open");
+    };
+  }, [showDeleteModal, successModal.show]);
+
   const handleDeleteClick = (e) => {
     e.stopPropagation();
     setShowDeleteModal(true);
@@ -188,10 +198,11 @@ export default function BookItem({
     try {
       await Books.deleteBook(book.id);
       setShowDeleteModal(false);
-      setSuccessModal({ show: true, type: "delete" });
-      setTimeout(() => {
+      if (onLocalDelete) {
+        onLocalDelete(book);
+      } else {
         setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
-      }, 2500);
+      }
     } catch {
       setError("שגיאה במחיקת הספר");
       setShowDeleteModal(false);
@@ -294,9 +305,13 @@ export default function BookItem({
         canBorrow: res.canBorrow,
       }));
 
+      setSuccessModal({ show: true, type: "return" });
+
       if (mode === "profile") {
-        // in profile view we remove the card
-        setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+        // in profile view, keep card visible for modal feedback then remove it
+        setTimeout(() => {
+          setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+        }, 1200);
       } else if (onLocalReturn) {
         onLocalReturn(book.id); // AllBooks updates list + counters
       } else {
@@ -309,8 +324,6 @@ export default function BookItem({
           )
         );
       }
-
-      setSuccessModal({ show: true, type: "return" });
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
