@@ -6,6 +6,7 @@ import Filters from "../services/filtirs";
 import { useAuth } from "../context/AuthContext";
 import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
+import Favorites from "../services/favorites";
 import "../csspages/BookForm.css";
 
 export default function SingleBook() {
@@ -16,7 +17,6 @@ export default function SingleBook() {
 
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  const isNew = id === "new";
   const isEditMode = searchParams.get("edit") === "true";
   const isNew = !id || location.pathname === "/book/new";
 
@@ -26,6 +26,9 @@ export default function SingleBook() {
   const [book, setBook] = useState(null);
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);  
+  const isBorrowedByMe = user?.borrowedBooks?.some((b) => b.bookid === book?.id);
 
   /* ================= LOAD DATA ================= */
   useEffect(() => {
