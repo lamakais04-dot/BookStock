@@ -305,9 +305,13 @@ export default function BookItem({
         canBorrow: res.canBorrow,
       }));
 
+      setSuccessModal({ show: true, type: "return" });
+
       if (mode === "profile") {
-        // in profile view we remove the card
-        setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+        // in profile view, keep card visible for modal feedback then remove it
+        setTimeout(() => {
+          setBooks?.((prev) => prev.filter((b) => b.id !== book.id));
+        }, 1200);
       } else if (onLocalReturn) {
         onLocalReturn(book.id); // AllBooks updates list + counters
       } else {
@@ -320,8 +324,6 @@ export default function BookItem({
           )
         );
       }
-
-      setSuccessModal({ show: true, type: "return" });
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
