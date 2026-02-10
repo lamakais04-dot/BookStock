@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { socket } from "../services/socket"; // adjust path if needed
-
+import { socket } from "../services/socket";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
