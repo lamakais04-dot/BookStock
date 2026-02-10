@@ -122,7 +122,7 @@ async def remove_book(
         {
             "reason": "deleted",
             "bookId": book_id,
-            "userId": admin.id,
+            "userId": admin["id"],
         },
     )
 
