@@ -10,6 +10,10 @@ from schemas.books import BookCreate, BookUpdate
 from services.authService import upload_image_to_s3
 
 
+def _normalized_title(value: str) -> str:
+    return " ".join(value.split()).strip()
+
+
 def get_books(
     page: int = 1,
     limit: int = 8,
@@ -79,15 +83,23 @@ def get_book_by_id(book_id: int):
         return book
 
 
-def create_book(data: BookCreate, image_file: UploadFile):
-    image_url = upload_image_to_s3(image_file, "books")
-
-    new_book = books(
-        **data.model_dump(),
-        image=image_url,
-    )
+def create_book(data: BookCreate, image_file: UploadFile | None):
+    image_url = upload_image_to_s3(image_file, "books") if image_file else None
+    normalized_title = _normalized_title(data.title)
 
     with Session(engine) as session:
+        exists = session.exec(
+            select(books).where(func.lower(books.title) == normalized_title.lower())
+        ).first()
+        if exists:
+            raise HTTPException(400, "כבר קיים ספר עם שם זה")
+
+        new_book = books(
+            **data.model_dump(),
+            title=normalized_title,
+            image=image_url,
+        )
+
         session.add(new_book)
         session.commit()
         session.refresh(new_book)
@@ -100,7 +112,21 @@ def update_book(book_id: int, data: BookUpdate, image_file: UploadFile | None):
         if not book:
             raise HTTPException(404, "Book not found")
 
-        for key, value in data.model_dump(exclude_none=True).items():
+        updates = data.model_dump(exclude_none=True)
+
+        if "title" in updates:
+            normalized_title = _normalized_title(updates["title"])
+            exists = session.exec(
+                select(books).where(
+                    func.lower(books.title) == normalized_title.lower(),
+                    books.id != book_id,
+                )
+            ).first()
+            if exists:
+                raise HTTPException(400, "כבר קיים ספר עם שם זה")
+            updates["title"] = normalized_title
+
+        for key, value in updates.items():
             setattr(book, key, value)
 
         if image_file:
