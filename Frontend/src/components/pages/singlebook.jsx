@@ -7,6 +7,9 @@ import { useAuth } from "../context/AuthContext";
 import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
 import "../csspages/BookForm.css";
+import Favorites from "./favorites";
+import Library from "../services/library";
+
 
 export default function SingleBook() {
   const { id } = useParams();
@@ -25,13 +28,11 @@ export default function SingleBook() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [error, setError] = useState("");
   const [blockedModalMessage, setBlockedModalMessage] = useState("");
   const [book, setBook] = useState(null);
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
+  const isBorrowedByMe = user?.borrowedBooks?.some((b) => b.bookid === book?.id);
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function loadData() {
