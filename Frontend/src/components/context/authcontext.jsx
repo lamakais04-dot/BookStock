@@ -42,6 +42,19 @@ export function AuthProvider({ children }) {
     };
   }, [user]); // re-subscribe if user changes
 
+  useEffect(() => {
+    function handleUsersChanged(payload) {
+      if (!user?.id || !payload?.userId) return;
+      if (String(payload.userId) !== String(user.id)) return;
+      fetchUser({ silent: true });
+    }
+
+    socket.on("users_changed", handleUsersChanged);
+    return () => {
+      socket.off("users_changed", handleUsersChanged);
+    };
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
