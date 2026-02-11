@@ -130,6 +130,7 @@ export default function BookItem({
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [blockedModalMessage, setBlockedModalMessage] = useState("");
   
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -150,6 +151,7 @@ export default function BookItem({
   ) => {
     if (isBlocked) {
       setError(text);
+      setBlockedModalMessage(text);
       return true;
     }
     return false;
@@ -191,6 +193,7 @@ export default function BookItem({
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
+    if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן למחוק ספרים")) return;
     setShowDeleteModal(true);
   };
 
@@ -353,6 +356,17 @@ export default function BookItem({
         bookTitle={book.title}
       />
 
+      {blockedModalMessage && (
+        <div className="modal-overlay" onClick={() => setBlockedModalMessage("")}>
+          <div className="modal-content modal-success" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon confirm">🚫</div>
+            <h2 className="modal-title">פעולה חסומה</h2>
+            <p className="modal-message">{blockedModalMessage}</p>
+            <button type="button" className="modal-btn modal-btn-secondary" onClick={() => setBlockedModalMessage("")}>הבנתי</button>
+          </div>
+        </div>
+      )}
+
       <div className="book-card">
         <div className="book-image" onClick={handleClick}>
           <img src={book.image} alt={book.title} />
@@ -371,6 +385,7 @@ export default function BookItem({
               className="edit-btn"
               onClick={(e) => {
                 e.stopPropagation();
+                if (blockActionIfBlocked("החשבון שלך חסום — לא ניתן לערוך ספרים")) return;
                 navigate(`/book/${book.id}?edit=true`);
               }}
             >

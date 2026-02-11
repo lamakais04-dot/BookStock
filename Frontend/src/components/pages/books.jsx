@@ -33,8 +33,9 @@ export default function AllBooks() {
 
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
+  const [blockedError, setBlockedError] = useState("");
 
-  const { user } = useAuth();
+  const { user, isBlocked } = useAuth();
   const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
 
@@ -199,6 +200,12 @@ export default function AllBooks() {
 
   const availableBooksCount = totalBooksCount - borrowedBooksCount;
 
+  useEffect(() => {
+    if (!blockedError) return;
+    const t = setTimeout(() => setBlockedError(""), 2500);
+    return () => clearTimeout(t);
+  }, [blockedError]);
+
   /* =============== JSX =============== */
   return (
     <>
@@ -235,11 +242,21 @@ export default function AllBooks() {
         <div className="add-book-wrapper">
           <button
             className="add-book-btn"
-            onClick={() => navigate("/book/new")}
+            onClick={() => {
+              if (isBlocked) {
+                setBlockedError("החשבון שלך חסום — לא ניתן להוסיף או לערוך ספרים");
+                return;
+              }
+              navigate("/book/new");
+            }}
           >
             ➕ הוסף ספר חדש
           </button>
         </div>
+      )}
+
+      {blockedError && (
+        <div className="books-blocked-error">{blockedError}</div>
       )}
 
       {/* AGE FILTER */}
