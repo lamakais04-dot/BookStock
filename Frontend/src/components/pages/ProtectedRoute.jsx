@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authcontext";
 
-export default function ProtectedRoute({
+export default function ProtectedRoute({ 
   children,
   requireAdmin = false,
   blockAdmin = false
@@ -17,7 +17,7 @@ export default function ProtectedRoute({
 
   // User trying admin page
   if (requireAdmin && user.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />; // או עמוד "אין גישה"
   }
 
   // Admin trying user-only page

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/authcontext";
 import "../../csspages/navbar.css";
 import logo from "../../../../BookstockLogo.png";
 import LoginClass from "../../services/login";
@@ -8,7 +8,7 @@ import LoginClass from "../../services/login";
 export default function Navbar() {
   const { user, loading, setUser, fetchUser } = useAuth();
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(""); 
   const navigate = useNavigate();
   const isBlocked = user?.is_blocked;
   const location = useLocation();
@@ -27,9 +27,9 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await LoginClass.handleLogout();
+      await LoginClass.handleLogout(); // שולח בקשת התנתקות לשרת
     } catch (err) {
-      console.error("Logout request failed, clearing local session", err);
+      console.error("Logout request failed, clearing local session", err); 
     } finally {
       setOpenProfileMenu(false);
       setSearch("");
@@ -41,7 +41,7 @@ export default function Navbar() {
 
   const handleSearchChange = (value) => {
     setSearch(value);
-    navigate(`/book?search=${encodeURIComponent(value)}`);
+    navigate(`/book?search=${encodeURIComponent(value)}`); 
   };
 
   const clearSearch = () => {

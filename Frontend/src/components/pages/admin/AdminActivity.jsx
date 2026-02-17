@@ -17,8 +17,8 @@ export default function AdminActivity() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await AdminService.getActivity({
-        action,
+      const data = await AdminService.getActivity({ 
+        action, 
         user_id: userId ? Number(userId) : undefined,
         limit: 200,
       });
@@ -66,6 +66,7 @@ export default function AdminActivity() {
     downloadBlob(blob, "activity.pdf");
   };
 
+  //print
   const handlePrint = () => {
     window.print();
   };

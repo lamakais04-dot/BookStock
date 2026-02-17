@@ -4,7 +4,7 @@ import Library from "../services/library";
 import Login from "../services/login";
 import "../csspages/profile.css";
 import BookItem from "./BookItem";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authcontext";
 import { socket } from "../services/socket";
 
 export default function Profile() {

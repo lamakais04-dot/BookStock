@@ -1,11 +1,11 @@
 // BookForm.jsx
 import { useState } from "react";
 
-export default function BookForm({
-  initialData = {},
+export default function BookForm({  
+  initialData = {}, // אם יש, זה עמוד עריכה. אם לא, זה עמוד יצירה
   categories = [],
   ageGroups = [],
-  onSubmit,
+  onSubmit, // פונקציה ששומרת לשרת
   mode = "create", // create | edit
   title,
   subtitle,
@@ -15,8 +15,8 @@ export default function BookForm({
   const isEditMode =
     mode === "edit" || Boolean(initialData?.id);
 
-  const [form, setForm] = useState({
-    title: initialData.title || "",
+  const [form, setForm] = useState({ 
+    title: initialData.title || "", 
     summary: initialData.summary || "",
     author: initialData.author || "",
     pages: initialData.pages || "",
@@ -79,7 +79,7 @@ export default function BookForm({
     }));
   };
 
-  const validateForm = () => {
+  const validateForm = () => { 
     const errors = [];
 
     if (!form.title.trim()) {

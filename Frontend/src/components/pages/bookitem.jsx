@@ -4,10 +4,10 @@ import "../csspages/BookItem.css";
 import Favorites from "../services/favorites";
 import Books from "../services/books";
 import Library from "../services/library";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authcontext";
 
 // Modal Component for Delete Confirmation
-function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) {
+function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) { 
   if (!show) return null;
 
   return (
@@ -117,10 +117,10 @@ function SuccessModal({ show, onClose, type, bookTitle }) {
 
 export default function BookItem({
   book,
-  setBooks,
+  setBooks, // פונקציה לעדכון הרשימה 
   isAdmin = false,
-  mode = "all",
-  onLocalBorrow,
+  mode = "all", // all | profile
+  onLocalBorrow, //עדכון מקומי אחרי השאלה
   onLocalReturn,
   onLocalDelete,
 }) {

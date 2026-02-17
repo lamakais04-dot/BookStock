@@ -4,7 +4,7 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8000/api/book";
 
 class Books {
-  static async getBooks(
+  static async getBooks( // מקבל רשימת ספרים עם אפשרויות סינון
     page = 1,
     limit = 8,
     categoryId = null,
@@ -42,8 +42,8 @@ class Books {
     return res.data;
   }
 
-  static async addBook(data) {
-    const formData = new FormData();
+  static async addBook(data) { // מוסיף ספר חדש עם פרטים וייתכן תמונה
+    const formData = new FormData(); 
 
     formData.append("title", data.title);
     formData.append("summary", data.summary);
