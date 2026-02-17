@@ -1,10 +1,12 @@
 import axios from "axios";
+const APIKEY = import.meta.env.VITE_API_KEY;
+
 
 class Favorites {
     static async getFavorites() {
         const res = await axios.get("http://localhost:8000/api/favorites", {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" }
+            headers: { apiKey: APIKEY }
         });
         return res.data;
     }
@@ -15,7 +17,7 @@ class Favorites {
             {},
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             });
     }
 
@@ -24,7 +26,7 @@ class Favorites {
             `http://localhost:8000/api/favorites/${bookId}`,
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             });
     }
 }
