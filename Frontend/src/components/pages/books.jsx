@@ -29,7 +29,6 @@ export default function AllBooks() {
 
   const [categoryId, setCategoryId] = useState(null);
   const [ageGroupId, setAgeGroupId] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
@@ -46,22 +45,13 @@ export default function AllBooks() {
     return new URLSearchParams(location.search).get("search") || "";
   }, [location.search]);
 
-  // Keep initial order of fetched books stable
   const orderRef = useRef([]);
 
   const loadBooks = useCallback(
     async (page, catId, ageId, searchTerm, withSpinner = true) => {
       if (withSpinner) setLoading(true);
-
       try {
-        const data = await Books.getBooks(
-          page,
-          booksPerPage,
-          catId,
-          ageId,
-          searchTerm
-        );
-
+        const data = await Books.getBooks(page, booksPerPage, catId, ageId, searchTerm);
         const fetchedBooks = data?.books || [];
 
         if (orderRef.current.length === 0) {
@@ -70,8 +60,7 @@ export default function AllBooks() {
 
         const orderedBooks = [...fetchedBooks].sort(
           (a, b) =>
-            orderRef.current.indexOf(a.id) -
-            orderRef.current.indexOf(b.id)
+            orderRef.current.indexOf(a.id) - orderRef.current.indexOf(b.id)
         );
 
         setBooks(orderedBooks);
@@ -104,30 +93,25 @@ export default function AllBooks() {
     loadFilters();
   }, []);
 
-  /* =============== FETCH ON PAGE / FILTER / SEARCH CHANGE =============== */
-
-  // When filters/search change, reset to page 1 and clear order
+  /* =============== RESET ON FILTER / SEARCH CHANGE =============== */
   useEffect(() => {
     orderRef.current = [];
     setCurrentPage(1);
   }, [categoryId, ageGroupId, search]);
 
-  // Whenever page / filters / search change -> fetch
+  /* =============== FETCH =============== */
   useEffect(() => {
     const delay = setTimeout(() => {
       loadBooks(currentPage, categoryId, ageGroupId, search, true);
-    }, 400); // debounce for search/filter
-
+    }, 400);
     return () => clearTimeout(delay);
   }, [currentPage, categoryId, ageGroupId, search, loadBooks]);
 
-  /* =============== LOCAL UPDATERS (CURRENT USER) =============== */
+  /* =============== LOCAL UPDATERS =============== */
   const handleLocalBorrow = useCallback((bookId) => {
     setBooks((prev) =>
       prev.map((b) =>
-        b.id === bookId
-          ? { ...b, quantity: Math.max(0, b.quantity - 1) }
-          : b
+        b.id === bookId ? { ...b, quantity: Math.max(0, b.quantity - 1) } : b
       )
     );
     setBorrowedBooksCount((c) => c + 1);
@@ -149,15 +133,13 @@ export default function AllBooks() {
     );
   }, []);
 
-  /* =============== SOCKET UPDATES (OTHER USERS) =============== */
+  /* =============== SOCKET =============== */
   useEffect(() => {
     function handleBooksChanged(payload) {
-      // ignore current user
       if (!payload?.userId || String(payload.userId) === String(user?.id)) return;
 
       setBooks((prev) => {
         if (!payload?.reason) return prev;
-
         switch (payload.reason) {
           case "borrowed":
             setBorrowedBooksCount((c) => c + 1);
@@ -166,32 +148,23 @@ export default function AllBooks() {
                 ? { ...b, quantity: Math.max(0, b.quantity - 1) }
                 : b
             );
-
           case "returned":
             setBorrowedBooksCount((c) => Math.max(0, c - 1));
             return prev.map((b) =>
-              b.id === payload.id
-                ? { ...b, quantity: b.quantity + 1 }
-                : b
+              b.id === payload.id ? { ...b, quantity: b.quantity + 1 } : b
             );
-
           case "updated":
             return prev.map((b) =>
               b.id === payload.book.id ? { ...b, ...payload.book } : b
             );
-
           case "created":
             return payload.book ? [payload.book, ...prev] : prev;
-
           case "deleted":
             return prev.filter((b) => b.id !== payload.bookId);
-
           default:
             return prev;
         }
       });
-
-      // keep counters in sync for borrow/return live events
     }
 
     socket.on("books_changed", handleBooksChanged);
@@ -209,6 +182,7 @@ export default function AllBooks() {
   /* =============== JSX =============== */
   return (
     <>
+      {/* STATS */}
       <div className="inventory-stats">
         <div className="stat-card stat-total">
           <div className="stat-icon">📚</div>
@@ -217,7 +191,6 @@ export default function AllBooks() {
             <div className="stat-label">סה"כ ספרים</div>
           </div>
         </div>
-
         <div className="stat-card stat-borrowed">
           <div className="stat-icon">📖</div>
           <div className="stat-content">
@@ -225,16 +198,47 @@ export default function AllBooks() {
             <div className="stat-label">ספרים מושאלים</div>
           </div>
         </div>
-
         <div className="stat-card stat-available">
           <div className="stat-icon">✨</div>
           <div className="stat-content">
-            <div className="stat-number">
-              {availableBooksCount}
-            </div>
+            <div className="stat-number">{availableBooksCount}</div>
             <div className="stat-label">ספרים זמינים</div>
           </div>
         </div>
+      </div>
+
+      {/* CATEGORY BAR */}
+      <div className="category-bar">
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            className={`cat-pill ${categoryId === cat.id ? "active" : ""}`}
+            onClick={() => {
+              const next = cat.id === categoryId ? null : cat.id;
+              orderRef.current = [];
+              setCategoryId(next);
+            }}
+          >
+            ★ {cat.name}
+          </button>
+        ))}
+      </div>
+
+      {/* AGE FILTER */}
+      <div className="age-filter">
+        {ageGroups.map((age) => (
+          <button
+            key={age.id}
+            className={`age-btn ${ageGroupId === age.id ? "active" : ""}`}
+            onClick={() => {
+              const next = ageGroupId === age.id ? null : age.id;
+              orderRef.current = [];
+              setAgeGroupId(next);
+            }}
+          >
+            ★ {age.description}
+          </button>
+        ))}
       </div>
 
       {/* ADD BOOK */}
@@ -258,25 +262,6 @@ export default function AllBooks() {
       {blockedError && (
         <div className="books-blocked-error">{blockedError}</div>
       )}
-
-      {/* AGE FILTER */}
-      <div className="age-filter">
-        {ageGroups.map((age) => (
-          <button
-            key={age.id}
-            className={`age-btn ${
-              ageGroupId === age.id ? "active" : ""
-            }`}
-            onClick={() => {
-              const next = ageGroupId === age.id ? null : age.id;
-              orderRef.current = [];
-              setAgeGroupId(next);
-            }}
-          >
-            ★ {age.description}
-          </button>
-        ))}
-      </div>
 
       {/* CLEAR FILTERS */}
       {(categoryId || ageGroupId || search) && (
@@ -328,75 +313,27 @@ export default function AllBooks() {
         <div className="pagination">
           <button
             disabled={currentPage === 1}
-            onClick={() => {
-              orderRef.current = [];
-              setCurrentPage((p) => p - 1);
-            }}
+            onClick={() => { orderRef.current = []; setCurrentPage((p) => p - 1); }}
           >
             הקודם
           </button>
-
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
               className={currentPage === i + 1 ? "active" : ""}
-              onClick={() => {
-                orderRef.current = [];
-                setCurrentPage(i + 1);
-              }}
+              onClick={() => { orderRef.current = []; setCurrentPage(i + 1); }}
             >
               {i + 1}
             </button>
           ))}
-
           <button
             disabled={currentPage === totalPages}
-            onClick={() => {
-              orderRef.current = [];
-              setCurrentPage((p) => p + 1);
-            }}
+            onClick={() => { orderRef.current = []; setCurrentPage((p) => p + 1); }}
           >
             הבא
           </button>
         </div>
       )}
-
-      {/* CATEGORY MENU */}
-      <div className="category-menu">
-        <button
-          className="menu-btn"
-          onMouseEnter={() => setIsFilterOpen(true)}
-          onMouseLeave={() => setIsFilterOpen(false)}
-        >
-          ☰
-        </button>
-
-        {isFilterOpen && (
-          <div
-            className="category-list"
-            onMouseEnter={() => setIsFilterOpen(true)}
-            onMouseLeave={() => setIsFilterOpen(false)}
-          >
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                className={
-                  categoryId === cat.id ? "active" : ""
-                }
-                onClick={() => {
-                  const next =
-                    cat.id === categoryId ? null : cat.id;
-                  orderRef.current = [];
-                  setCategoryId(next);
-                  setIsFilterOpen(false);
-                }}
-              >
-                ★ {cat.name}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
     </>
   );
 }

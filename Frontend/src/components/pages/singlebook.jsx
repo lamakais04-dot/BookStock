@@ -8,7 +8,6 @@ import BookForm from "./BookForm";
 import "../csspages/singleBook.css";
 import Favorites from "../services/favorites";
 import "../csspages/BookForm.css";
-import Favorites from "./favorites";
 import Library from "../services/library";
 
 
