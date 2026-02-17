@@ -12,8 +12,7 @@ import { useAuth } from "../context/authcontext";
 import BookForm from "./BookForm";
 import Favorites from "../services/favorites";
 import Library from "../services/library";
-import "../csspages/singleBook.css";
-import "../csspages/BookForm.css";
+
 
 export default function SingleBook() {
   const { id } = useParams();
@@ -21,8 +20,10 @@ export default function SingleBook() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { user, setUser } = useAuth();
-
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+   const { isBlocked, setUser } = useAuth();  
+  const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const isBlocked = user?.is_blocked;
   const isEditMode = searchParams.get("edit") === "true";
@@ -31,15 +32,11 @@ export default function SingleBook() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
-  const [book, setBook] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [error, setError] = useState("");
   const [blockedModalMessage, setBlockedModalMessage] = useState("");
-  const [actionLoading, setActionLoading] = useState(false);
-
-  const isBorrowedByMe =
-    user?.borrowedBooks?.some((b) => b.bookid === book?.id);
-
+  const [book, setBook] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const isBorrowedByMe = user?.borrowedBooks?.some((b) => b.bookid === book?.id);
+  const [error, setError] = useState("");   
   /* ================= LOAD DATA ================= */
 
   useEffect(() => {

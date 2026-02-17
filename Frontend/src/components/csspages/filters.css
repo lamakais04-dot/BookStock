@@ -1,75 +1,57 @@
 /* =========================
-   CATEGORY MENU (☰)
+   filters.css — REWRITTEN
+   category-menu (☰) removed entirely.
+   age-filter is now a horizontal bar (no longer fixed/sidebar).
    ========================= */
-.category-menu {
-  position: fixed;
-  top: 120px;
-  left: 16px;
-  z-index: 60;
-}
 
-.menu-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  border: 1.5px solid #e8dcc8;
-  background: #ffffff;
-  color: #5d4e37;
-  font-size: 20px;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(107, 87, 68, 0.1);
-}
-
-.menu-btn:hover {
-  background: #fffbf5;
-  border-color: #d4a574;
-  transform: scale(1.03);
+/* Hide any leftover category-menu elements (safety) */
+.category-menu,
+.menu-btn,
+.category-list {
+  display: none !important;
 }
 
 /* =========================
-   AGE FILTER
+   AGE FILTER — horizontal bar
    ========================= */
 .age-filter {
-  position: fixed;
-  top: 175px;
-  left: 16px;
+  position: relative !important;
+  top: unset !important;
+  left: unset !important;
+  flex-direction: row !important;
 
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 
-  z-index: 50;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  padding: 0 24px;
+  z-index: 1;
   direction: rtl;
 }
 
 .age-btn {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
 
   background: #ffffff;
-  border: 1.5px solid #e8dcc8;
-  border-radius: 14px;
-
-  font-size: 14px;
-  font-weight: 600;
-  color: #6b5744;
+  border: 2px solid #e8dcc8;
+  border-radius: 18px;
+  color: #5d3a1a;
 
   cursor: pointer;
-  padding: 12px 16px;
-  text-align: right;
+  white-space: nowrap;
+  min-width: unset;
 
-  min-width: 160px;
-
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(107, 87, 68, 0.1);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 3px 10px rgba(139, 69, 19, 0.08);
 }
 
 .age-btn .star {
@@ -78,149 +60,64 @@
 }
 
 .age-btn:hover {
-  background: #fffbf5;
-  border-color: #d4a574;
-  transform: translateX(-2px);
+  background: linear-gradient(135deg, #fef9f3, #fff);
+  border-color: #c9945f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.15);
 }
 
 .age-btn.active {
-  background: linear-gradient(135deg, #f9f3ea, #f4ede0);
-  border-color: #d4a574;
-  font-weight: 700;
-  color: #5d4e37;
+  background: linear-gradient(135deg, #8b4513, #a05a2c);
+  color: #ffffff;
+  border-color: #8b4513;
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
 }
 
 /* =========================
-   CATEGORY LIST (☰ DROPDOWN)
-   ========================= */
-.category-list {
-  margin-top: 8px;
-
-  background: #ffffff;
-  border: 1.5px solid #e8dcc8;
-  border-radius: 14px;
-
-  padding: 6px;
-
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-
-  min-width: 180px;
-
-  box-shadow: 0 8px 24px rgba(107, 87, 68, 0.15);
-}
-
-.category-menu:hover .category-list {
-  display: flex;
-}
-
-/* === CATEGORY BUTTONS (מעוצבים כמו age-btn) === */
-.category-list button {
-  background: #ffffff;
-  border: 1.5px solid #e8dcc8;
-  border-radius: 12px;
-
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #6b5744;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.category-list button .star {
-  font-size: 14px;
-  color: #d4a574;
-}
-
-.category-list button:hover {
-  background: #fffbf5;
-  border-color: #d4a574;
-  transform: translateX(-2px);
-  box-shadow: 0 2px 8px rgba(107, 87, 68, 0.12);
-}
-
-.category-list button.active {
-  background: linear-gradient(135deg, #f9f3ea, #f4ede0);
-  border-color: #d4a574;
-  font-weight: 700;
-  color: #5d4e37;
-}
-
-/* =========================
-   CLEAR FILTERS (כפתור נפרד)
+   CLEAR FILTERS
    ========================= */
 .clear-filters-wrapper {
   display: flex;
   justify-content: center;
-  margin: 12px 0 4px;
-  transform: translateY(20px);
+  margin: 8px 0 16px;
+  transform: none;
 }
 
 .clear-filters {
   background: transparent;
   border: 2px solid #8b4513;
   color: #8b4513;
-  padding: 8px 18px;
-  border-radius: 14px;
-  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: 16px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
 }
 
 .clear-filters:hover {
-  background: rgba(139, 69, 19, 0.08);
+  background: linear-gradient(135deg, #8b4513, #a05a2c);
+  color: #ffffff;
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(139, 69, 19, 0.3);
 }
 
 /* =========================
    MOBILE
    ========================= */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .age-filter {
-    top: 150px;
-    gap: 10px;
+    gap: 8px;
+    padding: 0 14px;
   }
 
   .age-btn {
-    padding: 10px 14px;
+    padding: 9px 14px;
     font-size: 13px;
-    min-width: 145px;
   }
 }
 
-@media (max-width: 480px) {
-  .age-filter {
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 12px 0;
-  }
-
-  .age-btn {
-    min-width: auto;
-    font-size: 13px;
-  }
-
-  .clear-filters-wrapper {
-    transform: none;
-    margin: 20px 0;
-  }
-}
-
-
-/* Hide floating filters when a book modal is open */
-body.book-modal-open .category-menu,
-body.book-modal-open .age-filter,
-body.book-modal-open .category-list {
+/* Modal open — hide filters */
+body.book-modal-open .age-filter {
   display: none !important;
 }

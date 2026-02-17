@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "../csspages/homePage.css";
 import libraryBg from "../../../imageLibrary.png";
-import BookItem from "./BookItem";
+import BookItem from "./bookitem";
 import Books from "../services/books";
 import { useAuth } from "../context/authcontext";
 import { socket } from "../services/socket";

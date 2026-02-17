@@ -9,7 +9,6 @@
   direction: rtl;
 }
 
-/* רקע עם ספרים מרחפים */
 .books-container::before {
   content: '';
   position: fixed;
@@ -41,7 +40,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0 0 16px 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .books-header h1::after {
@@ -62,7 +61,7 @@
 }
 
 /* ===============================
-   INVENTORY STATS - ניהול מלאי
+   INVENTORY STATS
 ================================ */
 .inventory-stats {
   display: flex;
@@ -70,21 +69,15 @@
   gap: 24px;
   padding: 20px;
   max-width: 1200px;
-  margin: 0 auto 30px;
+  margin: 0 auto 20px;
   animation: slideDown 0.6s ease-out;
   position: relative;
   z-index: 1;
 }
 
 @keyframes slideDown {
-  0% {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0%   { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .stat-card {
@@ -102,29 +95,19 @@
   overflow: hidden;
 }
 
-/* אפקט ברק בהובר */
+/* shimmer on hover */
 .stat-card::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 70%
-  );
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
   transform: rotate(45deg);
   transition: all 0.6s ease;
   opacity: 0;
 }
 
-.stat-card:hover::before {
-  opacity: 1;
-  left: 100%;
-}
+.stat-card:hover::before { opacity: 1; left: 100%; }
 
 .stat-card:hover {
   transform: translateY(-8px) scale(1.03);
@@ -138,12 +121,8 @@
 }
 
 @keyframes floatIcon {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
 }
 
 .stat-content {
@@ -170,69 +149,132 @@
   letter-spacing: 0.5px;
 }
 
-/* צבעים שונים לכל סטטיסטיקה */
-.stat-total {
-  border-color: #d4a574;
-}
+.stat-total { border-color: #d4a574; }
+.stat-total:hover { border-color: #8b4513; background: linear-gradient(135deg, #fef9f3 0%, #fff 100%); }
 
-.stat-total:hover {
-  border-color: #8b4513;
-  background: linear-gradient(135deg, #fef9f3 0%, #ffffff 100%);
-}
-
-.stat-borrowed {
-  border-color: #e74c3c;
-}
-
-.stat-borrowed:hover {
-  border-color: #c0392b;
-  background: linear-gradient(135deg, #fef5f5 0%, #ffffff 100%);
-}
-
+.stat-borrowed { border-color: #e74c3c; }
+.stat-borrowed:hover { border-color: #c0392b; background: linear-gradient(135deg, #fef5f5 0%, #fff 100%); }
 .stat-borrowed .stat-number {
   background: linear-gradient(135deg, #e74c3c, #c0392b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
-.stat-available {
-  border-color: #27ae60;
-}
-
-.stat-available:hover {
-  border-color: #229954;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-}
-
+.stat-available { border-color: #27ae60; }
+.stat-available:hover { border-color: #229954; background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%); }
 .stat-available .stat-number {
   background: linear-gradient(135deg, #27ae60, #229954);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
 
 /* ===============================
-   ADD BOOK BUTTON - מעוצב ומושקע
+   CATEGORY BAR — NEW (replaces ☰ floating menu)
+================================ */
+.category-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(210, 180, 140, 0.25);
+  position: relative;
+  z-index: 1;
+  animation: slideDown 0.5s ease-out;
+}
+
+.cat-pill {
+  background: #fef8f0;
+  color: #5d3a1a;
+  border: 1.5px solid rgba(210, 180, 140, 0.4);
+  border-radius: 22px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.cat-pill:hover {
+  background: #fdefd5;
+  border-color: #c9945f;
+  color: #8b4513;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.15);
+}
+
+.cat-pill.active {
+  background: linear-gradient(135deg, #8b4513 0%, #cd853f 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(139, 69, 19, 0.35);
+}
+
+/* ===============================
+   AGE FILTER — now horizontal (was fixed sidebar)
+================================ */
+.age-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.age-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 2px solid #e8dcc8;
+  border-radius: 18px;
+  color: #5d3a1a;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 3px 10px rgba(139, 69, 19, 0.08);
+  white-space: nowrap;
+}
+
+.age-btn:hover {
+  background: linear-gradient(135deg, #fef9f3, #fff);
+  border-color: #c9945f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 69, 19, 0.15);
+}
+
+.age-btn.active {
+  background: linear-gradient(135deg, #8b4513, #a05a2c);
+  color: #ffffff;
+  border-color: #8b4513;
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
+}
+
+/* ===============================
+   ADD BOOK BUTTON
 ================================ */
 .add-book-wrapper {
   display: flex;
   justify-content: center;
-  padding: 0 20px 30px;
+  padding: 0 20px 24px;
   animation: floatIn 0.6s ease-out;
   position: relative;
   z-index: 1;
 }
 
 @keyframes floatIn {
-  0% {
-    opacity: 0;
-    transform: translateY(50px) scale(0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  0%   { opacity: 0; transform: translateY(50px) scale(0.8); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .add-book-btn {
@@ -242,162 +284,44 @@
   border-radius: 50px;
   font-weight: 800;
   font-size: 18px;
-  border: none;
+  border: 3px solid rgba(255,255,255,0.3);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 
-    0 10px 30px rgba(46, 204, 113, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3);
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(46,204,113,0.4), 0 4px 12px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.3);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 14px;
   position: relative;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* אפקט ברק */
 .add-book-btn::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
   transition: left 0.6s ease;
 }
 
-.add-book-btn:hover::before {
-  left: 100%;
-}
-
-/* אפקט גלי בלחיצה */
-.add-book-btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
-}
-
-.add-book-btn:active::after {
-  width: 300px;
-  height: 300px;
-}
+.add-book-btn:hover::before { left: 100%; }
 
 .add-book-btn:hover {
   transform: translateY(-6px) scale(1.05);
-  box-shadow: 
-    0 16px 42px rgba(46, 204, 113, 0.5),
-    0 8px 20px rgba(0, 0, 0, 0.2),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 42px rgba(46,204,113,0.5), 0 8px 20px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.4);
   background: linear-gradient(135deg, #27ae60, #229954, #1e8449);
 }
 
-.add-book-btn:active {
-  transform: translateY(-3px) scale(1.02);
-}
-
-.add-book-btn .icon {
-  font-size: 24px;
-  animation: rotateIcon 2s ease-in-out infinite;
-}
-
-@keyframes rotateIcon {
-  0%, 90% {
-    transform: rotate(0deg);
-  }
-  95% {
-    transform: rotate(90deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
-.add-book-btn:hover .icon {
-  animation: pulseIcon 0.6s ease infinite;
-}
-
-@keyframes pulseIcon {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.3);
-  }
-}
+.add-book-btn:active { transform: translateY(-3px) scale(1.02); }
 
 /* ===============================
-   AGE FILTER (צד שמאל)
-================================ */
-.age-filter {
-  position: fixed;
-  top: 150px;
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 50;
-  direction: rtl;
-}
-
-.age-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  font-size: 16px;
-  font-weight: 700;
-  background: #ffffff;
-  border: 2px solid #e8dcc8;
-  border-radius: 18px;
-  color: #5d3a1a;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
-}
-
-.age-btn:hover {
-  background: linear-gradient(135deg, #fef9f3, #fff);
-  border-color: #c9945f;
-  transform: translateY(-3px) translateX(-3px);
-  box-shadow: 0 8px 20px rgba(139, 69, 19, 0.15);
-}
-
-.age-btn.active {
-  background: linear-gradient(135deg, #8b4513, #a05a2c);
-  color: #ffffff;
-  border-color: #8b4513;
-  box-shadow: 0 8px 24px rgba(139, 69, 19, 0.3);
-}
-
-.age-btn .star {
-  font-size: 20px;
-  opacity: 0.85;
-  transition: transform 0.3s ease;
-}
-
-.age-btn:hover .star {
-  transform: scale(1.2);
-}
-
-/* ===============================
-   CLEAR FILTERS BUTTON
+   CLEAR FILTERS
 ================================ */
 .clear-filters-wrapper {
   display: flex;
   justify-content: center;
-  margin: 16px 0;
+  margin: 8px 0 16px;
   position: relative;
   z-index: 1;
 }
@@ -422,12 +346,12 @@
 }
 
 /* ===============================
-   BOOKS GRID
+   BOOKS GRID — 4 fixed columns
 ================================ */
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
   padding: 20px 40px 60px;
   max-width: 1400px;
   margin: 0 auto;
@@ -438,19 +362,20 @@
   z-index: 1;
 }
 
+/* card fills its grid cell, ignore fixed min/max-width */
+.books-grid .book-card {
+  min-width: unset;
+  max-width: unset;
+  width: 100%;
+}
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ===============================
-   LOADING STATE
+   LOADING
 ================================ */
 .books-loading {
   grid-column: 1 / -1;
@@ -476,24 +401,7 @@
   box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.books-loading::after {
-  content: '...';
-  display: inline-block;
-  animation: dots 1.5s steps(3, end) infinite;
-  margin-right: 4px;
-}
-
-@keyframes dots {
-  0%, 20% { content: '.'; }
-  40% { content: '..'; }
-  60%, 100% { content: '...'; }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ===============================
    EMPTY STATE
@@ -516,272 +424,30 @@
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-15px); }
 }
 
-.books-empty h2 {
-  font-size: 32px;
-  font-weight: 800;
-  color: #5d3a1a;
-  margin: 0 0 12px 0;
-}
-
-.books-empty p {
-  font-size: 18px;
-  color: #8b6f47;
-  margin: 0;
-}
+.books-empty h2 { font-size: 32px; font-weight: 800; color: #5d3a1a; margin: 0 0 12px; }
+.books-empty p  { font-size: 18px; color: #8b6f47; margin: 0; }
 
 /* ===============================
-   RESPONSIVE
+   BLOCKED ERROR + TOAST
 ================================ */
-@media (max-width: 1024px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 28px;
-    padding: 20px 30px 50px;
-  }
-
-  .age-filter {
-    top: 140px;
-    left: 16px;
-  }
-
-  .inventory-stats {
-    gap: 20px;
-    padding: 16px;
-  }
-
-  .stat-card {
-    min-width: 200px;
-    padding: 20px 24px;
-  }
-
-  .stat-icon {
-    font-size: 42px;
-  }
-
-  .stat-number {
-    font-size: 32px;
-  }
+.books-blocked-error {
+  max-width: 680px;
+  margin: -10px auto 18px;
+  background: #fdecea;
+  border: 1.5px solid #e74c3c;
+  color: #922b21;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
 }
 
-@media (max-width: 768px) {
-  .books-container {
-    padding: 100px 0 40px;
-  }
-
-  .books-header h1 {
-    font-size: 36px;
-  }
-
-  .books-header p {
-    font-size: 16px;
-  }
-
-  .inventory-stats {
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 16px;
-  }
-
-  .stat-card {
-    flex: 1;
-    min-width: 160px;
-    padding: 18px 20px;
-  }
-
-  .stat-icon {
-    font-size: 38px;
-  }
-
-  .stat-number {
-    font-size: 28px;
-  }
-
-  .stat-label {
-    font-size: 13px;
-  }
-
-  .age-filter {
-    top: 110px;
-    left: 12px;
-    gap: 12px;
-  }
-
-  .age-btn {
-    padding: 12px 16px;
-    font-size: 15px;
-  }
-
-  .books-grid {
-    padding: 20px 20px 40px;
-    gap: 24px;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-
-  .add-book-wrapper {
-    padding: 0 16px 24px;
-  }
-
-  .add-book-btn {
-    padding: 16px 32px;
-    font-size: 16px;
-    gap: 12px;
-  }
-
-  .add-book-btn .icon {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 640px) {
-  .books-header h1 {
-    font-size: 30px;
-  }
-
-  .inventory-stats {
-    gap: 12px;
-  }
-
-  .stat-card {
-    min-width: 140px;
-    padding: 16px 18px;
-    gap: 14px;
-  }
-
-  .stat-icon {
-    font-size: 34px;
-  }
-
-  .stat-number {
-    font-size: 24px;
-  }
-
-  .stat-label {
-    font-size: 12px;
-  }
-
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-  }
-
-  .add-book-btn {
-    padding: 14px 28px;
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .books-container {
-    padding: 90px 0 30px;
-  }
-
-  .books-header h1 {
-    font-size: 26px;
-  }
-
-  .books-header h1::after {
-    width: 80px;
-    margin: 16px auto 0;
-  }
-
-  .books-header p {
-    font-size: 15px;
-  }
-
-  /* Inventory stats במובייל - עמודה */
-  .inventory-stats {
-    flex-direction: row;
-    gap: 10px;
-    padding: 12px;
-    margin-bottom: 20px;
-  }
-
-  .stat-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-    padding: 14px;
-    min-width: auto;
-    flex: 1;
-  }
-
-  .stat-icon {
-    font-size: 32px;
-  }
-
-  .stat-number {
-    font-size: 22px;
-  }
-
-  .stat-label {
-    font-size: 11px;
-  }
-
-  /* פילטר גילאים במובייל - בשורה */
-  .age-filter {
-    position: static;
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 0 16px 20px;
-  }
-
-  .age-btn {
-    padding: 10px 14px;
-    font-size: 14px;
-    gap: 8px;
-  }
-
-  .clear-filters-wrapper {
-    margin: 0 0 20px;
-  }
-
-  .clear-filters {
-    padding: 8px 20px;
-    font-size: 14px;
-  }
-
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
-    padding: 16px 16px 32px;
-  }
-
-  .add-book-wrapper {
-    padding: 0 12px 20px;
-  }
-
-  .add-book-btn {
-    padding: 12px 24px;
-    font-size: 14px;
-    gap: 10px;
-  }
-
-  .add-book-btn .icon {
-    font-size: 20px;
-  }
-
-  .books-empty-icon {
-    font-size: 72px;
-  }
-
-  .books-empty h2 {
-    font-size: 24px;
-  }
-
-  .books-empty p {
-    font-size: 16px;
-  }
-}
-/* in books.css or a global css */
 .toast-container {
   position: fixed;
   bottom: 16px;
@@ -799,15 +465,61 @@
   font-size: 14px;
 }
 
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 1200px) {
+  .books-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 20px 30px 50px;
+  }
 
-.books-blocked-error {
-  max-width: 680px;
-  margin: -10px auto 18px;
-  background: #fdecea;
-  border: 1.5px solid #e74c3c;
-  color: #922b21;
-  padding: 10px 14px;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 700;
+  .stat-card { min-width: 200px; padding: 20px 24px; }
+  .stat-icon { font-size: 42px; }
+  .stat-number { font-size: 32px; }
+}
+
+@media (max-width: 900px) {
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px 24px 40px;
+  }
+
+  .inventory-stats { gap: 16px; padding: 16px; }
+  .stat-card { min-width: 160px; padding: 18px 18px; }
+  .stat-icon { font-size: 38px; }
+  .stat-number { font-size: 28px; }
+}
+
+@media (max-width: 640px) {
+  .books-container { padding: 90px 0 30px; }
+  .books-header h1 { font-size: 28px; }
+
+  .inventory-stats { flex-wrap: wrap; gap: 10px; padding: 12px; margin-bottom: 14px; }
+  .stat-card {
+    flex-direction: column; text-align: center;
+    gap: 8px; padding: 14px;
+    min-width: auto; flex: 1;
+  }
+  .stat-icon  { font-size: 30px; }
+  .stat-number { font-size: 22px; }
+  .stat-label  { font-size: 11px; }
+
+  .category-bar { padding: 12px; gap: 8px; }
+  .cat-pill { padding: 7px 13px; font-size: 13px; }
+
+  .age-filter { gap: 8px; padding: 0 14px; }
+  .age-btn { padding: 9px 14px; font-size: 13px; }
+
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 16px 14px 32px;
+  }
+
+  .add-book-btn { padding: 13px 26px; font-size: 15px; }
+  .books-empty-icon { font-size: 64px; }
+  .books-empty h2 { font-size: 22px; }
 }
