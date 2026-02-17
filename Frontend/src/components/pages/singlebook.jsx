@@ -10,12 +10,16 @@ import Favorites from "../services/favorites";
 import "../csspages/BookForm.css";
 import Library from "../services/library";
 
+
 export default function SingleBook() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+   const { isBlocked, setUser } = useAuth();  
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const isEditMode = searchParams.get("edit") === "true";
@@ -24,14 +28,11 @@ export default function SingleBook() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [error, setError] = useState("");
   const [blockedModalMessage, setBlockedModalMessage] = useState("");
   const [book, setBook] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);  
   const isBorrowedByMe = user?.borrowedBooks?.some((b) => b.bookid === book?.id);
-  
+  const [error, setError] = useState("");   
   /* ================= LOAD DATA ================= */
   useEffect(() => {
     async function loadData() {

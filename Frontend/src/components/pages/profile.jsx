@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Library from "../services/library";
 import Login from "../services/login";
 import "../csspages/profile.css";
-import BookItem from "./BookItem";
+import BookItem from "./bookitem";
 import { useAuth } from "../context/AuthContext";
 import { socket } from "../services/socket";
 
