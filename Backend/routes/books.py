@@ -23,7 +23,7 @@ from schemas.books import BookCreate, BookUpdate
 from socketio_app import sio
 
 # ❗❗❗ אין prefix כאן
-router = APIRouter(tags=["Book"])
+router = APIRouter(tags=["book"])
 
 
 # =========================

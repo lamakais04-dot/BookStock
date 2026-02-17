@@ -4,7 +4,7 @@ import "../csspages/homePage.css";
 import libraryBg from "../../../imageLibrary.png";
 import BookItem from "./bookitem";
 import Books from "../services/books";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authcontext";
 import { socket } from "../services/socket";
 
 const HomePage = () => {
@@ -14,7 +14,7 @@ const HomePage = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
 
-  const booksSectionRef = useRef(null);
+  const booksSectionRef = useRef(null); 
 
   const loadRandomBooks = useCallback(async () => {
     try {

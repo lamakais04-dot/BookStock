@@ -1,13 +1,16 @@
 // pages/SingleBook.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authcontext";
 import BookForm from "./BookForm";
-import "../csspages/singleBook.css";
 import Favorites from "../services/favorites";
-import "../csspages/BookForm.css";
 import Library from "../services/library";
 
 
@@ -19,11 +22,12 @@ export default function SingleBook() {
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-   const { isBlocked, setUser } = useAuth();  
+   const { setUser } = useAuth();  
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const isBlocked = user?.is_blocked;
   const isEditMode = searchParams.get("edit") === "true";
-  const isNew = !id || location.pathname === "/book/new";
+  const isNew = location.pathname === "/book/new";
 
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -34,6 +38,7 @@ export default function SingleBook() {
   const isBorrowedByMe = user?.borrowedBooks?.some((b) => b.bookid === book?.id);
   const [error, setError] = useState("");   
   /* ================= LOAD DATA ================= */
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -45,7 +50,6 @@ export default function SingleBook() {
         setCategories(cats);
         setAgeGroups(ages);
 
-        // ❗❗❗ רק אם זה לא new
         if (!isNew) {
           const data = await Books.getBookById(id);
           setBook(data);
@@ -62,16 +66,13 @@ export default function SingleBook() {
   }, [id, isNew]);
 
   /* ================= FAVORITES ================= */
+
   useEffect(() => {
     if (!user || isAdmin || isNew) return;
 
     async function loadFavs() {
-      try {
-        const favs = await Favorites.getFavorites();
-        setIsFavorite(favs.some((f) => f.bookid === Number(id)));
-      } catch (err) {
-        console.error("Failed to load favorites", err);
-      }
+      const favs = await Favorites.getFavorites();
+      setIsFavorite(favs.some((f) => f.bookid === Number(id)));
     }
 
     loadFavs();
@@ -80,7 +81,7 @@ export default function SingleBook() {
   /* ================= ACTIONS ================= */
 
   const handleBorrow = async () => {
-    if (!user) return setError("יש להתחבר כדי להשאיל ספר");
+    if (!user) return;
     if (isBlocked) {
       setBlockedModalMessage("החשבון שלך חסום — לא ניתן להשאיל ספרים");
       return;
@@ -96,7 +97,10 @@ export default function SingleBook() {
         canBorrow: res.canBorrow,
       }));
 
-      setBook((prev) => ({ ...prev, quantity: prev.quantity - 1 }));
+      setBook((prev) => ({
+        ...prev,
+        quantity: prev.quantity - 1,
+      }));
     } catch {
       setError("לא ניתן להשאיל את הספר");
     } finally {
@@ -120,7 +124,10 @@ export default function SingleBook() {
         canBorrow: res.canBorrow,
       }));
 
-      setBook((prev) => ({ ...prev, quantity: prev.quantity + 1 }));
+      setBook((prev) => ({
+        ...prev,
+        quantity: prev.quantity + 1,
+      }));
     } catch {
       setError("שגיאה בהחזרת הספר");
     } finally {
@@ -129,7 +136,6 @@ export default function SingleBook() {
   };
 
   const handleFavorite = async () => {
-    if (!user) return setError("יש להתחבר כדי להוסיף למועדפים");
     if (isBlocked) {
       setBlockedModalMessage("החשבון שלך חסום — לא ניתן לעדכן מועדפים");
       return;
@@ -148,8 +154,6 @@ export default function SingleBook() {
     }
   };
 
-  /* ================= ADMIN ================= */
-
   const handleUpdateBook = async (formData) => {
     if (isBlocked) {
       setBlockedModalMessage("החשבון שלך חסום — לא ניתן לערוך ספרים");
@@ -158,8 +162,8 @@ export default function SingleBook() {
 
     try {
       await Books.updateBook(book.id, formData);
-      const updatedBook = await Books.getBookById(book.id);
-      setBook(updatedBook);
+      const updated = await Books.getBookById(book.id);
+      setBook(updated);
       setSearchParams({});
     } catch {
       setError("שגיאה בעדכון הספר");
@@ -175,16 +179,17 @@ export default function SingleBook() {
     try {
       await Books.addBook(formData);
       navigate("/book");
-    } catch (err) {
-      const serverMsg = err?.response?.data?.detail;
-      setError(serverMsg || "שגיאה בהוספת ספר");
+    } catch {
+      setError("שגיאה בהוספת ספר");
     }
   };
 
   /* ================= LOADING ================= */
+
   if (loading) return <div className="loading-container" />;
 
-  /* ================= ADD NEW BOOK ================= */
+  /* ================= ADD MODE ================= */
+
   if (isNew && isAdmin) {
     return (
       <div className="single-book-container">
@@ -194,29 +199,23 @@ export default function SingleBook() {
 
         <div className="single-book">
           <div className="book-details">
-            <p className="section-subtitle">מידע על הספר</p>
-
             <BookForm
               categories={categories}
               ageGroups={ageGroups}
               onSubmit={handleAddBook}
               mode="create"
-              title="הוספת ספר חדש"
               readOnly={isBlocked}
-              readOnlyMessage="החשבון שלך חסום — לא ניתן להוסיף ספרים"
             />
-
-            {error && <p className="borrow-error">{error}</p>}
           </div>
         </div>
       </div>
     );
   }
 
-  /* ================= SAFETY ================= */
   if (!book) return null;
 
-  /* ================= VIEW / EDIT ================= */
+  /* ================= VIEW MODE ================= */
+
   return (
     <div className="single-book-container">
       <button className="back-button" onClick={() => navigate("/book")}>
@@ -231,28 +230,14 @@ export default function SingleBook() {
         <div className="book-details">
           {isAdmin && isEditMode ? (
             <>
-              <p className="section-subtitle">עריכת פרטי הספר</p>
-
               <BookForm
                 initialData={book}
                 categories={categories}
                 ageGroups={ageGroups}
-                onSubmit={isNew ? handleAddBook : handleUpdateBook}
-                mode={isNew ? "create" : "edit"}
-                title={isNew ? "הוספת ספר חדש" : "עריכת ספר"}
-                subtitle={
-                  isNew
-                    ? "מלא את כל הפרטים להוספת הספר לספרייה"
-                    : "עדכן את פרטי הספר ושמור שינויים"
-                }
+                onSubmit={handleUpdateBook}
+                mode="edit"
                 readOnly={isBlocked}
-                readOnlyMessage={
-                  isNew
-                    ? "החשבון שלך חסום — לא ניתן להוסיף ספרים"
-                    : "החשבון שלך חסום — לא ניתן לערוך ספרים"
-                }
               />
-
               <button
                 className="cancel-button"
                 onClick={() => setSearchParams({})}
@@ -263,7 +248,10 @@ export default function SingleBook() {
           ) : (
             <>
               <h1 className="book-title">{book.title}</h1>
+
               <p className="book-author">{book.author}</p>
+
+              <p className="book-summary">{book.summary}</p>
 
               <div className="book-info-grid">
                 <div className="info-item">
@@ -276,7 +264,10 @@ export default function SingleBook() {
                 <div className="info-item">
                   <div className="info-label">קבוצת גיל</div>
                   <div className="info-value">
-                    {ageGroups.find((a) => a.id === book.agesid)?.description}
+                    {
+                      ageGroups.find((a) => a.id === book.agesid)
+                        ?.description
+                    }
                   </div>
                 </div>
 
@@ -291,25 +282,17 @@ export default function SingleBook() {
                 </div>
               </div>
 
-              {isAdmin? (
+              {isAdmin ? (
                 <button
-                  type="button"
                   className="edit-toggle-button"
-                  onClick={() => {
-                    if (isBlocked) {
-                      setBlockedModalMessage("החשבון שלך חסום — לא ניתן לערוך ספרים");
-                      return;
-                    }
-                    setSearchParams({ edit: "true" });
-                  }}
+                  onClick={() => setSearchParams({ edit: "true" })}
                 >
                   ✏️ עריכה
                 </button>
-              )  :(
+              ) : (
                 <div className="book-actions">
                   {isBorrowedByMe ? (
                     <button
-                      type="button"
                       onClick={handleReturn}
                       disabled={actionLoading}
                     >
@@ -317,7 +300,6 @@ export default function SingleBook() {
                     </button>
                   ) : (
                     <button
-                      type="button"
                       onClick={handleBorrow}
                       disabled={actionLoading}
                     >
@@ -325,7 +307,7 @@ export default function SingleBook() {
                     </button>
                   )}
 
-                  <button type="button" onClick={handleFavorite}>
+                  <button onClick={handleFavorite}>
                     {isFavorite ? "❤️ במועדפים" : "♡ הוסף למועדפים"}
                   </button>
                 </div>
@@ -338,14 +320,18 @@ export default function SingleBook() {
       </div>
 
       {blockedModalMessage && (
-        <div className="modal-overlay" onClick={() => setBlockedModalMessage("")}
+        <div
+          className="modal-overlay"
+          onClick={() => setBlockedModalMessage("")}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-icon">🚫</div>
             <h2 className="modal-title">פעולה חסומה</h2>
             <p className="modal-message">{blockedModalMessage}</p>
             <button
-              type="button"
               className="modal-close-button"
               onClick={() => setBlockedModalMessage("")}
             >

@@ -47,7 +47,7 @@ export default function AdminUsers() {
 
   /* ================= OPEN MODAL ================= */
   const openModal = (userId, isBlocked, userName) => {
-    setModalData({ userId, isBlocked, userName });
+    setModalData({ userId, isBlocked, userName }); 
     setShowModal(true);
   };
 

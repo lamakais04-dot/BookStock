@@ -27,7 +27,7 @@ export default function Login() {
 
   // ===== Handle Submit =====
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // מונע רענון עמוד
 
     const newErrors = {};
 

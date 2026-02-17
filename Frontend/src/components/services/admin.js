@@ -41,7 +41,7 @@ export default class AdminService {
         });
         return res.data;
     }
-
+    
     static async exportActivityPdf(params = {}) {
         const res = await axios.get(`${BASE_URL}/admin/export/activity.pdf`, {
             withCredentials: true,

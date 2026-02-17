@@ -9,8 +9,8 @@ import React, {
 import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
-import BookItem from "./bookitem";
-import { useAuth } from "../context/AuthContext";
+import BookItem from "./BookItem";
+import { useAuth } from "../context/authcontext";
 import { socket } from "../services/socket";
 
 import "../csspages/books.css";
@@ -19,10 +19,10 @@ import "../csspages/pagination.css";
 
 export default function AllBooks() {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // ספרים נטענים מהשרת
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1); 
 
   const [categories, setCategories] = useState([]);
   const [ageGroups, setAgeGroups] = useState([]);
@@ -42,7 +42,7 @@ export default function AllBooks() {
   const location = useLocation();
 
   const search = useMemo(() => {
-    return new URLSearchParams(location.search).get("search") || "";
+    return new URLSearchParams(location.search).get("search") || ""; // ?search=a -> "abc"
   }, [location.search]);
 
   const orderRef = useRef([]);
@@ -54,8 +54,8 @@ export default function AllBooks() {
         const data = await Books.getBooks(page, booksPerPage, catId, ageId, searchTerm);
         const fetchedBooks = data?.books || [];
 
-        if (orderRef.current.length === 0) {
-          orderRef.current = fetchedBooks.map((b) => b.id);
+        if (orderRef.current.length === 0) {  
+          orderRef.current = fetchedBooks.map((b) => b.id); 
         }
 
         const orderedBooks = [...fetchedBooks].sort(
