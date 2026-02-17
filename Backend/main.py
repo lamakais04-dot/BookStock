@@ -12,7 +12,7 @@ from routes.admin_users import router as admin_users_router
 from routes.admin_activity import router as admin_activity_router
 from routes.admin_export import router as admin_export_router
 from routes.admin_category import router as admin_categories_router
-
+from os import getenv
 from dotenv import load_dotenv
 import socketio
 from socketio_app import sio  # <-- use existing sio, do NOT recreate it
@@ -20,7 +20,7 @@ from socketio_app import sio  # <-- use existing sio, do NOT recreate it
 load_dotenv()
 
 fastapi_app = FastAPI()
-apiKey = "123456789apikeysecure"
+APIKEY = getenv("APIKEY")
 
 fastapi_app.add_middleware(
     CORSMiddleware,
@@ -32,16 +32,22 @@ fastapi_app.add_middleware(
 
 @fastapi_app.middleware("http")
 async def middleware_apikey(request: Request, call_next):
+
     if request.method == "OPTIONS":
         return await call_next(request)
 
-    if request.headers.get("apiKey") != apiKey:
+    # skip auth routes
+    if request.url.path.startswith("/api/auth"):
+        return await call_next(request)
+
+    if request.headers.get("apiKey") != APIKEY:
         return JSONResponse(
-            status_code=401, content={"detail": "Invalid request, unauthorized"}
+            status_code=401,
+            content={"detail": "Invalid request, unauthorized"},
         )
 
-    response = await call_next(request)
-    return response
+    return await call_next(request)
+
 
 @fastapi_app.get("/api")
 def read_root():

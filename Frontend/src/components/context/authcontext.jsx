@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { socket } from "../services/socket";
+
+const APIKEY = import.meta.env.VITE_API_KEY;
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -12,7 +15,7 @@ export function AuthProvider({ children }) {
     try {
       const res = await axios.get("http://localhost:8000/api/auth/me", {
         withCredentials: true,
-        headers: { apiKey: "123456789apikeysecure" },
+        headers: { apiKey:APIKEY},
       });
       setUser(res.data);
     } catch {
