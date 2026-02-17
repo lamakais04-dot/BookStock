@@ -22,7 +22,7 @@ export default function SingleBook() {
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-   const { isBlocked, setUser } = useAuth();  
+   const { setUser } = useAuth();  
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const isBlocked = user?.is_blocked;

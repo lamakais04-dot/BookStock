@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Library from "../services/library";
 import Login from "../services/login";
 import "../csspages/profile.css";
-import BookItem from "./bookitem";
-import { useAuth } from "../context/AuthContext";
+import BookItem from "./BookItem";
+import { useAuth } from "../context/authcontext";
 import { socket } from "../services/socket";
 
 export default function Profile() {
