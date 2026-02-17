@@ -1,5 +1,7 @@
 // services/books.js
 import axios from "axios";
+const APIKEY = import.meta.env.VITE_API_KEY;
+
 
 const BASE_URL = "http://localhost:8000/api/book";
 
@@ -20,7 +22,7 @@ class Books {
         age_group_id: ageGroupId,
         search: search || undefined,
       },
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey: APIKEY },
     });
     return res.data;
   }
@@ -28,7 +30,7 @@ class Books {
   static async getBookById(id) {
     const res = await axios.get(`${BASE_URL}/${id}`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey: APIKEY },
     });
     return res.data;
   }
@@ -37,7 +39,7 @@ class Books {
     const res = await axios.get(`${BASE_URL}/random/limit`, {
       params: { limit },
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey:APIKEY },
     });
     return res.data;
   }
@@ -59,7 +61,7 @@ class Books {
 
     const res = await axios.post(BASE_URL, formData, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey: APIKEY },
     });
 
     return res.data;
@@ -83,7 +85,7 @@ class Books {
 
     const res = await axios.put(`${BASE_URL}/${id}`, formData, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey:APIKEY },
     });
 
     return res.data;
@@ -92,7 +94,7 @@ class Books {
   static async deleteBook(id) {
     await axios.delete(`${BASE_URL}/${id}`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey:APIKEY },
     });
   }
 }

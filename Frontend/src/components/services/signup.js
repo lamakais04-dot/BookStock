@@ -1,4 +1,6 @@
 import axios from "axios";
+const APIKEY = import.meta.env.VITE_API_KEY;
+
 
 class SignupClass {
   static async signup(data) {
@@ -8,7 +10,7 @@ class SignupClass {
       {
         withCredentials: true,
         headers: {
-          apiKey: "123456789apikeysecure",
+          apiKey: APIKEY,
           "Content-Type": "application/json"
         }
       }
