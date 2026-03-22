@@ -36,15 +36,6 @@ export default function AdminUsers() {
     };
   }, [load]);
 
-  useEffect(() => {
-    if (!resultModal.show) return;
-    const timer = setTimeout(() => {
-      setResultModal((prev) => ({ ...prev, show: false }));
-    }, 2500);
-
-    return () => clearTimeout(timer);
-  }, [resultModal.show]);
-
   /* ================= OPEN MODAL ================= */
   const openModal = (userId, isBlocked, userName) => {
     setModalData({ userId, isBlocked, userName }); 
@@ -70,7 +61,6 @@ export default function AdminUsers() {
   /* ================= CONFIRM BLOCK / UNBLOCK ================= */
   const confirmToggleBlock = async () => {
     const { userId } = modalData;
-    closeModal();
 
     try {
       const res = await Admin.toggleUserBlock(userId);
