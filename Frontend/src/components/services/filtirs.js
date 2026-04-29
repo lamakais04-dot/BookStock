@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL } from "./apiConfig";
 
 class Filters {
     static async getAgeGroups() {
-        const res = await axios.get("http://localhost:8000/api/age",
+        const res = await axios.get(`${API_BASE_URL}/api/age`,
             {
                 withCredentials: true,
                 headers: { apiKey: "123456789apikeysecure" }
@@ -12,7 +13,7 @@ class Filters {
     }
 
     static async getCategories() {
-        const res = await axios.get("http://localhost:8000/api/category",
+        const res = await axios.get(`${API_BASE_URL}/api/category`,
             {
                 withCredentials: true,
                 headers: { apiKey: "123456789apikeysecure" }

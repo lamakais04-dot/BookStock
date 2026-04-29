@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminService from "../../services/admin";
 import { downloadBlob } from "../../../../utils/downloadHelper";
-import "../../csspages/adminActivity.css";
+import "../../csspages/AdminActivity.css";
 import { socket } from "../../services/socket";
 
 export default function AdminActivity() {

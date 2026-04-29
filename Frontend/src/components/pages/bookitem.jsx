@@ -4,7 +4,7 @@ import "../csspages/BookItem.css";
 import Favorites from "../services/favorites";
 import Books from "../services/books";
 import Library from "../services/library";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/authcontext";
 
 // Modal Component for Delete Confirmation
 function DeleteConfirmModal({ show, onClose, onConfirm, bookTitle }) {

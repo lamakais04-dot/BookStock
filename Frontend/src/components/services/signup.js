@@ -1,9 +1,10 @@
 import axios from "axios";
+import { API_BASE_URL } from "./apiConfig";
 
 class SignupClass {
   static async signup(data) {
     const res = await axios.post(
-      "http://localhost:8000/api/auth/signup",
+      `${API_BASE_URL}/api/auth/signup`,
       data,
       {
         withCredentials: true,

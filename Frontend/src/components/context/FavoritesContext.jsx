@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import Favorites from "../services/favorites";
 import { socket } from "../services/socket";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./authcontext";
 
 const FavoritesContext = createContext();
 

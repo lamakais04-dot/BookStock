@@ -1,5 +1,7 @@
 import axios from "axios";
-const BASE_URL = "http://localhost:8000";
+import { API_BASE_URL } from "./apiConfig";
+
+const BASE_URL = API_BASE_URL;
 
 export default class AdminService {
 
