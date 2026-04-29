@@ -4,7 +4,7 @@ const APIKEY = import.meta.env.VITE_API_KEY;
 
 class Filters {
     static async getAgeGroups() {
-        const res = await axios.get("http://localhost:8000/api/age",
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/age`,
             {
                 withCredentials: true,
                 headers: { apiKey: APIKEY }
@@ -14,7 +14,7 @@ class Filters {
     }
 
     static async getCategories() {
-        const res = await axios.get("http://localhost:8000/api/category",
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/category`,
             {
                 withCredentials: true,
                 headers: { apiKey: APIKEY }

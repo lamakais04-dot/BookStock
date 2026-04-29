@@ -3,7 +3,7 @@ import axios from "axios";
 const APIKEY = import.meta.env.VITE_API_KEY;
 
 
-const BASE = "http://localhost:8000/admin/categories";
+const BASE = `${import.meta.env.VITE_API_URL}/admin/categories`;
 
 class AdminCategories {
     static async getAll() {
