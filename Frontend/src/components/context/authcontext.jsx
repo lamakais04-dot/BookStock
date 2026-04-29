@@ -9,18 +9,18 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
-    setLoading(true);
+  const fetchUser = async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
         withCredentials: true,
-        headers: { apiKey: "123456789apikeysecure" },
+        headers: { apiKey:APIKEY},
       });
       setUser(res.data);
     } catch {
       setUser(null);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
     function handleProfileUpdated(data) {
       // if event for this user or unknown user, just refetch
       if (!user || !data?.user_id || data.user_id === user.id) {
-        fetchUser();
+        fetchUser({ silent: true });
       }
     }
 
@@ -44,6 +44,19 @@ export function AuthProvider({ children }) {
     };
   }, [user]); // re-subscribe if user changes
 
+  useEffect(() => {
+    function handleUsersChanged(payload) {
+      if (!user?.id || !payload?.userId) return;
+      if (String(payload.userId) !== String(user.id)) return;
+      fetchUser({ silent: true });
+    }
+
+    socket.on("users_changed", handleUsersChanged);
+    return () => {
+      socket.off("users_changed", handleUsersChanged);
+    };
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -52,7 +65,10 @@ export function AuthProvider({ children }) {
         fetchUser,
         loading,
         isAdmin: user?.role === "admin",
-        isBlocked: user?.is_blocked === true,
+        isBlocked:
+          user?.is_blocked === true ||
+          user?.is_blocked === 1 ||
+          user?.is_blocked === "1",
       }}
     >
       {children}

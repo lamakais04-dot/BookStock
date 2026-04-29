@@ -25,6 +25,8 @@ def admin_get_users(q: str = Query(default="", description="search by name/email
     return admin_get_users_service(q)
 
 
+
+
 @router.get(
     "/users/{user_id}/borrows",
     response_model=List[BorrowRow],
@@ -34,6 +36,9 @@ def admin_get_user_borrows(
     user_id: int,
     only_open: bool = Query(False, description="only currently borrowed"),
 ):
+    
+    
+    
     return admin_get_user_borrows_service(user_id, only_open)
 
 

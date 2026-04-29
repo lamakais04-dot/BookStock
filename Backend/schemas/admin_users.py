@@ -17,7 +17,7 @@ class AdminUserRow(BaseModel):
     email: str
     role: str
 
-    is_blocked: bool  # 🔥🔥🔥 חובה – זה מה שהיה חסר
+    is_blocked: bool  
 
     borrowed_now_count: int
     total_borrows: int

@@ -12,6 +12,7 @@ export default function Profile() {
   const [books, setBooks] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [blockedModalMessage, setBlockedModalMessage] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -40,23 +41,22 @@ export default function Profile() {
     loadData();
   }, [loadBorrowedBooks]);
 
-  /* Live updates when this user borrows/returns in another tab / by admin */
+  /* Live updates when this user borrows/returns in another tab */
   useEffect(() => {
-    function handleBorrowReturnChanged(data) {
-      // if event belongs to current user – do nothing (local UI already updated)
-      if (!user || data?.user_id === user.id) return;
+    function handleBooksChanged(payload) {
+      if (!user?.id || !payload?.userId) return;
+      if (String(payload.userId) !== String(user.id)) return;
 
-      // only reload when some other user/admin changed this user's loans
       loadBorrowedBooks();
-      fetchUser();
+      fetchUser({ silent: true });
     }
 
-    socket.on("borrow_return_changed", handleBorrowReturnChanged);
+    socket.on("books_changed", handleBooksChanged);
 
     return () => {
-      socket.off("borrow_return_changed", handleBorrowReturnChanged);
+      socket.off("books_changed", handleBooksChanged);
     };
-  }, [user, loadBorrowedBooks, fetchUser]);
+  }, [user?.id, loadBorrowedBooks, fetchUser]);
 
   /* ===== Auto clear error ===== */
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function Profile() {
 
   const handleImageClick = () => {
     if (isBlocked) {
-      setErrorMsg("החשבון שלך חסום — לא ניתן להעלות תמונה");
+      setBlockedModalMessage("החשבון שלך חסום — לא ניתן להעלות תמונה");
       return;
     }
     fileInputRef.current.click();
@@ -218,7 +218,7 @@ export default function Profile() {
                 className="save-btn"
                 onClick={async () => {
                   if (isBlocked) {
-                    setErrorMsg(
+                    setBlockedModalMessage(
                       "החשבון שלך חסום — לא ניתן לשמור שינויים"
                     );
                     return;
@@ -237,7 +237,7 @@ export default function Profile() {
                 className="edit-btn"
                 onClick={() => {
                   if (isBlocked) {
-                    setErrorMsg(
+                    setBlockedModalMessage(
                       "החשבון שלך חסום — לא ניתן לערוך פרטים"
                     );
                     return;
@@ -299,6 +299,23 @@ export default function Profile() {
           </>
         )}
       </div>
+
+      {blockedModalMessage && (
+        <div
+          className="profile-blocked-modal-overlay"
+          onClick={() => setBlockedModalMessage("")}
+        >
+          <div
+            className="profile-blocked-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="profile-blocked-modal-icon">🚫</div>
+            <h3>פעולה חסומה</h3>
+            <p>{blockedModalMessage}</p>
+            <button type="button" onClick={() => setBlockedModalMessage("")}>הבנתי</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

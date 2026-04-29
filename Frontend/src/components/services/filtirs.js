@@ -6,7 +6,7 @@ class Filters {
         const res = await axios.get(`${API_BASE_URL}/api/age`,
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             }
         );
         return res.data;
@@ -16,7 +16,7 @@ class Filters {
         const res = await axios.get(`${API_BASE_URL}/api/category`,
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             }
         );
         return res.data;

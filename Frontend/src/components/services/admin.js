@@ -8,7 +8,7 @@ export default class AdminService {
     static async getUsers(q = "") {
         const res = await axios.get(`${BASE_URL}/admin/users`, {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" },
+            headers: { apiKey: APIKEY },
             params: q ? { q } : undefined
         });
         return res.data;
@@ -17,7 +17,7 @@ export default class AdminService {
     static async getUserBorrows(userId, onlyOpen = false) {
         const res = await axios.get(`${BASE_URL}/admin/users/${userId}/borrows`, {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" },
+            headers: { apiKey: APIKEY },
             params: onlyOpen ? { only_open: true } : undefined
         });
         return res.data;
@@ -26,7 +26,7 @@ export default class AdminService {
     static async getActivity(params = {}) {
         const res = await axios.get(`${BASE_URL}/admin/activity`, {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" },
+            headers: { apiKey:APIKEY},
             params
         });
         return res.data;
@@ -35,17 +35,17 @@ export default class AdminService {
     static async exportActivityExcel(params = {}) {
         const res = await axios.get(`${BASE_URL}/admin/export/activity.xlsx`, {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" },
+            headers: { apiKey: APIKEY},
             params,
             responseType: "blob"
         });
         return res.data;
     }
-
+    
     static async exportActivityPdf(params = {}) {
         const res = await axios.get(`${BASE_URL}/admin/export/activity.pdf`, {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" },
+            headers: { apiKey: APIKEY },
             params,
             responseType: "blob"
         });
@@ -59,7 +59,7 @@ export default class AdminService {
             {},
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             }
         );
         return res.data; // { is_blocked: true / false }

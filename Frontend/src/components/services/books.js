@@ -1,12 +1,13 @@
 // services/books.js
 import axios from "axios";
+const APIKEY = import.meta.env.VITE_API_KEY;
 
 import { API_BASE_URL } from "./apiConfig";
 
 const BASE_URL = `${API_BASE_URL}/api/book`;
 
 class Books {
-  static async getBooks(
+  static async getBooks( // מקבל רשימת ספרים עם אפשרויות סינון
     page = 1,
     limit = 8,
     categoryId = null,
@@ -22,7 +23,7 @@ class Books {
         age_group_id: ageGroupId,
         search: search || undefined,
       },
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey: APIKEY },
     });
     return res.data;
   }
@@ -30,7 +31,7 @@ class Books {
   static async getBookById(id) {
     const res = await axios.get(`${BASE_URL}/${id}`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey: APIKEY },
     });
     return res.data;
   }
@@ -39,13 +40,13 @@ class Books {
     const res = await axios.get(`${BASE_URL}/random/limit`, {
       params: { limit },
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey:APIKEY },
     });
     return res.data;
   }
 
-  static async addBook(data) {
-    const formData = new FormData();
+  static async addBook(data) { // מוסיף ספר חדש עם פרטים וייתכן תמונה
+    const formData = new FormData(); 
 
     formData.append("title", data.title);
     formData.append("summary", data.summary);
@@ -61,7 +62,7 @@ class Books {
 
     const res = await axios.post(BASE_URL, formData, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey: APIKEY },
     });
 
     return res.data;
@@ -85,7 +86,7 @@ class Books {
 
     const res = await axios.put(`${BASE_URL}/${id}`, formData, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey:APIKEY },
     });
 
     return res.data;
@@ -94,7 +95,7 @@ class Books {
   static async deleteBook(id) {
     await axios.delete(`${BASE_URL}/${id}`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" },
+      headers: { apiKey:APIKEY },
     });
   }
 }

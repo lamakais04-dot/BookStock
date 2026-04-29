@@ -12,7 +12,7 @@ from routes.admin_users import router as admin_users_router
 from routes.admin_activity import router as admin_activity_router
 from routes.admin_export import router as admin_export_router
 from routes.admin_category import router as admin_categories_router
-
+from os import getenv
 from dotenv import load_dotenv
 import os
 import socketio
@@ -21,7 +21,7 @@ from socketio_app import sio  # <-- use existing sio, do NOT recreate it
 load_dotenv()
 
 fastapi_app = FastAPI()
-apiKey = "123456789apikeysecure"
+APIKEY = getenv("APIKEY")
 
 allowed_origins = [
     origin.strip()
@@ -37,22 +37,30 @@ fastapi_app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @fastapi_app.middleware("http")
 async def middleware_apikey(request: Request, call_next):
+
     if request.method == "OPTIONS":
         return await call_next(request)
 
-    if request.headers.get("apiKey") != apiKey:
+    # skip auth routes
+    if request.url.path.startswith("/api/auth"):
+        return await call_next(request)
+
+    if request.headers.get("apiKey") != APIKEY:
         return JSONResponse(
-            status_code=401, content={"detail": "Invalid request, unauthorized"}
+            status_code=401,
+            content={"detail": "Invalid request, unauthorized"},
         )
 
-    response = await call_next(request)
-    return response
+    return await call_next(request)
+
 
 @fastapi_app.get("/api")
 def read_root():
     return {"message": "Welcome to BookStock API"}
+
 
 fastapi_app.include_router(booksRouter, prefix="/api/book", tags=["book"])
 fastapi_app.include_router(authRoter, prefix="/api/auth", tags=["auth"])
@@ -68,14 +76,17 @@ fastapi_app.include_router(admin_categories_router)
 # wrap FastAPI with Socket.IO ASGI app
 app = socketio.ASGIApp(sio, fastapi_app)
 
+
 # socket events
 @sio.event
 async def connect(sid, environ):
     print("Client connected:", sid)
 
+
 @sio.event
 async def disconnect(sid):
     print("Client disconnected:", sid)
+
 
 @sio.event
 async def ping_from_client(sid, data):

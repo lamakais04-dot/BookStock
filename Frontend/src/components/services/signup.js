@@ -9,7 +9,7 @@ class SignupClass {
       {
         withCredentials: true,
         headers: {
-          apiKey: "123456789apikeysecure",
+          apiKey: APIKEY,
           "Content-Type": "application/json"
         }
       }

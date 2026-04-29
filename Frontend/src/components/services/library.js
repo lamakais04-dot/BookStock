@@ -6,7 +6,7 @@ class Library {
         const res = await axios.post(
             `${API_BASE_URL}/api/library/borrow/${bookId}`,
             {},
-            { withCredentials: true, headers: { apiKey: "123456789apikeysecure" } }
+            { withCredentials: true, headers: { apiKey: APIKEY } }
         );
         console.log(res.data)
         return res.data;
@@ -16,7 +16,7 @@ class Library {
         const res = await axios.post(
             `${API_BASE_URL}/api/library/return/${bookId}`,
             {},
-            { withCredentials: true, headers: { apiKey: "123456789apikeysecure" } }
+            { withCredentials: true, headers: { apiKey: APIKEY } }
         );
         return res.data;
     }
@@ -26,7 +26,7 @@ class Library {
             `${API_BASE_URL}/api/library/my-books`,
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             }
         );
         return res.data;

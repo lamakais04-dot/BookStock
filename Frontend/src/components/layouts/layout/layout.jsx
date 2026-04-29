@@ -45,11 +45,11 @@ export default function Layout() {
           <Route
             path="/login"
             element={
-              <GuestOnlyRoute>
+              <GuestOnlyRoute> 
                 <Login />
               </GuestOnlyRoute>
             }
-          />
+          /> 
 
           <Route
             path="/signup"
@@ -64,7 +64,7 @@ export default function Layout() {
           <Route
             path='/'
             element={
-              <ProtectedRoute>
+              <ProtectedRoute> {/*כל המשתמשים, כולל חסומים*/}
                 <HomePage />
               </ProtectedRoute>
             }

@@ -8,9 +8,9 @@ import { socket } from "../../services/socket";
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
-  const [message, setMessage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({ userId: null, isBlocked: false, userName: "" });
+  const [resultModal, setResultModal] = useState({ show: false, text: "", success: true });
   const navigate = useNavigate();
 
   /* ================= LOAD USERS ================= */
@@ -38,8 +38,18 @@ export default function AdminUsers() {
 
   /* ================= OPEN MODAL ================= */
   const openModal = (userId, isBlocked, userName) => {
-    setModalData({ userId, isBlocked, userName });
+    setModalData({ userId, isBlocked, userName }); 
     setShowModal(true);
+  };
+
+  const handleBlockActionClick = (e, userItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(
+      userItem.id,
+      userItem.is_blocked,
+      `${userItem.firstname} ${userItem.lastname}`
+    );
   };
 
   /* ================= CLOSE MODAL ================= */
@@ -61,19 +71,14 @@ export default function AdminUsers() {
         )
       );
 
-      setMessage(
-        res.is_blocked
-          ? "🚫 המשתמש נחסם בהצלחה"
-          : "✅ החסימה בוטלה בהצלחה"
-      );
-
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err) {
-      setMessage("❌ שגיאה בעדכון סטטוס המשתמש");
-      setTimeout(() => setMessage(null), 3000);
+      const resultText = res.is_blocked
+        ? "🚫 המשתמש נחסם בהצלחה"
+        : "✅ החסימה בוטלה בהצלחה";
+      setResultModal({ show: true, text: resultText, success: true });
+    } catch {
+      const resultText = "❌ שגיאה בעדכון סטטוס המשתמש";
+      setResultModal({ show: true, text: resultText, success: false });
     }
-
-    closeModal();
   };
 
   const getInitials = (first, last) =>
@@ -89,7 +94,7 @@ export default function AdminUsers() {
         <div className="admin-users-header">
           <button
             className="back-btn"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/profile#admin")}
           >
             ← חזור
           </button>
@@ -99,9 +104,6 @@ export default function AdminUsers() {
             חסימה, שחרור ומעקב אחרי משתמשים
           </p>
         </div>
-
-        {/* MESSAGE */}
-        {message && <div className="admin-message">{message}</div>}
 
         {/* SEARCH */}
         <div className="admin-users-search-wrapper">
@@ -166,6 +168,7 @@ export default function AdminUsers() {
                   <td>
                     <div className="user-actions">
                       <button
+                        type="button"
                         className="user-action-btn view"
                         onClick={() => navigate(`/admin/users/${u.id}`)}
                       >
@@ -173,10 +176,11 @@ export default function AdminUsers() {
                       </button>
 
                       <button
+                        type="button"
                         className={`user-action-btn ${
                           u.is_blocked ? "unblock" : "block"
                         }`}
-                        onClick={() => openModal(u.id, u.is_blocked, `${u.firstname} ${u.lastname}`)}
+                        onClick={(e) => handleBlockActionClick(e, u)}
                       >
                         {u.is_blocked ? "✅ ביטול חסימה" : "🚫 חסום"}
                       </button>
@@ -211,16 +215,40 @@ export default function AdminUsers() {
 
             <div className="modal-buttons">
               <button 
+                type="button"
                 className="modal-btn cancel"
                 onClick={closeModal}
               >
                 ביטול
               </button>
               <button 
+                type="button"
                 className={`modal-btn confirm ${modalData.isBlocked ? "unblock" : "block"}`}
                 onClick={confirmToggleBlock}
               >
                 {modalData.isBlocked ? "✅ בטל חסימה" : "🚫 חסום משתמש"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {resultModal.show && (
+        <div
+          className="modal-overlay"
+          onClick={() => setResultModal((prev) => ({ ...prev, show: false }))}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">{resultModal.success ? "✅" : "⚠️"}</div>
+            <h2 className="modal-title">{resultModal.success ? "עודכן בהצלחה" : "שגיאה"}</h2>
+            <p className="modal-text">{resultModal.text}</p>
+            <div className="modal-buttons">
+              <button
+                type="button"
+                className="modal-btn confirm"
+                onClick={() => setResultModal((prev) => ({ ...prev, show: false }))}
+              >
+                סגור
               </button>
             </div>
           </div>

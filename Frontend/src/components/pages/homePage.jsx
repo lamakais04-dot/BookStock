@@ -14,7 +14,7 @@ const HomePage = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
 
-  const booksSectionRef = useRef(null);
+  const booksSectionRef = useRef(null); 
 
   const loadRandomBooks = useCallback(async () => {
     try {
@@ -80,9 +80,23 @@ const HomePage = () => {
           <div className="actions">
             <button onClick={handleSearchClick}>חיפוש ספר</button>
 
-            <button className="secondary" onClick={handleBorrowClick}>
-              השאל ספר
-            </button>
+            {isAdmin ? (
+              <button
+                className="secondary"
+                type="button"
+                onClick={() => navigate("/book")}
+              >
+                ניהול ספרים
+              </button>
+            ) : (
+              <button
+                className="secondary"
+                type="button"
+                onClick={handleBorrowClick}
+              >
+                השאל ספר
+              </button>
+            )}
           </div>
         </div>
       </section>

@@ -5,7 +5,7 @@ class Favorites {
     static async getFavorites() {
         const res = await axios.get(`${API_BASE_URL}/api/favorites`, {
             withCredentials: true,
-            headers: { apiKey: "123456789apikeysecure" }
+            headers: { apiKey: APIKEY }
         });
         return res.data;
     }
@@ -16,7 +16,7 @@ class Favorites {
             {},
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             });
     }
 
@@ -25,7 +25,7 @@ class Favorites {
             `${API_BASE_URL}/api/favorites/${bookId}`,
             {
                 withCredentials: true,
-                headers: { apiKey: "123456789apikeysecure" }
+                headers: { apiKey: APIKEY }
             });
     }
 }

@@ -1,4 +1,5 @@
 import axios from "axios";
+const APIKEY = import.meta.env.VITE_API_KEY;
 
 import { API_BASE_URL } from "./apiConfig";
 
@@ -12,7 +13,7 @@ class LoginClass {
 
     const res = await axios.post(`${API}/login`, payload, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey:APIKEY}
     });
 
     return res.data;
@@ -22,7 +23,7 @@ class LoginClass {
   static async handleLogout() {
     await axios.post(`${API}/logout`, {}, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey: APIKEY }
     });
   }
 
@@ -30,7 +31,7 @@ class LoginClass {
   static async getProfile() {
     const res = await axios.get(`${API}/me`, {
       withCredentials: true,
-      headers: { apiKey: "123456789apikeysecure" }
+      headers: { apiKey:APIKEY }
     });
 
     return res.data;
@@ -44,7 +45,7 @@ class LoginClass {
       {
         withCredentials: true,
         headers: {
-          apiKey: "123456789apikeysecure",
+          apiKey: APIKEY,
           "Content-Type": "multipart/form-data"
         }
       }
@@ -65,7 +66,7 @@ class LoginClass {
       },
       {
         withCredentials: true,
-        headers: { apiKey: "123456789apikeysecure" }
+        headers: { apiKey: APIKEY }
       }
     );
 

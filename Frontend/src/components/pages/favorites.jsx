@@ -13,18 +13,18 @@ export default function FavoritesPage() {
   const navigate = useNavigate();
   const { isBlocked, user } = useAuth();
 
-  const loadFavorites = useCallback(async () => {
+  const loadFavorites = useCallback(async () => { // טוען את ספרי המועדפים של המשתמש
     setLoading(true);
     try {
       const favs = await Favorites.getFavorites();
-      const bookIds = favs.map((f) => f.bookid);
+      const bookIds = favs.map((f) => f.bookid); 
 
       if (bookIds.length === 0) {
         setBooks([]);
         return;
       }
 
-      const booksData = await Promise.all(
+      const booksData = await Promise.all( // מקבל את פרטי כל ספר לפי ה-IDs
         bookIds.map((id) => Books.getBookById(id))
       );
       setBooks(booksData);

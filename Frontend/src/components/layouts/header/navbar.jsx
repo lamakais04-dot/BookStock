@@ -4,11 +4,13 @@ import { useAuth } from "../../context/authcontext";
 import "../../csspages/navbar.css";
 import logo from "../../../../BookStockLogo.png";
 import LoginClass from "../../services/login";
+import logo from "../../../assets/BookStockLogo.png";
+
 
 export default function Navbar() {
-  const { user, loading, setUser } = useAuth();
+  const { user, loading, setUser, fetchUser } = useAuth();
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(""); 
   const navigate = useNavigate();
   const isBlocked = user?.is_blocked;
   const location = useLocation();
@@ -25,17 +27,23 @@ export default function Navbar() {
 
   if (loading) return null;
 
-  const handleLogout = () => {
-    setUser(null);
-    LoginClass.handleLogout();
-    navigate("/login");
-    window.location.reload();
-    
+  const handleLogout = async () => {
+    try {
+      await LoginClass.handleLogout(); // שולח בקשת התנתקות לשרת
+    } catch (err) {
+      console.error("Logout request failed, clearing local session", err); 
+    } finally {
+      setOpenProfileMenu(false);
+      setSearch("");
+      setUser(null);
+      await fetchUser({ silent: true });
+      navigate("/login", { replace: true });
+    }
   };
 
   const handleSearchChange = (value) => {
     setSearch(value);
-    navigate(`/book?search=${encodeURIComponent(value)}`);
+    navigate(`/book?search=${encodeURIComponent(value)}`); 
   };
 
   const clearSearch = () => {
