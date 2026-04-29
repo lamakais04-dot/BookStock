@@ -3,7 +3,7 @@ import axios from "axios";
 const APIKEY = import.meta.env.VITE_API_KEY;
 
 
-const BASE_URL = "http://localhost:8000/api/book";
+const BASE_URL = `${import.meta.env.VITE_API_URL}/api/book`;
 
 class Books {
   static async getBooks( // מקבל רשימת ספרים עם אפשרויות סינון

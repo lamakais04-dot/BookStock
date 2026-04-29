@@ -4,7 +4,7 @@ const APIKEY = import.meta.env.VITE_API_KEY;
 
 class Favorites {
     static async getFavorites() {
-        const res = await axios.get("http://localhost:8000/api/favorites", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
             withCredentials: true,
             headers: { apiKey: APIKEY }
         });
@@ -13,7 +13,7 @@ class Favorites {
 
     static async add(bookId) {
         await axios.post(
-            `http://localhost:8000/api/favorites/${bookId}`,
+            `${import.meta.env.VITE_API_URL}/api/favorites/${bookId}`,
             {},
             {
                 withCredentials: true,
@@ -23,7 +23,7 @@ class Favorites {
 
     static async remove(bookId) {
         await axios.delete(
-            `http://localhost:8000/api/favorites/${bookId}`,
+            `${import.meta.env.VITE_API_URL}/api/favorites/${bookId}`,
             {
                 withCredentials: true,
                 headers: { apiKey: APIKEY }

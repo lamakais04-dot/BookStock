@@ -5,7 +5,7 @@ const APIKEY = import.meta.env.VITE_API_KEY;
 class SignupClass {
   static async signup(data) {
     const res = await axios.post(
-      "http://localhost:8000/api/auth/signup",
+      `${import.meta.env.VITE_API_URL}/api/auth/signup`,
       data,
       {
         withCredentials: true,

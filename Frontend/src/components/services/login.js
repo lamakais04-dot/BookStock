@@ -2,7 +2,7 @@ import axios from "axios";
 const APIKEY = import.meta.env.VITE_API_KEY;
 
 
-const API = "http://localhost:8000/api/auth";
+const API = `${import.meta.env.VITE_API_URL}/api/auth`;
 
 class LoginClass {
 
