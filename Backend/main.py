@@ -14,6 +14,7 @@ from routes.admin_export import router as admin_export_router
 from routes.admin_category import router as admin_categories_router
 
 from dotenv import load_dotenv
+import os
 import socketio
 from socketio_app import sio  # <-- use existing sio, do NOT recreate it
 
@@ -22,9 +23,15 @@ load_dotenv()
 fastapi_app = FastAPI()
 apiKey = "123456789apikeysecure"
 
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:5173").split(",")
+    if origin.strip()
+]
+
 fastapi_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

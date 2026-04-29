@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../services/apiConfig";
 import { socket } from "../services/socket"; // adjust path if needed
 
 const AuthContext = createContext();
@@ -11,7 +12,7 @@ export function AuthProvider({ children }) {
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:8000/api/auth/me", {
+      const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
         withCredentials: true,
         headers: { apiKey: "123456789apikeysecure" },
       });

@@ -1,5 +1,7 @@
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:8000", {
+import { SOCKET_URL } from "./apiConfig";
+
+export const socket = io(SOCKET_URL, {
   transports: ["websocket"],
 });

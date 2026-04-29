@@ -1,7 +1,9 @@
 // services/books.js
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/api/book";
+import { API_BASE_URL } from "./apiConfig";
+
+const BASE_URL = `${API_BASE_URL}/api/book`;
 
 class Books {
   static async getBooks(

@@ -9,8 +9,8 @@ import React, {
 import { useLocation, useNavigate } from "react-router-dom";
 import Books from "../services/books";
 import Filters from "../services/filtirs";
-import BookItem from "./BookItem";
-import { useAuth } from "../context/AuthContext";
+import BookItem from "./bookitem";
+import { useAuth } from "../context/authcontext";
 import { socket } from "../services/socket";
 
 import "../csspages/books.css";

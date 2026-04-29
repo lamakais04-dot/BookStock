@@ -1,7 +1,9 @@
 // services/adminCategories.js
 import axios from "axios";
 
-const BASE = "http://localhost:8000/admin/categories";
+import { API_BASE_URL } from "./apiConfig";
+
+const BASE = `${API_BASE_URL}/admin/categories`;
 
 class AdminCategories {
     static async getAll() {

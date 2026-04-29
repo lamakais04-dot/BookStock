@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API = "http://localhost:8000/api/auth";
+import { API_BASE_URL } from "./apiConfig";
+
+const API = `${API_BASE_URL}/api/auth`;
 
 class LoginClass {
 
