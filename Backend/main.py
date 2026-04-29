@@ -24,11 +24,15 @@ APIKEY = getenv("APIKEY")
 
 fastapi_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @fastapi_app.middleware("http")
 async def middleware_apikey(request: Request, call_next):
@@ -53,6 +57,7 @@ async def middleware_apikey(request: Request, call_next):
 def read_root():
     return {"message": "Welcome to BookStock API"}
 
+
 fastapi_app.include_router(booksRouter, prefix="/api/book", tags=["book"])
 fastapi_app.include_router(authRoter, prefix="/api/auth", tags=["auth"])
 fastapi_app.include_router(agesRouter, prefix="/api/age", tags=["age"])
@@ -67,14 +72,17 @@ fastapi_app.include_router(admin_categories_router)
 # wrap FastAPI with Socket.IO ASGI app
 app = socketio.ASGIApp(sio, fastapi_app)
 
+
 # socket events
 @sio.event
 async def connect(sid, environ):
     print("Client connected:", sid)
 
+
 @sio.event
 async def disconnect(sid):
     print("Client disconnected:", sid)
+
 
 @sio.event
 async def ping_from_client(sid, data):
