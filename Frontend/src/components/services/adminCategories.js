@@ -2,8 +2,9 @@
 import axios from "axios";
 const APIKEY = import.meta.env.VITE_API_KEY;
 
+import { API_BASE_URL } from "./apiConfig";
 
-const BASE = `${import.meta.env.VITE_API_URL}/admin/categories`;
+const BASE = `${API_BASE_URL}/admin/categories`;
 
 class AdminCategories {
     static async getAll() {

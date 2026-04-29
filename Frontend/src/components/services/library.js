@@ -1,11 +1,10 @@
 import axios from "axios";
-const APIKEY = import.meta.env.VITE_API_KEY;
-
+import { API_BASE_URL } from "./apiConfig";
 
 class Library {
     static async borrowBook(bookId) {
         const res = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/library/borrow/${bookId}`,
+            `${API_BASE_URL}/api/library/borrow/${bookId}`,
             {},
             { withCredentials: true, headers: { apiKey: APIKEY } }
         );
@@ -15,7 +14,7 @@ class Library {
 
     static async returnBook(bookId) {
         const res = await axios.post(
-            `${import.meta.env.VITE_API_URL}/api/library/return/${bookId}`,
+            `${API_BASE_URL}/api/library/return/${bookId}`,
             {},
             { withCredentials: true, headers: { apiKey: APIKEY } }
         );
@@ -24,7 +23,7 @@ class Library {
 
     static async getMyBooks() {
         const res = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/library/my-books`,
+            `${API_BASE_URL}/api/library/my-books`,
             {
                 withCredentials: true,
                 headers: { apiKey: APIKEY }

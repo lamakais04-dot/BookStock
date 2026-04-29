@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import LoginClass from "../services/login.js";
+import { useAuth } from "../context/authcontext.jsx";
 import "../csspages/login.css";
 
 export default function Login() {

@@ -2,8 +2,9 @@
 import axios from "axios";
 const APIKEY = import.meta.env.VITE_API_KEY;
 
+import { API_BASE_URL } from "./apiConfig";
 
-const BASE_URL = `${import.meta.env.VITE_API_URL}/api/book`;
+const BASE_URL = `${API_BASE_URL}/api/book`;
 
 class Books {
   static async getBooks( // מקבל רשימת ספרים עם אפשרויות סינון

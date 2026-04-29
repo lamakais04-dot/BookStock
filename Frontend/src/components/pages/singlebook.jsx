@@ -12,7 +12,10 @@ import { useAuth } from "../context/authcontext";
 import BookForm from "./BookForm";
 import Favorites from "../services/favorites";
 import Library from "../services/library";
-
+import { useAuth } from "../context/authcontext";
+import BookForm from "./BookForm";
+import "../csspages/singleBook.css";
+import "../csspages/BookForm.css";
 
 export default function SingleBook() {
   const { id } = useParams();

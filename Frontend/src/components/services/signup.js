@@ -1,11 +1,10 @@
 import axios from "axios";
-const APIKEY = import.meta.env.VITE_API_KEY;
-
+import { API_BASE_URL } from "./apiConfig";
 
 class SignupClass {
   static async signup(data) {
     const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/auth/signup`,
+      `${API_BASE_URL}/api/auth/signup`,
       data,
       {
         withCredentials: true,

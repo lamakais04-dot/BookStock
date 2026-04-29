@@ -1,8 +1,9 @@
 import axios from "axios";
 const APIKEY = import.meta.env.VITE_API_KEY;
 
+import { API_BASE_URL } from "./apiConfig";
 
-const API = `${import.meta.env.VITE_API_URL}/api/auth`;
+const API = `${API_BASE_URL}/api/auth`;
 
 class LoginClass {
 
