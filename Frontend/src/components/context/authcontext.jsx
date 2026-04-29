@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
   const fetchUser = async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     try {
-      const res = await axios.get("http://localhost:8000/api/auth/me", {
+      const res = await axios.get( `${import.meta.env.VITE_API_URL}/api/auth/me`, {
         withCredentials: true,
         headers: { apiKey:APIKEY},
       });
